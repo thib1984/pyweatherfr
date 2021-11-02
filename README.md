@@ -17,9 +17,14 @@ example : ``pyweather Grenoble`` to display weather forecast in town Grenoble
 # ⚙️ Install
 
 See [this page](INSTALL.md)
+
 # :construction_worker: Contribution
 
 See [this page](CONTRIBUTING.md)
+
+# :package: Changelog
+
+See [this page](CHANGELOG.md)
 
 
 # License
