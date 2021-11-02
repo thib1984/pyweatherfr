@@ -1,4 +1,4 @@
-# :syringe: pyweather
+# :weather: pyweather
 
 pyweather displays weather forecast for a given town in France
 
