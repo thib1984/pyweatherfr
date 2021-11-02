@@ -2,20 +2,20 @@ from setuptools import setup
 
 
 setup(
-    name="pyweather",
+    name="pyweatherfr",
     version="0.0.1",
-    description="pyweather displays weather forecast for a given town in France",
-    long_description="The complete description/installation/use/FAQ is available at : https://github.com/thib1984/pyweather#readme",
-    url="https://github.com/thib1984/pyweather",
+    description="pyweatherfr displays weather forecast for a given town in France",
+    long_description="The complete description/installation/use/FAQ is available at : https://github.com/thib1984/pyweatherfr#readme",
+    url="https://github.com/thib1984/pyweatherfr",
     author="thib1984",
     author_email="thibault.garcon@gmail.com",
     license="MIT",
-    packages=["pyweather"],
+    packages=["pyweatherfr"],
     install_requires=[],
     zip_safe=False,
     entry_points={
         "console_scripts": [
-            "pyweather=pyweather.__init__:pyweather"
+            "pyweatherfr=pyweatherfr.__init__:pyweatherfr"
         ],
     },
     classifiers=[

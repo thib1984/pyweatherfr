@@ -1,18 +1,18 @@
-# :sunny: :umbrella: :cloud: pyweather
+# :sunny: :umbrella: :cloud: pyweatherfr
 
-pyweather displays weather forecast for a given town in France
+pyweatherfr displays weather forecast for a given town in France
 
 
-# 🚀 How to use **pyweather**
+# 🚀 How to use **pyweatherfr**
 
-pyweather \[TOWN\]
+pyweatherfr \[TOWN\]
 
-example : ``pyweather Grenoble`` to display weather forecast in town Grenoble
+example : ``pyweatherfr Grenoble`` to display weather forecast in town Grenoble
 
 ## Other options
 
   - ``-h/--help``    show the help message and exit
-  - ``-u/--update``  update pyweather
+  - ``-u/--update``  update pyweatherfr
 
 # ⚙️ Install
 

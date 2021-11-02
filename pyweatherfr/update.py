@@ -17,6 +17,6 @@ def update():
         prog,
         "install",
         "--upgrade",
-        "pyweather",
+        "pyweatherfr",
     ]
     subprocess.check_call(params)

@@ -11,10 +11,10 @@ def compute_args():
     check args and return them
     """
     my_parser = argparse.ArgumentParser(
-        description="pyweather displays meteo for your town in France given in parameter",
+        description="pyweatherfr displays meteo for your town in France given in parameter",
         epilog="""
-        Full documentation at: <https://github.com/thib1984/pyweather>.
-        Report bugs to <https://github.com/thib1984/pyweather/issues>.
+        Full documentation at: <https://github.com/thib1984/pyweatherfr>.
+        Report bugs to <https://github.com/thib1984/pyweatherfr/issues>.
         MIT Licence.
         Copyright (c) 2021 thib1984.
         This is free software: you are free to change and redistribute it.
@@ -33,7 +33,7 @@ def compute_args():
         "-u",
         "--update",
         action="store_true",
-        help="update pyweather",
+        help="update pyweatherfr",
     )
 
     # if no parameter

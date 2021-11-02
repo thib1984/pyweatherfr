@@ -7,14 +7,14 @@
 
 # Installation 
 
-``pip3 install pyweather``
+``pip3 install pyweatherfr``
 
 # Upgrade 
 
-``pyweather -u``
+``pyweatherfr -u``
  
  or
 
- `` pip3 install --upgrade pyweather``
+ `` pip3 install --upgrade pyweatherfr``
 
 *_Install pip instead of pip3, if pip3 does not exist for your OS_

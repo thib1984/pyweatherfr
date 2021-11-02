@@ -1,11 +1,11 @@
 # Work with Github
 
 ```
-git clone https://github.com/thib1984/pyweather.git
-cd pyweather 
+git clone https://github.com/thib1984/pyweatherfr.git
+cd pyweatherfr 
 #work!
 pip3 install . #to build
-pyweather Grenoble #to retest
-pip3 uninstall pyweather #to properly uninstall the dev version
+pyweatherfr Grenoble #to retest
+pip3 uninstall pyweatherfr #to properly uninstall the dev version
 ``` 
 

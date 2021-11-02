@@ -1,5 +1,5 @@
 """
-pyweather use case
+pyweatherfr use case
 """
 
 import argparse
