@@ -1,4 +1,4 @@
-# :weather: pyweather
+# :sun: pyweather
 
 pyweather displays weather forecast for a given town in France
 
