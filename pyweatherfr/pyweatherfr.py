@@ -9,19 +9,45 @@ import requests
 def find(town):
     r = requests.get("https://prevision-meteo.ch/services/json/"+town)
     if r.json().get("errors"):
-        print("error found : ")
-        print(r.json().get("errors")[0].get("code"))
-        print(r.json().get("errors")[0].get("text"))
-        print(r.json().get("errors")[0].get("description"))
-        exit(1)
+        if r.json().get("errors")[0].get("code") == "11":
+            v = requests.get("https://www.prevision-meteo.ch/services/json/list-cities")
+            vjson = v.json()
+            try:
+                matches=[]
+                i=0
+                while True:
+                    if town.lower() in vjson.get(str(i)).get("name").lower():
+                        print("for " + vjson.get(str(i)).get("name")+" use parameter : "+vjson.get(str(i)).get("url"))
+                        matches.append(vjson.get(str(i)).get("url"))
+                    i=i+1
+            except Exception:
+                if len(matches) == 1:
+                    print("only one match, we continue...")
+                    town = matches[0]
+                    r = requests.get("https://prevision-meteo.ch/services/json/"+town)
+                elif len(matches)>1:    
+                    print("relaunch with correct paramter")
+                    exit(1)
+                else:
+                    print("error found : ")
+                    print(r.json().get("errors")[0].get("code"))
+                    print(r.json().get("errors")[0].get("text"))
+                    print(r.json().get("errors")[0].get("description"))
+                    exit(1)                    
+        else: 
+            print("error found : ")
+            print(r.json().get("errors")[0].get("code"))
+            print(r.json().get("errors")[0].get("text"))
+            print(r.json().get("errors")[0].get("description"))
+            exit(1)
     print("ville       : " +r.json().get("city_info").get("name"))
     print("heure       : " +r.json().get("current_condition").get("date") +" "+r.json().get("current_condition").get("hour"))
     print("========================")
-    print("condition    : " +r.json().get("current_condition").get("condition"))
-    print("température  : " +str(r.json().get("current_condition").get("tmp"))+"°")    
-    print("humidité     : " +str(r.json().get("current_condition").get("humidity"))+"%")
-    print("vent         : " +str(r.json().get("current_condition").get("wnd_spd"))+"km/h" + " (" +r.json().get("current_condition").get("wnd_dir") + ")")
-    print("pression     : " +str(r.json().get("current_condition").get("pressure"))+"Hp")
+    print("condition   : " +r.json().get("current_condition").get("condition"))
+    print("température : " +str(r.json().get("current_condition").get("tmp"))+"°")    
+    print("humidité    : " +str(r.json().get("current_condition").get("humidity"))+"%")
+    print("vent        : " +str(r.json().get("current_condition").get("wnd_spd"))+"km/h" + " (" +r.json().get("current_condition").get("wnd_dir") + ")")
+    print("pression    : " +str(r.json().get("current_condition").get("pressure"))+"Hp")
     print("========================")
     for i in [0,1,2,3,4]:
         print("date        : " +r.json().get("fcst_day_"+str(i)).get("date") +" ("+r.json().get("fcst_day_"+str(i)).get("day_short") +")")  
