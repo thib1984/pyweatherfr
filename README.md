@@ -1,4 +1,4 @@
-# :syringe: pyweather
+# :sunny: :umbrella: :cloud: pyweather
 
 pyweather displays weather forecast for a given town in France
 
