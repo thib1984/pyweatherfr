@@ -1,0 +1,6 @@
+build
+dist
+pyweather.egg-info
+.vscode
+venv
+
