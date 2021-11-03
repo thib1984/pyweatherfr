@@ -1,3 +1,12 @@
+# TODO 
+
+- [ ] Verbose mode
+- [ ] One day mode (hour by hour)
+- [ ] Add color
+- [ ] Refacto and deduplicate code
+- [ ] Search by longitude/latitude
+- [ ] Dafault search by ip information
+
 # 0.0.4
 
 Unicode for matching names + city informations
