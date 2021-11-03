@@ -1,3 +1,7 @@
+# 0.0.4
+
+Unicode for matching names + city informations
+
 # 0.0.3
 
 Add test for matching names if param is not correct
