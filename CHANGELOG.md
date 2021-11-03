@@ -1,6 +1,7 @@
 # TODO 
 
 - [ ] Verbose mode
+- [ ] Compact mode
 - [ ] One day mode (hour by hour)
 - [ ] Add color
 - [ ] Refacto and deduplicate code
