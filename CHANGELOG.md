@@ -1,11 +1,16 @@
 # TODO 
 
-- [ ] Verbose mode
 - [ ] Refacto and deduplicate code
 - [ ] Search by longitude/latitude
 - [ ] Dafault search by ip information
-- [ ] Include only FR
 
+# 0.0.6 (WIP)
+
+- [x] Clean color in compact mode
+- [x] Fix colorama
+- [x] Fix impports termcolor
+- [ ] Include only FR + fix "Lille" bug
+- [ ] Verbose mode
 
 # 0.0.5
 

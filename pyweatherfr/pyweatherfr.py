@@ -100,7 +100,7 @@ def find(town):
             table = columnar(data, headers, no_borders=False)
             print(table)             
         else:
-            print(my_colored(time,"green") + " " + my_colored(city + " " + infos,"yellow")+ " " + my_colored(condition,"green")+ " "+ my_colored(temp,"green")+ " "+ my_colored(humidity,"green")+ " "+ my_colored(wind,"green")+ " "+ my_colored(pression,"green"))
+            print(my_colored(time + " " + city + " " + infos + " " + condition + " "+ temp + " "+ humidity+ " "+wind+ " "+pression,"green"))
             table = columnar(data, no_borders=True)
             print(table)                         
            
@@ -144,9 +144,10 @@ def find(town):
             table = columnar(data, headers, no_borders=False)
             print(table)
         else:
-            print(my_colored(date_long_format,"green") + " " + my_colored(city + " " + infos,"yellow") + " " + my_colored(condition,"green")+ " "+ my_colored(temp_delta,"green")+ " "+ total_pluie)
+            print(my_colored(date_long_format + " " + city + " " + infos + " " +condition+ " "+ temp_delta+ " "+ total_pluie,"green"))
             table = columnar(data, no_borders=True)
-            print(table)           
+            print(table)   
+
 def my_colored(message, color):
     if compute_args().nocolor:
         return message

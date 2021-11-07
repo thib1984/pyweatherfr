@@ -11,7 +11,7 @@ setup(
     author_email="thibault.garcon@gmail.com",
     license="MIT",
     packages=["pyweatherfr"],
-    install_requires=["columnar"],
+    install_requires=["columnar","termcolor", "colorama"],
     zip_safe=False,
     entry_points={
         "console_scripts": [
