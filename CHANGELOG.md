@@ -6,7 +6,7 @@
 - [ ] Include only FR + fix "Lille" bug
 - [ ] Verbose mode
 
-# 0.0.6 (WIP)
+# 0.0.6
 
 - [x] Clean color in compact mode
 - [x] Fix colorama
