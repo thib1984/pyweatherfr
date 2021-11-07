@@ -29,6 +29,28 @@ def compute_args():
         nargs="?",
         help="town",
     )
+    my_parser.add_argument(
+        "-d",
+        "--day",
+        metavar="[day]",
+        action="store",
+        type=int,
+        default=-1,
+        choices=range(0, 5),
+        help="set the day to see (min=0, max=5, 0 for actual day)",
+    ) 
+    my_parser.add_argument(
+        "-n",
+        "--nocolor",
+        action="store_true",
+        help="disable colors in sysout",
+    )
+    my_parser.add_argument(
+        "-c",
+        "--condensate",
+        action="store_true",
+        help="condensate sysout",
+    )       
     my_group.add_argument(
         "-u",
         "--update",

@@ -3,7 +3,7 @@ from setuptools import setup
 
 setup(
     name="pyweatherfr",
-    version="0.0.4",
+    version="0.0.5",
     description="pyweatherfr displays weather forecast for a given town in France",
     long_description="The complete description/installation/use/FAQ is available at : https://github.com/thib1984/pyweatherfr#readme",
     url="https://github.com/thib1984/pyweatherfr",
@@ -11,7 +11,7 @@ setup(
     author_email="thibault.garcon@gmail.com",
     license="MIT",
     packages=["pyweatherfr"],
-    install_requires=[],
+    install_requires=["columnar"],
     zip_safe=False,
     entry_points={
         "console_scripts": [

@@ -13,7 +13,9 @@ def pyweatherfr():
     """
     args = compute_args()
 
-
+    if args.day and (args.town is None):
+        print("--day requires --town")
+        exit(1)
     if args.update:
         update()
     if args.town:
