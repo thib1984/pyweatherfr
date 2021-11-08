@@ -1,8 +1,11 @@
 # TODO 
 
 - [ ] Refacto and deduplicate code
-- [ ] Search by longitude/latitude
 - [ ] Include only FR + fix "Lille" bug
+
+# 0.0.8 (WIP)
+
+- [ ] Search by longitude/latitude (-g/--gps)
 
 # 0.0.7
 
