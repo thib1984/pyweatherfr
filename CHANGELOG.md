@@ -2,9 +2,13 @@
 
 - [ ] Refacto and deduplicate code
 - [ ] Search by longitude/latitude
-- [ ] Dafault search by ip information
 - [ ] Include only FR + fix "Lille" bug
-- [ ] Verbose mode
+
+# 0.0.7
+
+- [x] Fix bug current conditions
+- [x] Default search by ip information
+- [x] Verbose mode
 
 # 0.0.6
 

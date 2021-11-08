@@ -9,11 +9,25 @@ import unidecode
 from pyweatherfr.args import compute_args
 from columnar import columnar
 from termcolor import colored
+import json
+import urllib.request
 
-def find(town):
-    r = requests.get("https://prevision-meteo.ch/services/json/"+town)
+def find():
+    if compute_args().town:
+        print_debug("town found from arg -> " + compute_args().town)
+        town =compute_args().town
+    else:
+        with urllib.request.urlopen("https://geolocation-db.com/json") as url:
+            print_debug("no town given, search from ip with https://geolocation-db.com/json")
+            data = json.loads(url.read().decode())
+            print_debug(str(data))                     
+            town = data['city']
+            print_debug("town found from ip -> " + town)  
+    print_debug("search from http://prevision-meteo.ch/services/json/"+town)                   
+    r = requests.get("http://prevision-meteo.ch/services/json/"+town)
     if r.json().get("errors"):
         if r.json().get("errors")[0].get("code") == "11":
+            print_debug("search town from https://www.prevision-meteo.ch/services/json/list-cities")
             v = requests.get("https://www.prevision-meteo.ch/services/json/list-cities")
             vjson = v.json()
             try:
@@ -28,6 +42,7 @@ def find(town):
                 if len(matches) == 1:
                     print(my_colored("only one match, we continue...","green"))
                     town = matches[0]
+                    print_debug("town found from list-cities -> " + town) 
                     r = requests.get("https://prevision-meteo.ch/services/json/"+town)
                 elif len(matches)>1:    
                     print(my_colored("relaunch with correct paramter","yellow"))
@@ -45,7 +60,7 @@ def find(town):
             print(my_colored(r.json().get("errors")[0].get("description"),"red"))
             exit(1)
 
-
+    print_debug("search infos from https://www.prevision-meteo.ch/services/json/list-cities")
     v = requests.get("https://www.prevision-meteo.ch/services/json/list-cities")
     vjson = v.json()
     city = r.json().get("city_info").get("name")
@@ -55,6 +70,8 @@ def find(town):
             if unidecode.unidecode(town.lower()) == unidecode.unidecode(vjson.get(str(i)).get("url").lower()):
                 npa = vjson.get(str(i)).get("npa")
                 country = vjson.get(str(i)).get("country")
+                print_debug("npa found from list-cities -> " + npa) 
+                print_debug("country found from list-cities -> " + country) 
                 infos = "("+country + " - " + npa+")"
                 break
             i=i+1
@@ -63,12 +80,12 @@ def find(town):
         infos = "not found"        
 
     if compute_args().day == -1:
-        time=r.json().get("current_condition").get("date") +" "+r.json().get("current_condition").get("hour")
-        condition=r.json().get("current_condition").get("condition")
-        temp=str(r.json().get("current_condition").get("tmp"))+"°"
-        humidity=str(r.json().get("current_condition").get("humidity"))+"%"
-        wind=str(r.json().get("current_condition").get("wnd_spd"))+"km/h" + " (" +r.json().get("current_condition").get("wnd_dir") + ")"
-        pression=str(r.json().get("current_condition").get("pressure"))+"Hp"
+        time_now=r.json().get("current_condition").get("date") +" "+r.json().get("current_condition").get("hour")
+        condition_now=r.json().get("current_condition").get("condition")
+        temp_now=str(r.json().get("current_condition").get("tmp"))+"°"
+        humidity_now=str(r.json().get("current_condition").get("humidity"))+"%"
+        wind_now=str(r.json().get("current_condition").get("wnd_spd"))+"km/h" + " (" +r.json().get("current_condition").get("wnd_dir") + ")"
+        pression_now=str(r.json().get("current_condition").get("pressure"))+"Hp"
         headers = ['day', 'condition', 'T','pluie']
         data=[]        
         for i in [0,1,2,3,4]:
@@ -90,17 +107,17 @@ def find(town):
             print("")
             print(my_colored("ville       : " +city + " " + infos,"yellow"))
             print("")
-            print(my_colored("heure       : " +time,"green"))
-            print(my_colored("condition   : " +condition,"green"))
-            print(my_colored("température : " +temp ,"green"))   
-            print(my_colored("humidité    : " +humidity,"green"))
-            print(my_colored("vent        : " +wind,"green"))
-            print(my_colored("pression    : " +pression,"green"))
+            print(my_colored("heure       : " +time_now,"green"))
+            print(my_colored("condition   : " +condition_now,"green"))
+            print(my_colored("température : " +temp_now ,"green"))   
+            print(my_colored("humidité    : " +humidity_now,"green"))
+            print(my_colored("vent        : " +wind_now,"green"))
+            print(my_colored("pression    : " +pression_now,"green"))
             print("")
             table = columnar(data, headers, no_borders=False)
             print(table)             
         else:
-            print(my_colored(time + " " + city + " " + infos + " " + condition + " "+ temp + " "+ humidity+ " "+wind+ " "+pression,"green"))
+            print(my_colored(time_now + " " + city + " " + infos + " " + condition + " "+ temp + " "+ humidity+ " "+wind+ " "+pression,"green"))
             table = columnar(data, no_borders=True)
             print(table)                         
            
@@ -152,3 +169,7 @@ def my_colored(message, color):
     if compute_args().nocolor:
         return message
     return colored(message,color)      
+
+def print_debug(message):
+    if compute_args().verbose:
+        print("debug : " + message)
