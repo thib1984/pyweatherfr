@@ -5,8 +5,8 @@
 
 # 0.0.8 (WIP)
 
+- [x] Fix if not data (ex : Étival-lès-le-Mans)
 - [ ] Search by longitude/latitude (-g/--gps)
-- [x] Fix if not data
 - [ ] Search by code postal
 - [ ] Fix if not a town at i^p with no parameter
 
