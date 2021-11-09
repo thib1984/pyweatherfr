@@ -6,6 +6,9 @@
 # 0.0.8 (WIP)
 
 - [ ] Search by longitude/latitude (-g/--gps)
+- [x] Fix if not data
+- [ ] Search by code postal
+- [ ] Fix if not a town at i^p with no parameter
 
 # 0.0.7
 

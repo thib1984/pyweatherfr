@@ -80,26 +80,39 @@ def find():
         infos = "not found"        
 
     if compute_args().day == -1:
-        time_now=r.json().get("current_condition").get("date") +" "+r.json().get("current_condition").get("hour")
-        condition_now=r.json().get("current_condition").get("condition")
-        temp_now=str(r.json().get("current_condition").get("tmp"))+"°"
-        humidity_now=str(r.json().get("current_condition").get("humidity"))+"%"
-        wind_now=str(r.json().get("current_condition").get("wnd_spd"))+"km/h" + " (" +r.json().get("current_condition").get("wnd_dir") + ")"
-        pression_now=str(r.json().get("current_condition").get("pressure"))+"Hp"
+        date = valueorNA(r.json().get("current_condition").get("date"))
+        hour = valueorNA(r.json().get("current_condition").get("hour"))       
+        time_now=date +" "+hour
+        condition_now=valueorNA(r.json().get("current_condition").get("condition"))         
+        temp_now=str(valueorNA(r.json().get("current_condition").get("tmp")))+"°"           
+        humidity_now=str(valueorNA(r.json().get("current_condition").get("humidity")))+"%"     
+        wnd_spd = str(valueorNA(r.json().get("current_condition").get("wnd_spd")))
+        wnd_dir = valueorNA(r.json().get("current_condition").get("wnd_dir"))  
+        wind_now=wnd_spd +" km/h" + " (" +wnd_dir + ")"
+        pression_now = str(valueorNA(r.json().get("current_condition").get("pressure")))+" Hp"
         headers = ['day', 'condition', 'T','pluie']
         data=[]        
         for i in [0,1,2,3,4]:
-            pluie=0
-            day=r.json().get("fcst_day_"+str(i)).get("date") +" ("+r.json().get("fcst_day_"+str(i)).get("day_short") +")"
-            condition=r.json().get("fcst_day_"+str(i)).get("condition")
-            temp=str(r.json().get("fcst_day_"+str(i)).get("tmin"))+"° - "+str(r.json().get("fcst_day_"+str(i)).get("tmax"))+"°"
+            pluie="."
+            date_i = valueorNA(r.json().get("fcst_day_"+str(i)).get("date"))
+            day_short_i = valueorNA(r.json().get("fcst_day_"+str(i)).get("day_short"))                          
+            day=date_i +" ("+day_short_i +")"
+            condition=valueorNA(r.json().get("fcst_day_"+str(i)).get("condition"))
+            temp=str(valueorNA(r.json().get("fcst_day_"+str(i))).get("tmin"))+"° - "+str(valueorNA(r.json().get("fcst_day_"+str(i)).get("tmax")))+"°"
             for h in range(0,24):
-                hourly_data = r.json().get("fcst_day_"+str(i)).get("hourly_data").get(str(h)+"H00")
-                pluie=pluie+hourly_data.get("APCPsfc")
-            if pluie > 0:
-                pluie=my_colored(str(round(pluie,1))+"mm","yellow")
+                hourly_pluie = valueorNA(r.json().get("fcst_day_"+str(i)).get("hourly_data").get(str(h)+"H00").get("APCPsfc"))
+                if hourly_pluie != ".":
+                    if pluie == ".":
+                        print(hourly_pluie)
+                        pluie=0
+                    print(hourly_pluie)
+                    pluie=pluie+hourly_pluie
+            if pluie == ".":
+                pluie=". mm"
+            elif pluie > 0:   
+                pluie=my_colored(str(round(pluie,1))+" mm","yellow")
             else:
-                pluie="0mm"
+                pluie="0 mm"
             data.append([day,condition,temp,pluie])
             
         
@@ -125,27 +138,35 @@ def find():
     else:
         #cas day
         json_day = r.json().get("fcst_day_"+str(compute_args().day))
-        date_long_format = json_day.get("date") +" ("+json_day.get("day_short") +")"
-        temp_delta = str(json_day.get("tmin"))+"° - "+str(json_day.get("tmax"))+"°"
-        condition = r.json().get("fcst_day_"+str(compute_args().day)).get("condition")
-        total_pluie = 0
+        date_long_format = valueorNA(json_day.get("date")) +" ("+valueorNA(json_day.get("day_short")) +")"
+        temp_delta = str(valueorNA(json_day.get("tmin")))+"° - "+str(valueorNA(json_day.get("tmax")))+"°"
+        condition = valueorNA(r.json().get("fcst_day_"+str(compute_args().day)).get("condition"))
+        total_pluie = "."
         headers = ['hour', 'condition', 'T', 'H', 'P', 'pluie','wind']
         data=[]
         for h in range(0,24):
             hourly_data = json_day.get("hourly_data").get(str(h)+"H00")
             hour=str(h)+"H00"
-            cond=hourly_data.get("CONDITION")
-            temp=str(hourly_data.get("TMP2m"))+ "°"
-            hum=str(hourly_data.get("RH2m"))+ "%"
-            pression=str(hourly_data.get("PRMSL"))+"Hp"
-            if hourly_data.get("APCPsfc") == 0:
-                pluie=str(hourly_data.get("APCPsfc"))+"mm"
+            cond=valueorNA(hourly_data.get("CONDITION"))
+            temp=str(valueorNA(hourly_data.get("TMP2m")))+ "°"
+            hum=str(valueorNA(hourly_data.get("RH2m")))+ "%"
+            pression=str(valueorNA(hourly_data.get("PRMSL")))+"Hp"
+            if not hourly_data.get("APCPsfc"):
+                pluie=". mm"
+            elif hourly_data.get("APCPsfc") == 0:
+                pluie=str(hourly_data.get("APCPsfc"))+" mm"
+                if total_pluie == ".":
+                    total_pluie =0
             else:
-                pluie=my_colored(str(hourly_data.get("APCPsfc"))+"mm","yellow")
+                pluie=my_colored(str(hourly_data.get("APCPsfc"))+" mm","yellow")
+                if total_pluie == ".":
+                    total_pluie =0                
                 total_pluie=total_pluie+hourly_data.get("APCPsfc")
-            wind=str(hourly_data.get("WNDSPD10m"))+ " khm/h " + "("+ str(hourly_data.get("WNDDIRCARD10"))  +")"
+            wind=str(valueorNA(hourly_data.get("WNDSPD10m")))+ " khm/h " + "("+ str(valueorNA(hourly_data.get("WNDDIRCARD10")))  +")"
             data.append([hour,cond,temp,hum,pression,pluie,wind])
-        if total_pluie>0:
+        if total_pluie == ".":
+            total_pluie == ". mm"
+        elif total_pluie>0:
             total_pluie=my_colored(str(round(total_pluie,1))+"mm","yellow")
         else:
             total_pluie="0mm"    
@@ -173,3 +194,8 @@ def my_colored(message, color):
 def print_debug(message):
     if compute_args().verbose:
         print("debug : " + message)
+        
+def valueorNA(my_string):
+    if not my_string:
+        return "."
+    return my_string     
