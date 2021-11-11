@@ -23,9 +23,9 @@ example : ``pyweatherfr Grenoble`` to display hourly weather forecast for for th
 
 # Démo
 
-![image](./demo_1.png)
+![image](./demo_01.png)
 
-![image](./demo_2.png)
+![image](./demo_02.png)
 
 # ⚙️ Install
 
