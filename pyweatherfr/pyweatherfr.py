@@ -12,7 +12,11 @@ from termcolor import colored
 import json
 import urllib.request
 
+incomplete_data = False
+
 def find():
+    global incomplete_data
+    incomplete_data = False
     if compute_args().town:
         print_debug("town found from arg -> " + compute_args().town)
         town =compute_args().town
@@ -103,9 +107,7 @@ def find():
                 hourly_pluie = valueorNA(r.json().get("fcst_day_"+str(i)).get("hourly_data").get(str(h)+"H00").get("APCPsfc"))
                 if hourly_pluie != ".":
                     if pluie == ".":
-                        print(hourly_pluie)
                         pluie=0
-                    print(hourly_pluie)
                     pluie=pluie+hourly_pluie
             if pluie == ".":
                 pluie=". mm"
@@ -115,7 +117,6 @@ def find():
                 pluie="0 mm"
             data.append([day,condition,temp,pluie])
             
-        
         if not compute_args().condensate:
             print("")
             print(my_colored("ville       : " +city + " " + infos,"yellow"))
@@ -130,10 +131,12 @@ def find():
             table = columnar(data, headers, no_borders=False)
             print(table)             
         else:
-            print(my_colored(time_now + " " + city + " " + infos + " " + condition + " "+ temp + " "+ humidity+ " "+wind+ " "+pression,"green"))
+            print(my_colored(time_now + " " + city + " " + infos + " " + condition + " "+ temp_now + " "+ humidity_now+ " "+wind_now+ " "+pression_now,"green"))
             table = columnar(data, no_borders=True)
             print(table)                         
            
+        if incomplete_data == True:
+            print(my_colored("incomplete data, you can try an other town","red"))
 
     else:
         #cas day
@@ -151,7 +154,7 @@ def find():
             temp=str(valueorNA(hourly_data.get("TMP2m")))+ "°"
             hum=str(valueorNA(hourly_data.get("RH2m")))+ "%"
             pression=str(valueorNA(hourly_data.get("PRMSL")))+"Hp"
-            if not hourly_data.get("APCPsfc"):
+            if hourly_data.get("APCPsfc") is None:
                 pluie=". mm"
             elif hourly_data.get("APCPsfc") == 0:
                 pluie=str(hourly_data.get("APCPsfc"))+" mm"
@@ -185,6 +188,8 @@ def find():
             print(my_colored(date_long_format + " " + city + " " + infos + " " +condition+ " "+ temp_delta+ " "+ total_pluie,"green"))
             table = columnar(data, no_borders=True)
             print(table)   
+        if incomplete_data == True:
+            print(my_colored("incomplete data, you can try an other town","red"))
 
 def my_colored(message, color):
     if compute_args().nocolor:
@@ -196,6 +201,8 @@ def print_debug(message):
         print("debug : " + message)
         
 def valueorNA(my_string):
-    if not my_string:
+    global incomplete_data
+    if my_string is None:
+        incomplete_data = True
         return "."
     return my_string     

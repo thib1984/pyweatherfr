@@ -2,13 +2,14 @@
 
 - [ ] Refacto and deduplicate code
 - [ ] Include only FR + fix "Lille" bug
-
-# 0.0.8 (WIP)
-
-- [x] Fix if not data (ex : Étival-lès-le-Mans)
 - [ ] Search by longitude/latitude (-g/--gps)
-- [ ] Search by code postal
-- [ ] Fix if not a town at i^p with no parameter
+- [ ] Search by code postal (-p/--postal)
+- [ ] Fix if not a town at ip with no parameter
+- [ ] Fix le/la/les (exemple mans is OK but le-mans is not)
+
+# 0.0.8
+
+- [x] Fix if no data (ex : Étival-lès-le-Mans)
 
 # 0.0.7
 
