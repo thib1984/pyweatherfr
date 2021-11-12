@@ -1,16 +1,18 @@
 # TODO 
 
 - [ ] Refacto and deduplicate code
+- [ ] cache town cities
 
 # 1.0.0 (WIP)
 
 - [x] Search by longitude/latitude (-g/--gps)
 - [x] Search by code postal (-p/--postal)
-- [ ] Fix if not a town at ip with no parameter
 - [x] search town 
 - [x] replace space with tiret
+- [ ] Fix if not a town at ip with no parameter
 - [ ] post in string
 - [ ] display sunrise + lat/long
+
 
 
 # 0.0.8
