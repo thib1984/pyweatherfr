@@ -14,7 +14,6 @@
 - [ ] display sunrise + lat/long
 
 
-
 # 0.0.8
 
 - [x] Fix if no data (ex : Étival-lès-le-Mans)
