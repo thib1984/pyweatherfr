@@ -29,6 +29,31 @@ def compute_args():
         nargs="?",
         help="town",
     )
+    my_group.add_argument(
+        "-p",
+        "--post",
+        action="store",
+        metavar="postal code",
+        type=int,
+        help="the postal code",
+    )  
+    my_group.add_argument(
+        "-s",
+        "--search",
+        action="store",
+        metavar="search",
+        type=str,
+        help="the postal code",
+    )        
+    my_group.add_argument(
+        "-g",
+        "--gps",
+        metavar=("lat", "long"),
+        action="store",
+        nargs=2,
+        type=str,
+        help="the postal code",
+    )
     my_parser.add_argument(
         "-d",
         "--day",

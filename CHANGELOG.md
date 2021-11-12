@@ -1,11 +1,17 @@
 # TODO 
 
 - [ ] Refacto and deduplicate code
-- [ ] Include only FR + fix "Lille" bug
-- [ ] Search by longitude/latitude (-g/--gps)
-- [ ] Search by code postal (-p/--postal)
+
+# 1.0.0 (WIP)
+
+- [x] Search by longitude/latitude (-g/--gps)
+- [x] Search by code postal (-p/--postal)
 - [ ] Fix if not a town at ip with no parameter
-- [ ] Fix le/la/les (exemple mans is OK but le-mans is not)
+- [x] search town 
+- [x] replace space with tiret
+- [ ] post in string
+- [ ] display sunrise + lat/long
+
 
 # 0.0.8
 
