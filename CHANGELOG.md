@@ -3,6 +3,10 @@
 - [ ] Refacto and deduplicate code
 - [ ] cache town cities
 
+# 1.0.1 (WIP)
+
+- [x] Add white space in -s option results
+
 # 1.0.0
 
 - [x] Search by longitude/latitude (-g/--gps)

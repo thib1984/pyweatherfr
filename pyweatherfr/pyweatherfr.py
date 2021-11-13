@@ -34,7 +34,7 @@ def find():
                     url = vjson.get(str(i)).get("url")
                     if (str(search) == vjson.get(str(i)).get("npa")) or unidecode.unidecode(search.lower()).replace(" ", "-") in unidecode.unidecode(vjson.get(str(i)).get("name").lower()).replace(" ", "-") or unidecode.unidecode(vjson.get(str(i)).get("name").lower().replace(" ", "-")) in unidecode.unidecode(search.lower().replace(" ", "-")):
                         trouve = True
-                        print(my_colored("pour " + name + "("+npa+"), exécutez 'pyweatherfr " +
+                        print(my_colored("pour " + name + " ("+npa+"), exécutez 'pyweatherfr " +
                               url + "' or 'pyweatherfr -p " + npa+"'","yellow"))
                 i = i+1
         except Exception:
