@@ -6,6 +6,7 @@
 # 1.1.1
 
 - [x] Explain disable emoji -n
+- [x] keep condition even if emoji
 
 # 1.1.0
 

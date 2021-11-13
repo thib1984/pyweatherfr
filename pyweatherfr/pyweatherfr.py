@@ -28,75 +28,75 @@ FOG = '\U0001F32B'
 
 def emoji(key):
     if compute_args().nocolor:
-        return key
+        return key 
     if key == "Ensoleillé":
-        return SUN
+        return SUN + " " + key
     if key =="Nuit claire":
-        return NIGHT_CLEAR
+        return NIGHT_CLEAR + " " + key
     if key == "Ciel voilé":
-        return MI_SUN 
+        return MI_SUN + " " + key
     if key == "Nuit légèrement voilée":
-        return MI_SUN
+        return MI_SUN + " " + key
     if key == "Faibles passages nuageux":
-        return MI_SUN                
+        return MI_SUN + " " + key                
     if key == "Nuit bien dégagée":
-        return MI_SUN    
+        return MI_SUN + " " + key 
     if key == "Stratus":
-        return CLOUD    
+        return CLOUD + " " + key   
     if  key == "Stratus se dissipant":
-        return CLOUD
+        return CLOUD + " " + key
     if key == "Nuit claire et stratus":
-        return CLOUD           
+        return CLOUD + " " + key           
     if key == "Eclaircies":
-        return MI_SUN
+        return MI_SUN + " " + key
     if key == "Nuit nuageuse":
-        return CLOUD    
+        return CLOUD + " " + key   
     if key=="Faiblement nuageux":
-        return MI_SUN
+        return MI_SUN+ " " + key
     if key == "Fortement nuageux":
-        return CLOUD
+        return CLOUD+ " " + key
     if key == "Averses de pluie faible":
-        return MI_CLOUD_RAIN
+        return MI_CLOUD_RAIN+ " " + key
     if key == "Nuit avec averses":
-        return MI_CLOUD_RAIN
+        return MI_CLOUD_RAIN+ " " + key
     if key == "Averses de pluie modérée":
-        return RAIN 
+        return RAIN + " " + key
     if key == "Averses de pluie forte":
-        return RAIN 
+        return RAIN + " " + key
     if key == "Couvert avec averse":
-        return RAIN
+        return RAIN+ " " + key
     if key == "Pluie faible":
-        return MI_CLOUD_RAIN 
+        return MI_CLOUD_RAIN + " " + key
     if key == "Pluie forte":
-        return RAIN 
+        return RAIN + " " + key
     if key == "Pluie modérée":
-        return RAIN 
+        return RAIN + " " + key
     if key == "Développement nuageux":
-        return CLOUD  
+        return CLOUD  + " " + key
     if key == "Nuit avec développement nuageux":
-        return CLOUD                 
+        return CLOUD     + " " + key            
     if key == "Faiblement orageux":
-        return ORAGE 
+        return ORAGE + " " + key
     if key == "Nuit faiblement orageuse":
-        return ORAGE
+        return ORAGE+ " " + key
     if key == "Orage modéré":
-        return ORAGE_PLUIE
+        return ORAGE_PLUIE+ " " + key
     if key == "Fortement orageux":
-        return ORAGE_PLUIE
+        return ORAGE_PLUIE+ " " + key
     if key == "Nuit avec averses de neige faible":
-        return SNOW  
+        return SNOW  + " " + key
     if key == "Neige faible":
-        return SNOW  
+        return SNOW  + " " + key
     if key == "Neige modérée":
-        return SNOW
+        return SNOW+ " " + key
     if key == "Neige forte":
-        return SNOW
+        return SNOW+ " " + key
     if key == "Pluie et neige mélée faible":
-        return SNOW  
+        return SNOW  + " " + key
     if key == "Pluie et neige mélée modérée":
-        return SNOW
+        return SNOW+ " " + key
     if key == "Pluie et neige mélée forte":
-        return SNOW                      
+        return SNOW  + " " + key                    
     return key
 
 def find():
