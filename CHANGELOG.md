@@ -3,7 +3,11 @@
 - [ ] Refacto and deduplicate code
 - [ ] cache town cities
 
-# 1.1.2 (WIP)
+# 1.1.3
+
+- [x] Fix emoji (bis)
+
+# 1.1.2
 
 - [x] Add white space with emoji
 - [x] Fix emoji
