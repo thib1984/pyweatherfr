@@ -27,7 +27,7 @@ exemple : `` pyweatherfr -g 45 5 `` affiche les prévisions météo pour les coo
   - ``-h/--help``    montrer l'aide
   - ``-u/--update``  update pyweatherfr
   - ``-c/--condensate``  condense la sortie
-  - ``-n/--nocolor``  désactive les couleurs en sortie
+  - ``-n/--nocolor``  désactive les couleurs et les emojis en sortie
   - ``-v/--verbose``  mode verbeux
 
 # Démo
