@@ -3,8 +3,7 @@
 - [ ] Refacto and deduplicate code
 - [ ] cache town cities
 
-
-# 1.0.0 (WIP)
+# 1.0.0
 
 - [x] Search by longitude/latitude (-g/--gps)
 - [x] Search by code postal (-p/--postal)
@@ -13,7 +12,7 @@
 - [x] Fix if not a town at ip with no parameter
 - [x] post in string
 - [x] display sunrise + lat/long #"elevation":"480","sunrise":"07:31","sunset":"17:11"
-- [ ] francisation
+- [x] francisation
 
 # 0.0.8
 
