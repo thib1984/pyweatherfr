@@ -71,8 +71,8 @@ def find():
                 print_debug("gps found from ip -> " + "lat="+str(data['latitude'])+"lng="+str(data['longitude']))  
                 url="lat="+str(data['latitude'])+"lng="+str(data['longitude'])  
             else:
-                print_debug("town found from ip -> " + url)  
                 url=town
+                print_debug("town found from ip -> " + url)  
     print_debug("search from http://prevision-meteo.ch/services/json/"+url)                   
     r = requests.get("http://prevision-meteo.ch/services/json/"+url)
     if r.json().get("errors"):
