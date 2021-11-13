@@ -6,6 +6,7 @@
 # 1.1.2 (WIP)
 
 - [x] Add white space with emoji
+- [x] Fix emoji
 
 # 1.1.1
 
