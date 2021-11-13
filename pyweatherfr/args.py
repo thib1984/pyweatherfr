@@ -24,63 +24,63 @@ def compute_args():
     my_group = my_parser.add_mutually_exclusive_group()
     my_group.add_argument(
         "town",
-        metavar="town",
+        metavar="VILLE",
         type=str,
         nargs="?",
-        help="town",
+        help="",
     )
     my_group.add_argument(
         "-p",
         "--post",
         action="store",
-        metavar="postal code",
+        metavar="CODE_POSTAL",
         type=str,
-        help="the postal code",
+        help="",
     )  
     my_group.add_argument(
         "-s",
         "--search",
         action="store",
-        metavar="search",
+        metavar="RECHERCHE",
         type=str,
-        help="the postal code",
+        help="ville ou code postal à rechercher",
     )        
     my_group.add_argument(
         "-g",
         "--gps",
-        metavar=("lat", "long"),
+        metavar=("LATITUDE", "LONGITUDE"),
         action="store",
-        nargs="*",
+        nargs=2,
         type=str,
-        help="the postal code",
+        help="coordonnées GPS",
     )
     my_parser.add_argument(
         "-d",
         "--day",
-        metavar="[day]",
+        metavar="JOUR",
         action="store",
         type=int,
         default=-1,
         choices=range(0, 5),
-        help="set the day to see (min=0, max=5, 0 for actual day)",
+        help="JOUR des prévision (0 pour le jour actuel, 1 pour le J+1, ...)",
     ) 
     my_parser.add_argument(
         "-n",
         "--nocolor",
         action="store_true",
-        help="disable colors in sysout",
+        help="désactiver couleur en sortie",
     )
     my_parser.add_argument(
         "-c",
         "--condensate",
         action="store_true",
-        help="condensate sysout",
+        help="condenser la sortie",
     )
     my_parser.add_argument(
         "-v",
         "--verbose",
         action="store_true",
-        help="debug mode",
+        help="mode verbeux",
     )              
     my_group.add_argument(
         "-u",
