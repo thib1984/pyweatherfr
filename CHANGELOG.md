@@ -15,11 +15,6 @@
 - [x] Import unidecode
 - [x] Add white space in -d -c option results
 
-- [x] Add white space in -s option results
-- [x] Emoji
-- [x] Import unidecode
-- [x] Add white space in -d -c option results
-
 # 1.0.0
 
 - [x] Search by longitude/latitude (-g/--gps)
