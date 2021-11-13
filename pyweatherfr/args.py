@@ -34,7 +34,7 @@ def compute_args():
         "--post",
         action="store",
         metavar="postal code",
-        type=int,
+        type=str,
         help="the postal code",
     )  
     my_group.add_argument(
@@ -50,7 +50,7 @@ def compute_args():
         "--gps",
         metavar=("lat", "long"),
         action="store",
-        nargs=2,
+        nargs="*",
         type=str,
         help="the postal code",
     )

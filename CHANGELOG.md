@@ -9,9 +9,9 @@
 - [x] Search by code postal (-p/--postal)
 - [x] search town 
 - [x] replace space with tiret
-- [ ] Fix if not a town at ip with no parameter
-- [ ] post in string
-- [ ] display sunrise + lat/long
+- [x] Fix if not a town at ip with no parameter
+- [x] post in string
+- [x] display sunrise + lat/long #"elevation":"480","sunrise":"07:31","sunset":"17:11"
 
 
 # 0.0.8
