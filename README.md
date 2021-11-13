@@ -13,11 +13,11 @@ pyweatherfr \[TOWN\] -d [INT(0-4)]
 
 exemple : ``pyweatherfr Grenoble -d 1`` affiche les prévisions météo détaillées pour Grenoble à J+1
 
-pyweather -p \[CODE_POSTAL\]
+pyweatherfr -p \[CODE_POSTAL\]
 
 exemple : ``pyweatherfr -p  38700`` affiche les prévisions météo pour le code postal 38700
 
-pyweather -g \[COORDONNEES_GPS\]
+pyweatherfr -g \[COORDONNEES_GPS\]
 
 exemple : `` pyweatherfr -g 45 5`` affiche les prévisions météo pour les coordonnées GPS (latitude : 45 et longitude : 5)
 
