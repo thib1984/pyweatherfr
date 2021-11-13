@@ -1,25 +1,34 @@
 # :sunny: :umbrella: :cloud: pyweatherfr
 
-pyweatherfr displays weather forecast for a given town in your terminal. It uses https://www.prevision-meteo.ch and https://geolocation-db.com/json
+pyweatherfr affiche les prévisions méteo pour les communes françaises dans votre terminal. Il utilise les API https://www.prevision-meteo.ch et https://geolocation-db.com/json
 
 
-# 🚀 How to use **pyweatherfr**
+# 🚀 Comment utiliser **pyweatherfr**
 
-pyweatherfr \[TOWN\]
+pyweatherfr \[VILLE\]
 
-example : ``pyweatherfr Grenoble`` to display weather forecast in town Grenoble
+exemple : ``pyweatherfr Grenoble`` affiche les prévisions météo pour Grenoble
 
 pyweatherfr \[TOWN\] -d [INT(0-4)]
 
-example : ``pyweatherfr Grenoble`` to display hourly weather forecast for for the next day
+exemple : ``pyweatherfr Grenoble -d 1 `` affiche les prévisions météo détaillées pour Grenoble à J+1
 
-## Other options
+pyweather -p \[CODE_POSTAL\]
 
-  - ``-h/--help``    show the help message and exit
+exemple : ``pyweatherfr -p  38700 `` affiche les prévisions météo pour le code postal 38700
+
+pyweather -g \[CODE_POSTAL\]
+
+exemple : `` pyweatherfr -g 45 5 `` affiche les prévisions météo pour les coordonnées GPS (latitude : 45 et longitude : 5)
+
+
+## Autres options
+
+  - ``-h/--help``    montrer l'aide
   - ``-u/--update``  update pyweatherfr
-  - ``-c/--condensate``  condensate output
-  - ``-n/--nocolor``  disable colour in sysout
-  - ``-v/--verbose``  verbose sysout
+  - ``-c/--condensate``  condense la sortie
+  - ``-n/--nocolor``  désactive les couleurs en sortie
+  - ``-v/--verbose``  mode verbeux
 
 # Démo
 
