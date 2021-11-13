@@ -3,9 +3,12 @@
 - [ ] Refacto and deduplicate code
 - [ ] cache town cities
 
-# 1.0.1 (WIP)
+# 1.1.0 (WIP)
 
 - [x] Add white space in -s option results
+- [x] Emoji
+- [x] Import unidecode
+- [x] Add white space in -d -c option results
 
 # 1.0.0
 

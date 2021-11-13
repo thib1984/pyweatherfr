@@ -13,9 +13,95 @@ import json
 import urllib.request
 
 incomplete_data = False
+SUN = '\U00002600'
+MI_SUN = '\U0001F324'
+MI_CLOUD = '\U000026c5'
+CLOUD = '\U00002601'
+MI_CLOUD_RAIN = '\U0001F326'
+RAIN = '\U0001F327'
+SNOW = '\U0001F328'
+NIGHT_CLEAR = '\U0001F328'
+ORAGE = '\U0001F329'
+ORAGE_PLUIE = '\U000026c5' 
+FOG = '\U0001F32B'
 
+
+def emoji(key):
+    if compute_args().nocolor:
+        return key
+    if key == "Ensoleillé":
+        return SUN
+    if key =="Nuit claire":
+        return NIGHT_CLEAR
+    if key == "Ciel voilé":
+        return MI_SUN 
+    if key == "Nuit légèrement voilée":
+        return MI_SUN
+    if key == "Faibles passages nuageux":
+        return MI_SUN                
+    if key == "Nuit bien dégagée":
+        return MI_SUN    
+    if key == "Stratus":
+        return CLOUD    
+    if  key == "Stratus se dissipant":
+        return CLOUD
+    if key == "Nuit claire et stratus":
+        return CLOUD           
+    if key == "Eclaircies":
+        return MI_SUN
+    if key == "Nuit nuageuse":
+        return CLOUD    
+    if key=="Faiblement nuageux":
+        return MI_SUN
+    if key == "Fortement nuageux":
+        return CLOUD
+    if key == "Averses de pluie faible":
+        return MI_CLOUD_RAIN
+    if key == "Nuit avec averses":
+        return MI_CLOUD_RAIN
+    if key == "Averses de pluie modérée":
+        return RAIN 
+    if key == "Averses de pluie forte":
+        return RAIN 
+    if key == "Couvert avec averse":
+        return RAIN
+    if key == "Pluie faible":
+        return MI_CLOUD_RAIN 
+    if key == "Pluie forte":
+        return RAIN 
+    if key == "Pluie modérée":
+        return RAIN 
+    if key == "Développement nuageux":
+        return CLOUD  
+    if key == "Nuit avec développement nuageux":
+        return CLOUD                 
+    if key == "Faiblement orageux":
+        return ORAGE 
+    if key == "Nuit faiblement orageuse":
+        return ORAGE
+    if key == "Orage modéré":
+        return ORAGE_PLUIE
+    if key == "Fortement orageux":
+        return ORAGE_PLUIE
+    if key == "Nuit avec averses de neige faible":
+        return SNOW  
+    if key == "Neige faible":
+        return SNOW  
+    if key == "Neige modérée":
+        return SNOW
+    if key == "Neige forte":
+        return SNOW
+    if key == "Pluie et neige mélée faible":
+        return SNOW  
+    if key == "Pluie et neige mélée modérée":
+        return SNOW
+    if key == "Pluie et neige mélée forte":
+        return SNOW                      
+    return key
 
 def find():
+
+    
     global incomplete_data
     incomplete_data = False
     vjson = requests.get(
@@ -144,8 +230,8 @@ def find():
         date = valueorNA(r.json().get("current_condition").get("date"))
         hour = valueorNA(r.json().get("current_condition").get("hour"))
         time_now = date + " "+hour
-        condition_now = valueorNA(r.json().get(
-            "current_condition").get("condition"))
+        condition_now = emoji(valueorNA(r.json().get(
+            "current_condition").get("condition")))
         temp_now = str(valueorNA(r.json().get(
             "current_condition").get("tmp")))+"°"
         humidity_now = str(valueorNA(r.json().get(
@@ -164,8 +250,8 @@ def find():
             day_short_i = valueorNA(r.json().get(
                 "fcst_day_"+str(i)).get("day_short"))
             day = date_i + " ("+day_short_i + ")"
-            condition = valueorNA(r.json().get(
-                "fcst_day_"+str(i)).get("condition"))
+            condition = emoji(valueorNA(r.json().get(
+                "fcst_day_"+str(i)).get("condition")))
             temp = str(valueorNA(r.json().get("fcst_day_"+str(i))).get("tmin")) + \
                 "° - " + \
                 str(valueorNA(r.json().get("fcst_day_"+str(i)).get("tmax")))+"°"
@@ -219,15 +305,15 @@ def find():
             "date")) + " ("+valueorNA(json_day.get("day_short")) + ")"
         temp_delta = str(valueorNA(json_day.get("tmin"))) + \
             "° - "+str(valueorNA(json_day.get("tmax")))+"°"
-        condition = valueorNA(r.json().get(
-            "fcst_day_"+str(compute_args().day)).get("condition"))
+        condition = emoji(valueorNA(r.json().get(
+            "fcst_day_"+str(compute_args().day)).get("condition")))
         total_pluie = "."
         headers = ['hour', 'condition', 'T', 'H', 'P', 'pluie', 'wind']
         data = []
         for h in range(0, 24):
             hourly_data = json_day.get("hourly_data").get(str(h)+"H00")
             hour = str(h)+"H00"
-            cond = valueorNA(hourly_data.get("CONDITION"))
+            cond = emoji(valueorNA(hourly_data.get("CONDITION")))
             temp = str(valueorNA(hourly_data.get("TMP2m"))) + "°"
             hum = str(valueorNA(hourly_data.get("RH2m"))) + "%"
             pression = str(valueorNA(hourly_data.get("PRMSL")))+"Hp"
@@ -269,7 +355,7 @@ def find():
         else:
             if compute_args().day == 0:
                 print(my_colored(date_long_format + " " + city + " " + infos + " " + elevation + " " + sunrise +
-                      "-" + sunset + " " + " " + condition + " " + temp_delta + " " + total_pluie, "green"))
+                      "-" + sunset + " "  + condition + "  " + temp_delta + " " + total_pluie, "green"))
             else:
                 print(my_colored(date_long_format + " " + city + " " + infos + " " +
                       elevation + " " + condition + " " + temp_delta + " " + total_pluie, "green"))
