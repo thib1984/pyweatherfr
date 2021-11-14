@@ -2,12 +2,12 @@
 
 - [ ] Refacto and deduplicate code
 - [ ] snow or rain for precipitations
-- [ ] user choice if two or more postal code matching?
+- [ ] user choice if two or more postal code matching? Warning?
 - [ ] pyweatherfr -s 29217 ? duplicate?
 
-# 1.4.0 (WIP coming soon)
+# 1.4.0 (WIP)
 
-- [ ] cache town cities (5Mo!)
+- [ ] cache town cities (5Mo!) : 1 week ?
 
 # 1.3.1 (WIP coming soon)
 
