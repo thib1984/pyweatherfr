@@ -4,7 +4,11 @@
 - [ ] cache town cities
 - [ ] snow or rain for precipitations
 
+# 1.3.0
 
+- [x] Fix emoji "Couvert avec averses"
+- [x] Change -d to -j 
+- [ ] Clean/reorder help message
 
 # 1.2.0
 

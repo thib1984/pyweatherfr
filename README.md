@@ -9,9 +9,9 @@ pyweatherfr \[VILLE\]
 
 exemple : ``pyweatherfr Grenoble`` affiche les prévisions météo pour Grenoble
 
-pyweatherfr \[TOWN\] -d [INT(0-4)]
+pyweatherfr \[TOWN\] -j [INT(0-4)]
 
-exemple : ``pyweatherfr Grenoble -d 1`` affiche les prévisions météo détaillées pour Grenoble à J+1
+exemple : ``pyweatherfr Grenoble -j 1`` affiche les prévisions météo détaillées pour Grenoble à J+1
 
 pyweatherfr -p \[CODE_POSTAL\]
 

@@ -143,7 +143,7 @@ def emoji_allign(key, allign):
         return RAIN + "  " + key+ " "
     if key == "Averses de pluie forte":
         return RAIN + "  " + key+ " "
-    if key == "Couvert avec averse":
+    if key == "Couvert avec averses":
         return RAIN+ "  " + key+ " "
     if key == "Pluie faible":
         return MI_CLOUD_RAIN + "  " + key+ " "
@@ -303,7 +303,7 @@ def find():
     else:
         city = "."
         infos = "("+url+")"
-    if compute_args().day == -1:
+    if compute_args().jour == -1:
         elevation = valueorNA(r.json().get("city_info").get("elevation"))+"m"
         sunrise = valueorNA(r.json().get("city_info").get("sunrise"))
         sunset = valueorNA(r.json().get("city_info").get("sunset"))
@@ -380,13 +380,13 @@ def find():
         elevation = valueorNA(r.json().get("city_info").get("elevation"))+"m"
         sunrise = valueorNA(r.json().get("city_info").get("sunrise"))
         sunset = valueorNA(r.json().get("city_info").get("sunset"))
-        json_day = r.json().get("fcst_day_"+str(compute_args().day))
+        json_day = r.json().get("fcst_day_"+str(compute_args().jour))
         date_long_format = valueorNA(json_day.get(
             "date")) + " ("+valueorNA(json_day.get("day_short")) + ")"
         temp_delta = emoji_tmp_allign(str(valueorNA(json_day.get("tmin"))),False) + \
             "-> "+emoji_tmp_allign_right(str(valueorNA(json_day.get("tmax"))),False)
         condition = emoji_allign(valueorNA(r.json().get(
-            "fcst_day_"+str(compute_args().day)).get("condition")),False)
+            "fcst_day_"+str(compute_args().jour)).get("condition")),False)
         total_pluie = "."
         headers = ['heure', 'condition', 'température', 'humidité', 'pression', 'précipitations', 'vent']
         data = []
@@ -427,13 +427,13 @@ def find():
             print(my_colored("température : " + temp_delta, "green"))
             print(my_colored("pluie       : " + total_pluie, "green"))
             print(my_colored("condition   : " + condition, "green"))
-            if compute_args().day == 0:
+            if compute_args().jour == 0:
                 print(my_colored("soleil      : " + sunrise+" - "+sunset, "green"))
             print("")
             table = columnar(data, headers, no_borders=False,wrap_max=0)
             print(table)
         else:
-            if compute_args().day == 0:
+            if compute_args().jour == 0:
                 print(my_colored(date_long_format + " " + city + " " + infos + " " + elevation + " " + sunrise +
                       "-" + sunset + " "  + condition + "  " + temp_delta + " " + total_pluie, "green"))
             else:
