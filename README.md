@@ -1,6 +1,6 @@
 # :sunny: :umbrella: :cloud: pyweatherfr
 
-pyweatherfr affiche les prévisions méteo pour les communes françaises dans votre terminal. Il utilise les API https://www.prevision-meteo.ch et https://geolocation-db.com/json
+pyweatherfr affiche les prévisions méteo pour les communes françaises dans votre terminal. Il utilise les API https://www.prevision-meteo.ch et https://geolocation-db.com/json.
 
 
 # 🚀 Comment utiliser **pyweatherfr**
