@@ -24,79 +24,160 @@ ORAGE = '\U0001F329'
 ORAGE_PLUIE = '\U0001F329' + " " + '\U0001F327' 
 FOG = '\U0001F32B'
 
+DROPLET = '\U0001F4A7'
+
+WIND = '\U0001F6A9'
+
+COLD = '\U0001F9CA'
+WARM = '\U0001F321'
+
+def emoji_rain(key):
+    return emoji_rain_allign(key, True)
+
+def emoji_rain_allign(key, allign):
+    if allign is not None and allign == True:
+        prefixe = "    "
+    else:
+        prefixe =""    
+    if compute_args().nocolor:
+        return key + "mm" 
+    if key == ".":
+        return prefixe + key + "mm "
+    if float(key) > 0:
+        return DROPLET + "  " + key + "mm "
+    return prefixe + key + "mm "
+
+def emoji_tmp(key):
+    return emoji_tmp_allign(key, True)
+    
+def emoji_tmp_allign(key, allign):
+    if allign is not None and allign == True:
+        prefixe = "    "
+    else:
+        prefixe =""     
+    if compute_args().nocolor:
+        return key + "°" 
+    if key == ".":
+        return prefixe + key + "° " 
+    if float(key) <= 0:
+        return COLD + "  " + key + "° " 
+    if float(key) >= 30:
+        return WARM + "  " + key + "° "    
+    return prefixe + key + "° " 
+
+def emoji_tmp_right(key):
+    return emoji_tmp_allign_right(key, True)
+    
+def emoji_tmp_allign_right(key, allign):
+    if allign is not None and allign == True:
+        prefixe = "    "
+    else:
+        prefixe =""     
+    if compute_args().nocolor:
+        return key + "° " 
+    if key == ".":
+        return key + "° " + prefixe
+    if float(key) <= 0:
+        return key + "° "+ "  " + COLD
+    if float(key) >= 30:
+        return key + "° "+ "  " + WARM    
+    return key + "° "+ prefixe
+
+def emoji_wnd(key):
+     return emoji_wnd_allign(key, True)
+
+def emoji_wnd_allign(key, allign):    
+    if allign is not None and allign == True:
+        prefixe = "    "
+    else:
+        prefixe =""       
+    if compute_args().nocolor:
+        return key 
+    if key == prefixe + ".":
+        return key
+    if float(key) >= 30:
+        return WIND + "  " + key  
+    return prefixe + key    
 
 def emoji(key):
+    return emoji_allign(key,True)
+
+def emoji_allign(key, allign):
+    if allign is not None and allign == True:
+        prefixe = "    "
+    else:
+        prefixe =""     
     if compute_args().nocolor:
         return key 
     if key == "Ensoleillé":
-        return SUN + " " + key
+        return SUN + " " + key + " "
     if key =="Nuit claire":
-        return NIGHT_CLEAR + "  " + key
+        return NIGHT_CLEAR + "  " + key + " "
     if key == "Ciel voilé":
-        return MI_SUN + "  " + key
+        return MI_SUN + "  " + key + " "
     if key == "Nuit légèrement voilée":
-        return MI_SUN + "  " + key
+        return MI_SUN + "  " + key + " "
     if key == "Faibles passages nuageux":
-        return MI_SUN + "  " + key                
+        return MI_SUN + "  " + key + " "               
     if key == "Nuit bien dégagée":
-        return MI_SUN + "  " + key 
+        return MI_SUN + "  " + key + " "
     if key == "Stratus":
-        return CLOUD + "  " + key   
+        return CLOUD + "  " + key + " "  
     if  key == "Stratus se dissipant":
-        return CLOUD + "  " + key
+        return CLOUD + "  " + key + " "
     if key == "Nuit claire et stratus":
-        return CLOUD + "  " + key           
+        return CLOUD + "  " + key + " "          
     if key == "Eclaircies":
-        return MI_SUN + "  " + key
+        return MI_SUN + "  " + key+ " "
     if key == "Nuit nuageuse":
-        return CLOUD + "  " + key   
+        return CLOUD + "  " + key   + " "
     if key=="Faiblement nuageux":
-        return MI_SUN+ "  " + key
+        return MI_SUN+ "  " + key+ " "
     if key == "Fortement nuageux":
-        return CLOUD+ "  " + key
+        return CLOUD+ "  " + key+ " "
     if key == "Averses de pluie faible":
-        return MI_CLOUD_RAIN+ "  " + key
+        return MI_CLOUD_RAIN+ "  " + key+ " "
     if key == "Nuit avec averses":
-        return MI_CLOUD_RAIN+ "  " + key
+        return MI_CLOUD_RAIN+ "  " + key+ " "
     if key == "Averses de pluie modérée":
-        return RAIN + "  " + key
+        return RAIN + "  " + key+ " "
     if key == "Averses de pluie forte":
-        return RAIN + "  " + key
+        return RAIN + "  " + key+ " "
     if key == "Couvert avec averse":
-        return RAIN+ "  " + key
+        return RAIN+ "  " + key+ " "
     if key == "Pluie faible":
-        return MI_CLOUD_RAIN + "  " + key
+        return MI_CLOUD_RAIN + "  " + key+ " "
     if key == "Pluie forte":
-        return RAIN + "  " + key
+        return RAIN + "  " + key+ " "
     if key == "Pluie modérée":
-        return RAIN + "  " + key
+        return RAIN + "  " + key+ " "
     if key == "Développement nuageux":
-        return CLOUD  + "  " + key
+        return CLOUD  + "  " + key+ " "
     if key == "Nuit avec développement nuageux":
-        return CLOUD     + "  " + key            
+        return CLOUD     + "  " + key  + " "          
     if key == "Faiblement orageux":
-        return ORAGE + "  " + key
+        return ORAGE + "  " + key+ " "
     if key == "Nuit faiblement orageuse":
-        return ORAGE+ "  " + key
+        return ORAGE+ "  " + key+ " "
     if key == "Orage modéré":
-        return ORAGE_PLUIE+ "  " + key
+        return ORAGE_PLUIE+ "  " + key+ " "
     if key == "Fortement orageux":
-        return ORAGE_PLUIE+ "  " + key
+        return ORAGE_PLUIE+ "  " + key+ " "
     if key == "Nuit avec averses de neige faible":
-        return SNOW  + "  " + key
+        return SNOW  + "  " + key+ " "
     if key == "Neige faible":
-        return SNOW  + "  " + key
+        return SNOW  + "  " + key+ " "
     if key == "Neige modérée":
-        return SNOW+ "  " + key
+        return SNOW+ "  " + key+ " "
     if key == "Neige forte":
-        return SNOW+ "  " + key
-    if key == "Pluie et neige mélée faible":
-        return SNOW  + "  " + key
-    if key == "Pluie et neige mélée modérée":
-        return SNOW+ "  " + key
-    if key == "Pluie et neige mélée forte":
-        return SNOW  + "  " + key                    
-    return key
+        return SNOW+ "  " + key+ " "
+    if key == "Pluie et neige mêlée faible":
+        return SNOW  + "  " + key+ " "
+    if key == "Pluie et neige mêlée modérée":
+        return SNOW+ "  " + key+ " "
+    if key == "Pluie et neige mêlée forte":
+        return SNOW  + "  " + key  + " "                  
+    return prefixe + key
 
 def find():
 
@@ -229,19 +310,19 @@ def find():
         date = valueorNA(r.json().get("current_condition").get("date"))
         hour = valueorNA(r.json().get("current_condition").get("hour"))
         time_now = date + " "+hour
-        condition_now = emoji(valueorNA(r.json().get(
-            "current_condition").get("condition")))
-        temp_now = str(valueorNA(r.json().get(
-            "current_condition").get("tmp")))+"°"
+        condition_now = emoji_allign(valueorNA(r.json().get(
+            "current_condition").get("condition")),False)
+        temp_now = emoji_tmp_allign(str(valueorNA(r.json().get(
+            "current_condition").get("tmp"))),False)
         humidity_now = str(valueorNA(r.json().get(
             "current_condition").get("humidity")))+"%"
-        wnd_spd = str(valueorNA(r.json().get(
-            "current_condition").get("wnd_spd")))
+        wnd_spd = emoji_wnd_allign(str(valueorNA(r.json().get(
+            "current_condition").get("wnd_spd"))),False)
         wnd_dir = valueorNA(r.json().get("current_condition").get("wnd_dir"))
         wind_now = wnd_spd + " km/h" + " (" + wnd_dir + ")"
         pression_now = str(valueorNA(r.json().get(
             "current_condition").get("pressure")))+" Hp"
-        headers = ['day', 'condition', 'T', 'pluie']
+        headers = ['date', 'condition', 'température', 'précipitations']
         data = []
         for i in [0, 1, 2, 3, 4]:
             pluie = "."
@@ -251,9 +332,9 @@ def find():
             day = date_i + " ("+day_short_i + ")"
             condition = emoji(valueorNA(r.json().get(
                 "fcst_day_"+str(i)).get("condition")))
-            temp = str(valueorNA(r.json().get("fcst_day_"+str(i))).get("tmin")) + \
-                "° - " + \
-                str(valueorNA(r.json().get("fcst_day_"+str(i)).get("tmax")))+"°"
+            temp = emoji_tmp(str(valueorNA(r.json().get("fcst_day_"+str(i))).get("tmin"))) + \
+                "-> " + \
+                emoji_tmp_right(str(valueorNA(r.json().get("fcst_day_"+str(i)).get("tmax"))))
             for h in range(0, 24):
                 hourly_pluie = valueorNA(r.json().get(
                     "fcst_day_"+str(i)).get("hourly_data").get(str(h)+"H00").get("APCPsfc"))
@@ -262,11 +343,11 @@ def find():
                         pluie = 0
                     pluie = pluie+hourly_pluie
             if pluie == ".":
-                pluie = ". mm"
+                pluie = emoji_rain(str("."))
             elif pluie > 0:
-                pluie = my_colored(str(round(pluie, 1))+"mm", "yellow")
+                pluie = emoji_rain(str(round(pluie, 1)))
             else:
-                pluie = "0 mm"
+                 pluie = emoji_rain(str("0"))
             data.append([day, condition, temp, pluie])
 
         if not compute_args().condensate:
@@ -282,12 +363,12 @@ def find():
             print(my_colored("pression    : " + pression_now, "green"))
             print(my_colored("soleil      : " + sunrise+" - "+sunset, "green"))
             print("")
-            table = columnar(data, headers, no_borders=False)
+            table = columnar(data, headers, no_borders=False,wrap_max=0)
             print(table)
         else:
             print(my_colored(time_now + " " + city + " " + infos + " " + elevation + " " + sunrise + "-" + sunset +
                   " " + condition + " " + temp_now + " " + humidity_now + " "+wind_now + " "+pression_now, "green"))
-            table = columnar(data, no_borders=True)
+            table = columnar(data, no_borders=True,wrap_max=0)
             print(table)
 
         if incomplete_data == True:
@@ -302,41 +383,41 @@ def find():
         json_day = r.json().get("fcst_day_"+str(compute_args().day))
         date_long_format = valueorNA(json_day.get(
             "date")) + " ("+valueorNA(json_day.get("day_short")) + ")"
-        temp_delta = str(valueorNA(json_day.get("tmin"))) + \
-            "° - "+str(valueorNA(json_day.get("tmax")))+"°"
-        condition = emoji(valueorNA(r.json().get(
-            "fcst_day_"+str(compute_args().day)).get("condition")))
+        temp_delta = emoji_tmp_allign(str(valueorNA(json_day.get("tmin"))),False) + \
+            "-> "+emoji_tmp_allign_right(str(valueorNA(json_day.get("tmax"))),False)
+        condition = emoji_allign(valueorNA(r.json().get(
+            "fcst_day_"+str(compute_args().day)).get("condition")),False)
         total_pluie = "."
-        headers = ['hour', 'condition', 'T', 'H', 'P', 'pluie', 'wind']
+        headers = ['heure', 'condition', 'température', 'humidité', 'pression', 'précipitations', 'vent']
         data = []
         for h in range(0, 24):
             hourly_data = json_day.get("hourly_data").get(str(h)+"H00")
             hour = str(h)+"H00"
             cond = emoji(valueorNA(hourly_data.get("CONDITION")))
-            temp = str(valueorNA(hourly_data.get("TMP2m"))) + "°"
+            temp = emoji_tmp(str(valueorNA(hourly_data.get("TMP2m"))))
             hum = str(valueorNA(hourly_data.get("RH2m"))) + "%"
             pression = str(valueorNA(hourly_data.get("PRMSL")))+"Hp"
             if hourly_data.get("APCPsfc") is None:
-                pluie = ". mm"
+                pluie = emoji_rain(str("."))
             elif hourly_data.get("APCPsfc") == 0:
-                pluie = str(hourly_data.get("APCPsfc"))+"mm"
+                pluie = emoji_rain(str("0"))
                 if total_pluie == ".":
                     total_pluie = 0
             else:
-                pluie = my_colored(
-                    str(hourly_data.get("APCPsfc"))+"mm", "yellow")
+                pluie = emoji_rain(
+                    str(hourly_data.get("APCPsfc")))
                 if total_pluie == ".":
                     total_pluie = 0
                 total_pluie = total_pluie+hourly_data.get("APCPsfc")
-            wind = str(valueorNA(hourly_data.get("WNDSPD10m"))) + "khm/h " + \
-                "(" + str(valueorNA(hourly_data.get("WNDDIRCARD10"))) + ")"
+            wind = emoji_wnd(str(valueorNA(hourly_data.get("WNDSPD10m")))) + "km/h " + \
+                "(" + str(valueorNA(hourly_data.get("WNDDIRCARD10"))) + ") "
             data.append([hour, cond, temp, hum, pression, pluie, wind])
         if total_pluie == ".":
-            total_pluie == ". mm"
+            total_pluie == emoji_rain_allign(str("."),False)
         elif total_pluie > 0:
-            total_pluie = my_colored(str(round(total_pluie, 1))+"mm", "yellow")
+            total_pluie = emoji_rain_allign(str(round(total_pluie, 1)),False)
         else:
-            total_pluie = "0mm"
+            total_pluie = emoji_rain_allign(str("0"),False)
         if not compute_args().condensate:
             print("")
             print(my_colored("ville       : " + city + " " + infos, "yellow"))
@@ -349,7 +430,7 @@ def find():
             if compute_args().day == 0:
                 print(my_colored("soleil      : " + sunrise+" - "+sunset, "green"))
             print("")
-            table = columnar(data, headers, no_borders=False)
+            table = columnar(data, headers, no_borders=False,wrap_max=0)
             print(table)
         else:
             if compute_args().day == 0:
@@ -358,7 +439,7 @@ def find():
             else:
                 print(my_colored(date_long_format + " " + city + " " + infos + " " +
                       elevation + " " + condition + " " + temp_delta + " " + total_pluie, "green"))
-            table = columnar(data, no_borders=True)
+            table = columnar(data, no_borders=True,wrap_max=0)
             print(table)
             
         if incomplete_data == True:

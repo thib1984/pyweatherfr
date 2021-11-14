@@ -3,7 +3,7 @@ from setuptools import setup
 
 setup(
     name="pyweatherfr",
-    version="1.1.3",
+    version="1.2.0",
     description="pyweatherfr displays weather forecast for a given town in France",
     long_description="The complete description/installation/use/FAQ is available at : https://github.com/thib1984/pyweatherfr#readme",
     url="https://github.com/thib1984/pyweatherfr",

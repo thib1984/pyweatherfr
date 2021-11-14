@@ -2,6 +2,18 @@
 
 - [ ] Refacto and deduplicate code
 - [ ] cache town cities
+- [ ] snow or rain for precipitations
+
+
+
+# 1.2.0
+
+- [x] Add emoji rain (>0mm), wind(>30km.h), cold(<0), and warm(>30)
+- [x] Fix emoji (ter)
+- [x] Change "-" to "->" for temperature
+- [x] Fix wrap and troncate columnar
+- [x] Francisation (bis)
+- [x] Allignement emoji not emoji
 
 # 1.1.3
 
