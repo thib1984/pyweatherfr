@@ -1,12 +1,18 @@
 # TODO 
 
 - [ ] Refacto and deduplicate code
-- [ ] cache town cities
 - [ ] snow or rain for precipitations
+- [ ] user choice if two or more postal code matching?
+- [ ] pyweatherfr -s 29217 ? duplicate?
 
-# 1.3.1 (WIP)
+# 1.4.0 (WIP coming soon)
+
+- [ ] cache town cities (5Mo!)
+
+# 1.3.1 (WIP coming soon)
 
 - [x] Clean/reorder help message
+- [x] bug duplicate postal : pyweatherfr -vp 29217
 
 # 1.3.0
 

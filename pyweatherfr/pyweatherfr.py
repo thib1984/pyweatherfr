@@ -286,7 +286,7 @@ def find():
             i = 0
             while True:
                 if vjson.get(str(i)).get("country") is not None and vjson.get(str(i)).get("country") == 'FRA':
-                    if unidecode.unidecode(town.lower()) == unidecode.unidecode(vjson.get(str(i)).get("url").lower()):
+                    if unidecode.unidecode(town.lower()) == unidecode.unidecode(vjson.get(str(i)).get("name").lower()):
                         npa = vjson.get(str(i)).get("npa")
                         country = vjson.get(str(i)).get("country")
                         print_debug("CODE_POSTAL : " + npa)
