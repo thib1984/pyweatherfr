@@ -29,7 +29,8 @@ exemple : `` pyweatherfr -g 45 5`` affiche les prévisions météo pour les coor
   - ``-c/--condensate``  condense la sortie
   - ``-n/--nocolor``  désactive les couleurs et les emojis en sortie
   - ``-v/--verbose``  mode verbeux
-
+  - ``-C/--cache``  met à jour le cache du nom des villes (cache par défaut 30j)
+  
 # Démo
 
 ![image](./demo_01.png)
