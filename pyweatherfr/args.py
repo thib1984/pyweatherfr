@@ -95,6 +95,12 @@ def compute_args():
         help="condenser la sortie",
     )
     my_parser.add_argument(
+        "-C",
+        "--cache",
+        action="store_true",
+        help="rafraichit le cache des villes",
+    )    
+    my_parser.add_argument(
         "-v",
         "--verbose",
         action="store_true",

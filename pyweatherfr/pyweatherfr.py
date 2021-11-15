@@ -11,6 +11,10 @@ from columnar import columnar
 from termcolor import colored
 import json
 import urllib.request
+import os
+import tempfile
+import time
+from pathlib import Path
 
 incomplete_data = False
 SUN = '\U0001F31E'
@@ -165,6 +169,8 @@ def emoji_allign(key, allign):
         return ORAGE_PLUIE+ "  " + key+ " "
     if key == "Nuit avec averses de neige faible":
         return SNOW  + "  " + key+ " "
+    if key == "Averses de neige faible":
+        return SNOW  + "  " + key+ " "        
     if key == "Neige faible":
         return SNOW  + "  " + key+ " "
     if key == "Neige modérée":
@@ -179,13 +185,56 @@ def emoji_allign(key, allign):
         return SNOW  + "  " + key  + " "                  
     return prefixe + key
 
+
+def get_user_config_directory():
+    """Returns a platform-specific root directory for user config settings."""
+    # On Windows, prefer %LOCALAPPDATA%, then %APPDATA%, since we can expect the
+    # AppData directories to be ACLed to be visible only to the user and admin
+    # users (https://stackoverflow.com/a/7617601/1179226). If neither is set,
+    # return None instead of falling back to something that may be world-readable.
+    if os.name == "nt":
+        appdata = os.getenv("LOCALAPPDATA")
+        if appdata:
+            ze_path = os.path.join(appdata,"pyweatherfr")
+            Path(ze_path).mkdir(parents=True, exist_ok=True)
+            return ze_path
+        appdata = os.getenv("APPDATA")
+        if appdata:
+            ze_path = os.path.join(appdata,"pyweatherfr")
+            Path(ze_path).mkdir(parents=True, exist_ok=True)
+            return ze_path            
+        print(my_colored("erreur : impossible de créer le dossier de config","red"))
+        sys.exit(1)
+    # On non-windows, use XDG_CONFIG_HOME if set, else default to ~/.config.
+    xdg_config_home = os.getenv("XDG_CONFIG_HOME")
+    if xdg_config_home:
+        ze_path = os.path.join(xdg_config_home,"")
+        Path(ze_path).mkdir(parents=True, exist_ok=True)
+        return ze_path
+    ze_path = os.path.join(os.path.expanduser("~"), ".config","pyweatherfr","") 
+    Path(ze_path).mkdir(parents=True, exist_ok=True)
+    return ze_path 
+
 def find():
 
-    
     global incomplete_data
     incomplete_data = False
-    vjson = requests.get(
+
+    tmp_json = "villes.json"
+    if compute_args().cache or not os.path.exists(get_user_config_directory()+tmp_json) or (
+        time.time() - os.stat(get_user_config_directory()+tmp_json).st_mtime > 86400*30
+    ):
+        print(my_colored("cache des villes absent, expiré ou reset, en cours de téléchargement...","yellow"))
+        vjson = requests.get(
         "https://www.prevision-meteo.ch/services/json/list-cities").json()
+        print_debug("enregistrement du cache dans " + get_user_config_directory()+tmp_json)
+        with open(get_user_config_directory()+tmp_json, 'w') as f:
+            json.dump(vjson, f)
+    else:
+        print_debug("recupération du cache depuis " + get_user_config_directory()+tmp_json)
+        with open(get_user_config_directory()+tmp_json, 'r') as f:
+            vjson =  json.load(f)
+
     if compute_args().search:
         search = compute_args().search
         print_debug(
@@ -309,6 +358,7 @@ def find():
         sunset = valueorNA(r.json().get("city_info").get("sunset"))
         date = valueorNA(r.json().get("current_condition").get("date"))
         hour = valueorNA(r.json().get("current_condition").get("hour"))
+        altprev = valueorNA(r.json().get("forecast_info").get("elevation"))+"m"
         time_now = date + " "+hour
         condition_now = emoji_allign(valueorNA(r.json().get(
             "current_condition").get("condition")),False)
@@ -362,12 +412,13 @@ def find():
             print(my_colored("vent        : " + wind_now, "green"))
             print(my_colored("pression    : " + pression_now, "green"))
             print(my_colored("soleil      : " + sunrise+" - "+sunset, "green"))
+            print(my_colored("alt. prev.  : " + altprev, "green"))
             print("")
             table = columnar(data, headers, no_borders=False,wrap_max=0)
             print(table)
         else:
-            print(my_colored(time_now + " " + city + " " + infos + " " + elevation + " " + sunrise + "-" + sunset +
-                  " " + condition + " " + temp_now + " " + humidity_now + " "+wind_now + " "+pression_now, "green"))
+            print(my_colored(time_now + " " + city + " " + infos + " " + elevation+ " " + sunrise + "-" + sunset, "green"))
+            print(my_colored(condition + " " + temp_now + " " + humidity_now + " "+wind_now + " "+pression_now+ " (" + altprev + ") ", "green"))
             table = columnar(data, no_borders=True,wrap_max=0)
             print(table)
 
@@ -378,6 +429,7 @@ def find():
     else:
         # cas day
         elevation = valueorNA(r.json().get("city_info").get("elevation"))+"m"
+        altprev = valueorNA(r.json().get("forecast_info").get("elevation"))+"m"
         sunrise = valueorNA(r.json().get("city_info").get("sunrise"))
         sunset = valueorNA(r.json().get("city_info").get("sunset"))
         json_day = r.json().get("fcst_day_"+str(compute_args().jour))
@@ -427,6 +479,7 @@ def find():
             print(my_colored("température : " + temp_delta, "green"))
             print(my_colored("pluie       : " + total_pluie, "green"))
             print(my_colored("condition   : " + condition, "green"))
+            print(my_colored("alt. prev.  : " + altprev, "green"))
             if compute_args().jour == 0:
                 print(my_colored("soleil      : " + sunrise+" - "+sunset, "green"))
             print("")
@@ -435,10 +488,12 @@ def find():
         else:
             if compute_args().jour == 0:
                 print(my_colored(date_long_format + " " + city + " " + infos + " " + elevation + " " + sunrise +
-                      "-" + sunset + " "  + condition + "  " + temp_delta + " " + total_pluie, "green"))
+                      "-" + sunset, "green"))
+                print(my_colored(condition + "  " + temp_delta + " " + total_pluie+ " (" + altprev + ") ", "green"))                      
             else:
-                print(my_colored(date_long_format + " " + city + " " + infos + " " +
-                      elevation + " " + condition + " " + temp_delta + " " + total_pluie, "green"))
+                print(my_colored(date_long_format + " " + city + " " + infos + " " + elevation, "green"))
+                print(my_colored(condition + "  " + temp_delta + " " + total_pluie+ " (" + altprev + ") ", "green"))                      
+
             table = columnar(data, no_borders=True,wrap_max=0)
             print(table)
             

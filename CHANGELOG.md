@@ -1,15 +1,16 @@
 # TODO 
 
 - [ ] Refacto and deduplicate code
-- [ ] snow or rain for precipitations
-- [ ] user choice if two or more postal code matching? Warning?
 - [ ] pyweatherfr -s 29217 ? duplicate?
 
 # 1.4.0 (WIP coming soon)
 
-- [ ] cache town cities (5Mo!) : 1 week ? 1 month?
-- [ ] fix emoji : Averses de neige faible
-- [ ] afficher donnees stations
+- [x] cache town cities (5Mo!) : 1 week ? 1 month?
+- [x] fix emoji : Averses de neige faible
+- [x] afficher altitude prévision
+- [ ] snow or rain for precipitations
+- [ ] rafales
+- [ ] user choice if two or more postal code matching? Warning?
 
 # 1.3.1
 
