@@ -29,16 +29,17 @@ ORAGE_PLUIE = '\U0001F329' + " " + '\U0001F327'
 FOG = '\U0001F32B'
 
 DROPLET = '\U0001F4A7'
+FLOCON = '\U00002744'
 
 WIND = '\U0001F6A9'
 
 COLD = '\U0001F9CA'
 WARM = '\U0001F321'
 
-def emoji_rain(key):
-    return emoji_rain_allign(key, True)
+def emoji_rain(key, isSnow):
+    return emoji_rain_allign(key, isSnow, True)
 
-def emoji_rain_allign(key, allign):
+def emoji_rain_allign(key, isSnow, allign):
     if allign is not None and allign == True:
         prefixe = "    "
     else:
@@ -48,7 +49,10 @@ def emoji_rain_allign(key, allign):
     if key == ".":
         return prefixe + key + "mm "
     if float(key) > 0:
-        return DROPLET + "  " + key + "mm "
+        if isSnow:
+            return FLOCON + "  " + key + "mm "
+        else:    
+            return DROPLET + "  " + key + "mm "
     return prefixe + key + "mm "
 
 def emoji_tmp(key):
@@ -96,12 +100,12 @@ def emoji_wnd_allign(key, allign):
     else:
         prefixe =""       
     if compute_args().nocolor:
-        return key 
-    if key == prefixe + ".":
-        return key
+        return key+ "km/h "
+    if key == ".":
+        return prefixe + key+ "km/h "
     if float(key) >= 30:
-        return WIND + "  " + key  
-    return prefixe + key    
+        return WIND + "  " + key+ "km/h "
+    return prefixe + key+ "km/h " 
 
 def emoji(key):
     return emoji_allign(key,True)
@@ -188,10 +192,6 @@ def emoji_allign(key, allign):
 
 def get_user_config_directory():
     """Returns a platform-specific root directory for user config settings."""
-    # On Windows, prefer %LOCALAPPDATA%, then %APPDATA%, since we can expect the
-    # AppData directories to be ACLed to be visible only to the user and admin
-    # users (https://stackoverflow.com/a/7617601/1179226). If neither is set,
-    # return None instead of falling back to something that may be world-readable.
     if os.name == "nt":
         appdata = os.getenv("LOCALAPPDATA")
         if appdata:
@@ -369,7 +369,7 @@ def find():
         wnd_spd = emoji_wnd_allign(str(valueorNA(r.json().get(
             "current_condition").get("wnd_spd"))),False)
         wnd_dir = valueorNA(r.json().get("current_condition").get("wnd_dir"))
-        wind_now = wnd_spd + " km/h" + " (" + wnd_dir + ")"
+        wind_now = wnd_spd + "(" + wnd_dir + ")"
         pression_now = str(valueorNA(r.json().get(
             "current_condition").get("pressure")))+" Hp"
         headers = ['date', 'condition', 'température', 'précipitations']
@@ -385,19 +385,22 @@ def find():
             temp = emoji_tmp(str(valueorNA(r.json().get("fcst_day_"+str(i))).get("tmin"))) + \
                 "-> " + \
                 emoji_tmp_right(str(valueorNA(r.json().get("fcst_day_"+str(i)).get("tmax"))))
+            is_snow_day = False
             for h in range(0, 24):
                 hourly_pluie = valueorNA(r.json().get(
                     "fcst_day_"+str(i)).get("hourly_data").get(str(h)+"H00").get("APCPsfc"))
                 if hourly_pluie != ".":
                     if pluie == ".":
                         pluie = 0
+                    if hourly_pluie != 0 and r.json().get("fcst_day_"+str(i)).get("hourly_data").get(str(h)+"H00").get("ISSNOW")>0:
+                        is_snow_day = True                        
                     pluie = pluie+hourly_pluie
             if pluie == ".":
-                pluie = emoji_rain(str("."))
+                pluie = emoji_rain(str("."),False)
             elif pluie > 0:
-                pluie = emoji_rain(str(round(pluie, 1)))
+                pluie = emoji_rain(str(round(pluie, 1)),is_snow_day)
             else:
-                 pluie = emoji_rain(str("0"))
+                 pluie = emoji_rain(str("0"),False)
             data.append([day, condition, temp, pluie])
 
         if not compute_args().condensate:
@@ -442,6 +445,7 @@ def find():
         total_pluie = "."
         headers = ['heure', 'condition', 'température', 'humidité', 'pression', 'précipitations', 'vent']
         data = []
+        is_snow_day = False
         for h in range(0, 24):
             hourly_data = json_day.get("hourly_data").get(str(h)+"H00")
             hour = str(h)+"H00"
@@ -450,26 +454,28 @@ def find():
             hum = str(valueorNA(hourly_data.get("RH2m"))) + "%"
             pression = str(valueorNA(hourly_data.get("PRMSL")))+"Hp"
             if hourly_data.get("APCPsfc") is None:
-                pluie = emoji_rain(str("."))
+                pluie = emoji_rain(str("."),False)
             elif hourly_data.get("APCPsfc") == 0:
-                pluie = emoji_rain(str("0"))
+                pluie = emoji_rain(str("0"),False)
                 if total_pluie == ".":
                     total_pluie = 0
             else:
                 pluie = emoji_rain(
-                    str(hourly_data.get("APCPsfc")))
+                    str(hourly_data.get("APCPsfc")),hourly_data.get("ISSNOW")>=1)
                 if total_pluie == ".":
                     total_pluie = 0
+                if hourly_data.get("ISSNOW")>0:
+                    is_snow_day = True    
                 total_pluie = total_pluie+hourly_data.get("APCPsfc")
-            wind = emoji_wnd(str(valueorNA(hourly_data.get("WNDSPD10m")))) + "km/h " + \
+            wind = emoji_wnd(str(valueorNA(hourly_data.get("WNDSPD10m")))) + \
                 "(" + str(valueorNA(hourly_data.get("WNDDIRCARD10"))) + ") "
             data.append([hour, cond, temp, hum, pression, pluie, wind])
         if total_pluie == ".":
-            total_pluie == emoji_rain_allign(str("."),False)
+            total_pluie == emoji_rain_allign(str("."),False,False)
         elif total_pluie > 0:
-            total_pluie = emoji_rain_allign(str(round(total_pluie, 1)),False)
+            total_pluie = emoji_rain_allign(str(round(total_pluie, 1)),is_snow_day,False)
         else:
-            total_pluie = emoji_rain_allign(str("0"),False)
+            total_pluie = emoji_rain_allign(str("0"),False,False)
         if not compute_args().condensate:
             print("")
             print(my_colored("ville       : " + city + " " + infos, "yellow"))
@@ -477,7 +483,7 @@ def find():
             print("")
             print(my_colored("date        : " + date_long_format, "green"))
             print(my_colored("température : " + temp_delta, "green"))
-            print(my_colored("pluie       : " + total_pluie, "green"))
+            print(my_colored("précip.     : " + total_pluie, "green"))
             print(my_colored("condition   : " + condition, "green"))
             print(my_colored("alt. prev.  : " + altprev, "green"))
             if compute_args().jour == 0:
