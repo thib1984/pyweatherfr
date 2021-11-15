@@ -3,9 +3,14 @@
 - [ ] Refacto and deduplicate code
 - [ ] pyweatherfr -s 29217 ? duplicate?
 
-# 1.4.0 (WIP coming soon)
+# 1.4.1
 
-- [x] cache town cities (5Mo!) : 1 week ? 1 month?
+- [x] requests import
+- [x] retrait altitude prévision (donnée incorrecte?)
+
+# 1.4.0
+
+- [x] cache town cities (5Mo!) : 1 month
 - [x] fix emoji : Averses de neige faible
 - [x] afficher altitude prévision
 - [x] snow or rain for precipitations

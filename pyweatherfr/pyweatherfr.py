@@ -415,7 +415,6 @@ def find():
             print(my_colored("vent        : " + wind_now, "green"))
             print(my_colored("pression    : " + pression_now, "green"))
             print(my_colored("soleil      : " + sunrise+" - "+sunset, "green"))
-            print(my_colored("alt. prev.  : " + altprev, "green"))
             print("")
             table = columnar(data, headers, no_borders=False,wrap_max=0)
             print(table)
@@ -485,7 +484,6 @@ def find():
             print(my_colored("température : " + temp_delta, "green"))
             print(my_colored("précip.     : " + total_pluie, "green"))
             print(my_colored("condition   : " + condition, "green"))
-            print(my_colored("alt. prev.  : " + altprev, "green"))
             if compute_args().jour == 0:
                 print(my_colored("soleil      : " + sunrise+" - "+sunset, "green"))
             print("")
