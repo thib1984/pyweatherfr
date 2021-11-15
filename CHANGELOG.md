@@ -8,6 +8,7 @@
 # 1.4.0 (WIP)
 
 - [ ] cache town cities (5Mo!) : 1 week ?
+- [ ] fix emoji : Averses de neige faible
 
 # 1.3.1 (WIP coming soon)
 
