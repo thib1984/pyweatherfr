@@ -244,11 +244,9 @@ def find():
     if is_gps:
         infos = "("+url+")"
         city = "."
-        elevation = ".m"    
     else:
         infos = obtain_info_town(vjson, url, r)
         city = r.json().get("city_info").get("name")
-        elevation = valueorNA(r.json().get("city_info").get("elevation"))+"m"
     if compute_args().jour == -1:
         previsions_generiques(r, infos, city)
     else:
@@ -260,7 +258,6 @@ def find():
 def previsions_detaillees(r, infos, city):
     # cas day
     elevation = valueorNA(r.json().get("city_info").get("elevation"))+"m"
-    altprev = valueorNA(r.json().get("forecast_info").get("elevation"))+"m"
     sunrise = valueorNA(r.json().get("city_info").get("sunrise"))
     sunset = valueorNA(r.json().get("city_info").get("sunset"))
     json_day = r.json().get("fcst_day_"+str(compute_args().jour))
@@ -330,10 +327,10 @@ def previsions_detaillees(r, infos, city):
         if compute_args().jour == 0:
             print(my_colored(date_long_format + " " + city + " " + infos + " " + elevation + " " + sunrise +
                       "-" + sunset, "green"))
-            print(my_colored(condition + "  " + temp_delta + " " + total_pluie+ " (" + altprev + ") ", "green"))                      
+            print(my_colored(condition + "  " + temp_delta + " " + total_pluie , "green"))                   
         else:
             print(my_colored(date_long_format + " " + city + " " + infos + " " + elevation, "green"))
-            print(my_colored(condition + "  " + temp_delta + " " + total_pluie+ " (" + altprev + ") ", "green"))                      
+            print(my_colored(condition + "  " + temp_delta + " " + total_pluie , "green"))                   
 
         table = columnar(data, no_borders=True,wrap_max=0)
         print(table)
@@ -420,7 +417,7 @@ def previsions_generiques(r, infos, city):
             print(table)
     else:
         print(my_colored(time_now + " " + city + " " + infos + " " + elevation+ " " + sunrise + "-" + sunset, "green"))
-        print(my_colored(condition + " " + temp_now + " " + humidity_now + " "+wind_now + " "+pression_now+ " (" + altprev + ") ", "green"))
+        print(my_colored(condition + " " + temp_now + " " + humidity_now + " "+wind_now + " "+pression_now, "green"))
         table = columnar(data, no_borders=True,wrap_max=0)
         print(table)
 
@@ -434,10 +431,8 @@ def obtain_info_town(vjson, url, r):
             if vjson.get(str(i)).get("country") is not None and vjson.get(str(i)).get("country") == 'FRA':
                 if unidecode.unidecode(url.lower()) == unidecode.unidecode(vjson.get(str(i)).get("url").lower()):
                     npa = vjson.get(str(i)).get("npa")
-                    country = vjson.get(str(i)).get("country")
                     print_debug("CODE_POSTAL : " + npa)
-                    print_debug("COUNTRY : " + country)
-                    infos = "("+country + " - " + npa+")"
+                    infos = "("+npa+")"
                     break
             i = i+1
             infos = ""
