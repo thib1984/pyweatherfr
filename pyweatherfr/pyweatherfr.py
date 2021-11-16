@@ -17,6 +17,9 @@ import time
 from pathlib import Path
 
 incomplete_data = False
+
+DOSSIER_CONFIG_PYWEATHER = "pyweatherfr"
+
 SUN = '\U0001F31E'
 MI_SUN = '\U0001F324'
 CLOUD = '\U0001F325'
@@ -190,28 +193,26 @@ def emoji_allign(key, allign):
     return prefixe + key
 
 
-def get_user_config_directory():
-    """Returns a platform-specific root directory for user config settings."""
+def get_user_config_directory_pyweather():
     if os.name == "nt":
         appdata = os.getenv("LOCALAPPDATA")
-        if appdata:
-            ze_path = os.path.join(appdata,"pyweatherfr")
+        if appdata:            
+            ze_path = os.path.join(appdata,DOSSIER_CONFIG_PYWEATHER,"")
             Path(ze_path).mkdir(parents=True, exist_ok=True)
             return ze_path
         appdata = os.getenv("APPDATA")
         if appdata:
-            ze_path = os.path.join(appdata,"pyweatherfr")
+            ze_path = os.path.join(appdata,DOSSIER_CONFIG_PYWEATHER,"")
             Path(ze_path).mkdir(parents=True, exist_ok=True)
             return ze_path            
         print(my_colored("erreur : impossible de créer le dossier de config","red"))
         sys.exit(1)
-    # On non-windows, use XDG_CONFIG_HOME if set, else default to ~/.config.
     xdg_config_home = os.getenv("XDG_CONFIG_HOME")
     if xdg_config_home:
         ze_path = os.path.join(xdg_config_home,"")
         Path(ze_path).mkdir(parents=True, exist_ok=True)
         return ze_path
-    ze_path = os.path.join(os.path.expanduser("~"), ".config","pyweatherfr","") 
+    ze_path = os.path.join(os.path.expanduser("~"), ".config",DOSSIER_CONFIG_PYWEATHER,"") 
     Path(ze_path).mkdir(parents=True, exist_ok=True)
     return ze_path 
 
@@ -220,113 +221,23 @@ def find():
     global incomplete_data
     incomplete_data = False
 
-    tmp_json = "villes.json"
-    if compute_args().cache or not os.path.exists(get_user_config_directory()+tmp_json) or (
-        time.time() - os.stat(get_user_config_directory()+tmp_json).st_mtime > 86400*30
-    ):
-        print(my_colored("cache des villes absent, expiré ou reset, en cours de téléchargement...","yellow"))
-        vjson = requests.get(
-        "https://www.prevision-meteo.ch/services/json/list-cities").json()
-        print_debug("enregistrement du cache dans " + get_user_config_directory()+tmp_json)
-        with open(get_user_config_directory()+tmp_json, 'w') as f:
-            json.dump(vjson, f)
-    else:
-        print_debug("recupération du cache depuis " + get_user_config_directory()+tmp_json)
-        with open(get_user_config_directory()+tmp_json, 'r') as f:
-            vjson =  json.load(f)
+    vjson = recuperation_data_villes()
 
     if compute_args().search:
-        search = compute_args().search
-        print_debug(
-            "recherche de la ville depuis https://www.prevision-meteo.ch/services/json/list-cities")
-        trouve = False
-        i = 0
-        try:
-            while True:
-                if vjson.get(str(i)).get("country") is not None and vjson.get(str(i)).get("country") == 'FRA':
-                    name = vjson.get(str(i)).get("name")
-                    npa = vjson.get(str(i)).get("npa")
-                    url = vjson.get(str(i)).get("url")
-                    if (str(search) == vjson.get(str(i)).get("npa")) or unidecode.unidecode(search.lower()).replace(" ", "-") in unidecode.unidecode(vjson.get(str(i)).get("name").lower()).replace(" ", "-") or unidecode.unidecode(vjson.get(str(i)).get("name").lower().replace(" ", "-")) in unidecode.unidecode(search.lower().replace(" ", "-")):
-                        trouve = True
-                        print(my_colored("pour " + name + " ("+npa+"), exécutez 'pyweatherfr " +
-                              url + "' or 'pyweatherfr -p " + npa+"'","yellow"))
-                i = i+1
-        except Exception:
-            if not trouve:
-                print(my_colored("erreur : pas de ville trouvée", "red"))
-            sys.exit(1)
+        search_town(vjson)
     elif compute_args().town:
-        town = unidecode.unidecode(
-            compute_args().town.lower()).replace(" ", "-")
-        print_debug("VILLE : " +
-                    unidecode.unidecode(compute_args().town.lower()).replace(" ", "-"))
-        url = town
-        print_debug("URL : " +
-                    unidecode.unidecode(compute_args().town.lower()).replace(" ", "-"))
+        url, town = obtain_url_and_town()
     elif compute_args().post:
-        post = compute_args().post.zfill(5)
-        print_debug("CODE_POSTAL : " + str(post))
-        print_debug(
-            "recherche de la VILLE et de l'URL depuis https://www.prevision-meteo.ch/services/json/list-cities")
-        i = 0
-        try:
-            while True:
-                if vjson.get(str(i)).get("country") is not None and vjson.get(str(i)).get("country") == 'FRA':
-                    if str(post) == vjson.get(str(i)).get("npa"):
-                        town = vjson.get(str(i)).get("name")
-                        print_debug("VILLE : " + town)
-                        url = vjson.get(str(i)).get("url")
-                        print_debug("URL : " + town)
-                        break
-                i = i+1
-        except Exception:
-            print(my_colored(
-                "erreur : pas de ville trouvée avec le code postal " + str(post), "red"))
-            print(my_colored(
-                "essayez avec un autre code postal, ou avec le code postal principal de la ville", "yellow"))
-            sys.exit(1)
+        url, town = obtain_url_and_town_from_cp(vjson)
     elif compute_args().gps:
-        print_debug("COORDONNEES_GPS :" + "latitude=" +
-                    str(compute_args().gps[0])+" longitude="+str(compute_args().gps[1]))
-        url = "lat="+compute_args().gps[0]+"lng="+compute_args().gps[1]
-        print_debug("URL : " + url)
-        town = None
+        url, town = obtain_url_and_town_from_gps()
     else:
-        with urllib.request.urlopen("https://geolocation-db.com/json") as url:
-            print_debug(
-                "recherche de la localisation depuis https://geolocation-db.com/json")
-            data = json.loads(url.read().decode())
-            print_debug(str(data))
-            town = data['city']
-            if town is None:
-                print(my_colored(
-                    "attention : pas de ville trouvée avec l'ip, utilisation des coordonnées GPS...", "yellow"))
-                print_debug("COORDONNEES_GPS :" + "latitude=" +
-                            str(data['latitude'])+" longitude="+str(data['longitude']))
-                url = "lat="+str(data['latitude']) + \
-                    "lng="+str(data['longitude'])
-                print_debug("URL : " + url)
-            else:
-                print_debug("VILLE : " + town)
-                url = town
-                print_debug("URL : " + url)
+        url, town = obtain_url_and_town_from_ip()
     print_debug(
         "recherche prévision depuis http://prevision-meteo.ch/services/json/"+url)
     r = requests.get("http://prevision-meteo.ch/services/json/"+url)
     if r.json().get("errors"):
-        print(my_colored("erreur : pas de données trouvées", "red"))
-        print_debug(r.json().get("errors")[0].get("code"))
-        print_debug(r.json().get("errors")[0].get("text"))
-        print_debug(r.json().get("errors")[0].get("description"))
-        if compute_args().town or compute_args().post:
-            print(my_colored("essayez de trouver un paramètre correct avec \"pyweatherfr -s '" +
-                  compute_args().town+"'\"", "yellow"))
-        else:
-            print(my_colored(
-                "essayez avec le lancement classique \"pyweatherfr [VILLE]\"", "yellow"))
-        exit(1)
-
+        display_error(r)
     if town is not None:
         print_debug(
             "recherche informations de la VILLE depuis https://www.prevision-meteo.ch/services/json/list-cities")
@@ -504,6 +415,121 @@ def find():
         if incomplete_data == True:
             print(my_colored(
                 "attention : données incomplètes, vous pouvez essayer une autre ville pour plus de précision", "yellow"))
+
+def display_error(r):
+    print(my_colored("erreur : pas de données trouvées", "red"))
+    print_debug(r.json().get("errors")[0].get("code"))
+    print_debug(r.json().get("errors")[0].get("text"))
+    print_debug(r.json().get("errors")[0].get("description"))
+    if compute_args().town or compute_args().post:
+        print(my_colored("essayez de trouver un paramètre correct avec \"pyweatherfr -s '" +
+                  compute_args().town+"'\"", "yellow"))
+    else:
+        print(my_colored(
+                "essayez avec le lancement classique \"pyweatherfr [VILLE]\"", "yellow"))
+    exit(1)
+
+def obtain_url_and_town_from_ip():
+    with urllib.request.urlopen("https://geolocation-db.com/json") as url:
+        print_debug(
+                "recherche de la localisation depuis https://geolocation-db.com/json")
+        data = json.loads(url.read().decode())
+        print_debug(str(data))
+        town = data['city']
+        if town is None:
+            print(my_colored(
+                    "attention : pas de ville trouvée avec l'ip, utilisation des coordonnées GPS...", "yellow"))
+            print_debug("COORDONNEES_GPS :" + "latitude=" +
+                            str(data['latitude'])+" longitude="+str(data['longitude']))
+            url = "lat="+str(data['latitude']) + \
+                    "lng="+str(data['longitude'])
+            print_debug("URL : " + url)
+        else:
+            print_debug("VILLE : " + town)
+            url = town
+            print_debug("URL : " + url)
+    return [url, town]
+
+def obtain_url_and_town_from_gps():
+    print_debug("COORDONNEES_GPS :" + "latitude=" +
+                    str(compute_args().gps[0])+" longitude="+str(compute_args().gps[1]))
+    url = "lat="+compute_args().gps[0]+"lng="+compute_args().gps[1]
+    print_debug("URL : " + url)
+    town = None
+    return [url, town]
+
+def obtain_url_and_town_from_cp(vjson):
+    post = compute_args().post.zfill(5)
+    print_debug("CODE_POSTAL : " + str(post))
+    print_debug(
+            "recherche de la VILLE et de l'URL depuis https://www.prevision-meteo.ch/services/json/list-cities")
+    i = 0
+    try:
+        while True:
+            if vjson.get(str(i)).get("country") is not None and vjson.get(str(i)).get("country") == 'FRA':
+                if str(post) == vjson.get(str(i)).get("npa"):
+                    town = vjson.get(str(i)).get("name")
+                    print_debug("VILLE : " + town)
+                    url = vjson.get(str(i)).get("url")
+                    print_debug("URL : " + town)
+                    break
+            i = i+1
+    except Exception:
+        print(my_colored(
+                "erreur : pas de ville trouvée avec le code postal " + str(post), "red"))
+        print(my_colored(
+                "essayez avec un autre code postal, ou avec le code postal principal de la ville", "yellow"))
+        sys.exit(1)
+    return [url, town]     
+
+def obtain_url_and_town():
+    town = unidecode.unidecode(
+            compute_args().town.lower()).replace(" ", "-")
+    print_debug("VILLE : " +
+                    unidecode.unidecode(compute_args().town.lower()).replace(" ", "-"))
+    url = town
+    print_debug("URL : " +
+                    unidecode.unidecode(compute_args().town.lower()).replace(" ", "-"))
+    return url, town
+
+def search_town(vjson):
+    search = compute_args().search
+    print_debug(
+            "recherche de la ville depuis https://www.prevision-meteo.ch/services/json/list-cities")
+    trouve = False
+    i = 0
+    try:
+        while True:
+            if vjson.get(str(i)).get("country") is not None and vjson.get(str(i)).get("country") == 'FRA':
+                name = vjson.get(str(i)).get("name")
+                npa = vjson.get(str(i)).get("npa")
+                url = vjson.get(str(i)).get("url")
+                if (str(search) == vjson.get(str(i)).get("npa")) or unidecode.unidecode(search.lower()).replace(" ", "-") in unidecode.unidecode(vjson.get(str(i)).get("name").lower()).replace(" ", "-") or unidecode.unidecode(vjson.get(str(i)).get("name").lower().replace(" ", "-")) in unidecode.unidecode(search.lower().replace(" ", "-")):
+                    trouve = True
+                    print(my_colored("pour " + name + " ("+npa+"), exécutez 'pyweatherfr " +
+                              url + "' or 'pyweatherfr -p " + npa+"'","yellow"))
+            i = i+1
+    except Exception:
+        if not trouve:
+            print(my_colored("erreur : pas de ville trouvée", "red"))
+        sys.exit(1)
+
+def recuperation_data_villes():
+    tmp_json = "villes.json"
+    if compute_args().cache or not os.path.exists(get_user_config_directory_pyweather()+tmp_json) or (
+        time.time() - os.stat(get_user_config_directory_pyweather()+tmp_json).st_mtime > 86400*30
+    ):
+        print(my_colored("cache des villes absent, expiré ou reset, en cours de téléchargement...","yellow"))
+        vjson = requests.get(
+        "https://www.prevision-meteo.ch/services/json/list-cities").json()
+        print_debug("enregistrement du cache dans " + get_user_config_directory_pyweather()+tmp_json)
+        with open(get_user_config_directory_pyweather()+tmp_json, 'w') as f:
+            json.dump(vjson, f)
+    else:
+        print_debug("recupération du cache depuis " + get_user_config_directory_pyweather()+tmp_json)
+        with open(get_user_config_directory_pyweather()+tmp_json, 'r') as f:
+            vjson =  json.load(f)
+    return vjson
 
 
 def my_colored(message, color):

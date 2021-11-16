@@ -1,7 +1,11 @@
 # TODO 
 
-- [ ] Refacto and deduplicate code
 - [ ] pyweatherfr -s 29217 ? duplicate?
+
+# 1.4.2 (WIP coming soon)
+
+- [ ] Refacto and deduplicate code
+- [ ] date format "Lun. 15 nov."
 
 # 1.4.1
 
