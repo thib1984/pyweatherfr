@@ -219,174 +219,94 @@ def get_user_config_directory_pyweather():
 def find():
 
     global incomplete_data
+    global is_gps
     incomplete_data = False
+    is_gps=False
 
     vjson = recuperation_data_villes()
 
     if compute_args().search:
         search_town(vjson)
     elif compute_args().town:
-        url, town = obtain_url_and_town()
+        url = obtain_url_and_town()
     elif compute_args().post:
-        url, town = obtain_url_and_town_from_cp(vjson)
+        url = obtain_url_and_town_from_cp(vjson)
     elif compute_args().gps:
-        url, town = obtain_url_and_town_from_gps()
+        is_gps=True
+        url = obtain_url_and_town_from_gps()
     else:
-        url, town = obtain_url_and_town_from_ip()
+        url = obtain_url_and_town_from_ip()
     print_debug(
         "recherche prévision depuis http://prevision-meteo.ch/services/json/"+url)
     r = requests.get("http://prevision-meteo.ch/services/json/"+url)
     if r.json().get("errors"):
         display_error(r)
-    if town is not None:
-        print_debug(
-            "recherche informations de la VILLE depuis https://www.prevision-meteo.ch/services/json/list-cities")
-        city = r.json().get("city_info").get("name")
-        try:
-            i = 0
-            while True:
-                if vjson.get(str(i)).get("country") is not None and vjson.get(str(i)).get("country") == 'FRA':
-                    if unidecode.unidecode(town.lower()) == unidecode.unidecode(vjson.get(str(i)).get("name").lower()):
-                        npa = vjson.get(str(i)).get("npa")
-                        country = vjson.get(str(i)).get("country")
-                        print_debug("CODE_POSTAL : " + npa)
-                        print_debug("COUNTRY : " + country)
-                        infos = "("+country + " - " + npa+")"
-                        break
-                i = i+1
-                infos = ""
-        except Exception:
-            print(my_colored("erreur : la VILLE n'est pas en France", "red"))
-            print(my_colored("essayez de trouver un paramètre correct avec \"pyweatherfr -s '" +
-                  compute_args().town+"'\"", "yellow"))
-            sys.exit(1)
-    else:
-        city = "."
+    if is_gps:
         infos = "("+url+")"
-    if compute_args().jour == -1:
+        city = "."
+        elevation = ".m"    
+    else:
+        infos = obtain_info_town(vjson, url, r)
+        city = r.json().get("city_info").get("name")
         elevation = valueorNA(r.json().get("city_info").get("elevation"))+"m"
-        sunrise = valueorNA(r.json().get("city_info").get("sunrise"))
-        sunset = valueorNA(r.json().get("city_info").get("sunset"))
-        date = valueorNA(r.json().get("current_condition").get("date"))
-        hour = valueorNA(r.json().get("current_condition").get("hour"))
-        altprev = valueorNA(r.json().get("forecast_info").get("elevation"))+"m"
-        time_now = date + " "+hour
-        condition_now = emoji_allign(valueorNA(r.json().get(
-            "current_condition").get("condition")),False)
-        temp_now = emoji_tmp_allign(str(valueorNA(r.json().get(
-            "current_condition").get("tmp"))),False)
-        humidity_now = str(valueorNA(r.json().get(
-            "current_condition").get("humidity")))+"%"
-        wnd_spd = emoji_wnd_allign(str(valueorNA(r.json().get(
-            "current_condition").get("wnd_spd"))),False)
-        wnd_dir = valueorNA(r.json().get("current_condition").get("wnd_dir"))
-        wind_now = wnd_spd + "(" + wnd_dir + ")"
-        pression_now = str(valueorNA(r.json().get(
-            "current_condition").get("pressure")))+" Hp"
-        headers = ['date', 'condition', 'température', 'précipitations']
-        data = []
-        for i in [0, 1, 2, 3, 4]:
-            pluie = "."
-            date_i = valueorNA(r.json().get("fcst_day_"+str(i)).get("date"))
-            day_short_i = valueorNA(r.json().get(
-                "fcst_day_"+str(i)).get("day_short"))
-            day = date_i + " ("+day_short_i + ")"
-            condition = emoji(valueorNA(r.json().get(
-                "fcst_day_"+str(i)).get("condition")))
-            temp = emoji_tmp(str(valueorNA(r.json().get("fcst_day_"+str(i))).get("tmin"))) + \
-                "-> " + \
-                emoji_tmp_right(str(valueorNA(r.json().get("fcst_day_"+str(i)).get("tmax"))))
-            is_snow_day = False
-            for h in range(0, 24):
-                hourly_pluie = valueorNA(r.json().get(
-                    "fcst_day_"+str(i)).get("hourly_data").get(str(h)+"H00").get("APCPsfc"))
-                if hourly_pluie != ".":
-                    if pluie == ".":
-                        pluie = 0
-                    if hourly_pluie != 0 and r.json().get("fcst_day_"+str(i)).get("hourly_data").get(str(h)+"H00").get("ISSNOW")>0:
-                        is_snow_day = True                        
-                    pluie = pluie+hourly_pluie
-            if pluie == ".":
-                pluie = emoji_rain(str("."),False)
-            elif pluie > 0:
-                pluie = emoji_rain(str(round(pluie, 1)),is_snow_day)
-            else:
-                 pluie = emoji_rain(str("0"),False)
-            data.append([day, condition, temp, pluie])
-
-        if not compute_args().condensate:
-            print("")
-            print(my_colored("ville       : " + city + " " + infos, "yellow"))
-            print(my_colored("altitude    : " + elevation, "yellow"))
-            print("")
-            print(my_colored("heure       : " + time_now, "green"))
-            print(my_colored("condition   : " + condition_now, "green"))
-            print(my_colored("température : " + temp_now, "green"))
-            print(my_colored("humidité    : " + humidity_now, "green"))
-            print(my_colored("vent        : " + wind_now, "green"))
-            print(my_colored("pression    : " + pression_now, "green"))
-            print(my_colored("soleil      : " + sunrise+" - "+sunset, "green"))
-            print("")
-            table = columnar(data, headers, no_borders=False,wrap_max=0)
-            print(table)
-        else:
-            print(my_colored(time_now + " " + city + " " + infos + " " + elevation+ " " + sunrise + "-" + sunset, "green"))
-            print(my_colored(condition + " " + temp_now + " " + humidity_now + " "+wind_now + " "+pression_now+ " (" + altprev + ") ", "green"))
-            table = columnar(data, no_borders=True,wrap_max=0)
-            print(table)
-
-        if incomplete_data == True:
-            print(my_colored(
+    if compute_args().jour == -1:
+        previsions_generiques(r, infos, city)
+    else:
+        previsions_detaillees(r, infos, city)
+    if incomplete_data == True:
+        print(my_colored(
                 "attention : données incomplètes, vous pouvez essayer une autre ville pour plus de précision", "yellow"))
 
-    else:
-        # cas day
-        elevation = valueorNA(r.json().get("city_info").get("elevation"))+"m"
-        altprev = valueorNA(r.json().get("forecast_info").get("elevation"))+"m"
-        sunrise = valueorNA(r.json().get("city_info").get("sunrise"))
-        sunset = valueorNA(r.json().get("city_info").get("sunset"))
-        json_day = r.json().get("fcst_day_"+str(compute_args().jour))
-        date_long_format = valueorNA(json_day.get(
+def previsions_detaillees(r, infos, city):
+    # cas day
+    elevation = valueorNA(r.json().get("city_info").get("elevation"))+"m"
+    altprev = valueorNA(r.json().get("forecast_info").get("elevation"))+"m"
+    sunrise = valueorNA(r.json().get("city_info").get("sunrise"))
+    sunset = valueorNA(r.json().get("city_info").get("sunset"))
+    json_day = r.json().get("fcst_day_"+str(compute_args().jour))
+    date_long_format = valueorNA(json_day.get(
             "date")) + " ("+valueorNA(json_day.get("day_short")) + ")"
-        temp_delta = emoji_tmp_allign(str(valueorNA(json_day.get("tmin"))),False) + \
+    temp_delta = emoji_tmp_allign(str(valueorNA(json_day.get("tmin"))),False) + \
             "-> "+emoji_tmp_allign_right(str(valueorNA(json_day.get("tmax"))),False)
-        condition = emoji_allign(valueorNA(r.json().get(
+    condition = emoji_allign(valueorNA(r.json().get(
             "fcst_day_"+str(compute_args().jour)).get("condition")),False)
-        total_pluie = "."
-        headers = ['heure', 'condition', 'température', 'humidité', 'pression', 'précipitations', 'vent']
-        data = []
-        is_snow_day = False
-        for h in range(0, 24):
-            hourly_data = json_day.get("hourly_data").get(str(h)+"H00")
-            hour = str(h)+"H00"
-            cond = emoji(valueorNA(hourly_data.get("CONDITION")))
-            temp = emoji_tmp(str(valueorNA(hourly_data.get("TMP2m"))))
-            hum = str(valueorNA(hourly_data.get("RH2m"))) + "%"
-            pression = str(valueorNA(hourly_data.get("PRMSL")))+"Hp"
-            if hourly_data.get("APCPsfc") is None:
-                pluie = emoji_rain(str("."),False)
-            elif hourly_data.get("APCPsfc") == 0:
-                pluie = emoji_rain(str("0"),False)
-                if total_pluie == ".":
-                    total_pluie = 0
-            else:
-                pluie = emoji_rain(
-                    str(hourly_data.get("APCPsfc")),hourly_data.get("ISSNOW")>=1)
-                if total_pluie == ".":
-                    total_pluie = 0
-                if hourly_data.get("ISSNOW")>0:
-                    is_snow_day = True    
-                total_pluie = total_pluie+hourly_data.get("APCPsfc")
-            wind = emoji_wnd(str(valueorNA(hourly_data.get("WNDSPD10m")))) + \
-                "(" + str(valueorNA(hourly_data.get("WNDDIRCARD10"))) + ") "
-            data.append([hour, cond, temp, hum, pression, pluie, wind])
-        if total_pluie == ".":
-            total_pluie == emoji_rain_allign(str("."),False,False)
-        elif total_pluie > 0:
-            total_pluie = emoji_rain_allign(str(round(total_pluie, 1)),is_snow_day,False)
+    total_pluie = "."
+    headers = ['heure', 'condition', 'température', 'humidité', 'pression', 'précipitations', 'vent']
+    data = []
+    is_snow_day = False
+    for h in range(0, 24):
+        hourly_data = json_day.get("hourly_data").get(str(h)+"H00")
+        hour = str(h)+"H00"
+        cond = emoji(valueorNA(hourly_data.get("CONDITION")))
+        temp = emoji_tmp(str(valueorNA(hourly_data.get("TMP2m"))))
+        hum = str(valueorNA(hourly_data.get("RH2m"))) + "%"
+        pression = str(valueorNA(hourly_data.get("PRMSL")))+"Hp"
+        if hourly_data.get("APCPsfc") is None:
+            pluie = emoji_rain(str("."),False)
+        elif hourly_data.get("APCPsfc") == 0:
+            pluie = emoji_rain(str("0"),False)
+            if total_pluie == ".":
+                total_pluie = 0
         else:
-            total_pluie = emoji_rain_allign(str("0"),False,False)
-        if not compute_args().condensate:
+            pluie = emoji_rain(
+                    str(hourly_data.get("APCPsfc")),hourly_data.get("ISSNOW")>=1)
+            if total_pluie == ".":
+                total_pluie = 0
+            if hourly_data.get("ISSNOW")>0:
+                is_snow_day = True    
+            total_pluie = total_pluie+hourly_data.get("APCPsfc")
+        wind = emoji_wnd(str(valueorNA(hourly_data.get("WNDSPD10m")))) + \
+                "(" + str(valueorNA(hourly_data.get("WNDDIRCARD10"))) + ") "
+        if json_day.get("date"):        
+            data.append([hour, cond, temp, hum, pression, pluie, wind])
+    if total_pluie == ".":
+        total_pluie == emoji_rain_allign(str("."),False,False)
+    elif total_pluie > 0:
+        total_pluie = emoji_rain_allign(str(round(total_pluie, 1)),is_snow_day,False)
+    else:
+        total_pluie = emoji_rain_allign(str("0"),False,False)
+    if not compute_args().condensate:
+        if date_long_format != ". (.)":
             print("")
             print(my_colored("ville       : " + city + " " + infos, "yellow"))
             print(my_colored("altitude    : " + elevation, "yellow"))
@@ -395,26 +315,138 @@ def find():
             print(my_colored("température : " + temp_delta, "green"))
             print(my_colored("précip.     : " + total_pluie, "green"))
             print(my_colored("condition   : " + condition, "green"))
-            if compute_args().jour == 0:
-                print(my_colored("soleil      : " + sunrise+" - "+sunset, "green"))
+        else:
             print("")
+            print(my_colored("ville       : " + city + " " + infos, "yellow"))
+            print(my_colored("altitude    : " + elevation, "yellow"))
+            print("")
+        if compute_args().jour == 0:
+            print(my_colored("soleil      : " + sunrise+" - "+sunset, "green"))
+        print("")
+        if data != []:
             table = columnar(data, headers, no_borders=False,wrap_max=0)
             print(table)
-        else:
-            if compute_args().jour == 0:
-                print(my_colored(date_long_format + " " + city + " " + infos + " " + elevation + " " + sunrise +
+    else:
+        if compute_args().jour == 0:
+            print(my_colored(date_long_format + " " + city + " " + infos + " " + elevation + " " + sunrise +
                       "-" + sunset, "green"))
-                print(my_colored(condition + "  " + temp_delta + " " + total_pluie+ " (" + altprev + ") ", "green"))                      
-            else:
-                print(my_colored(date_long_format + " " + city + " " + infos + " " + elevation, "green"))
-                print(my_colored(condition + "  " + temp_delta + " " + total_pluie+ " (" + altprev + ") ", "green"))                      
+            print(my_colored(condition + "  " + temp_delta + " " + total_pluie+ " (" + altprev + ") ", "green"))                      
+        else:
+            print(my_colored(date_long_format + " " + city + " " + infos + " " + elevation, "green"))
+            print(my_colored(condition + "  " + temp_delta + " " + total_pluie+ " (" + altprev + ") ", "green"))                      
 
-            table = columnar(data, no_borders=True,wrap_max=0)
-            print(table)
+        table = columnar(data, no_borders=True,wrap_max=0)
+        print(table)
             
-        if incomplete_data == True:
-            print(my_colored(
-                "attention : données incomplètes, vous pouvez essayer une autre ville pour plus de précision", "yellow"))
+
+def previsions_generiques(r, infos, city):
+    gps = "lat. " +r.json().get("city_info").get("latitude")+" / long. " +r.json().get("city_info").get("longitude")
+    if not is_gps:
+        elevation = valueorNA(r.json().get("city_info").get("elevation"))+"m"
+    else:
+        elevation = valueorNA(r.json().get("forecast_info").get("elevation"))+"m"
+    sunrise = valueorNA(r.json().get("city_info").get("sunrise"))
+    sunset = valueorNA(r.json().get("city_info").get("sunset"))
+    condition_now = emoji_allign(valueorNA(r.json().get(
+            "current_condition").get("condition")),False)
+    date = valueorNA(r.json().get("current_condition").get("date"))
+    hour = valueorNA(r.json().get("current_condition").get("hour"))
+    time_now = date + " "+hour
+    temp_now = emoji_tmp_allign(str(valueorNA(r.json().get(
+            "current_condition").get("tmp"))),False)
+    humidity_now = str(valueorNA(r.json().get(
+            "current_condition").get("humidity")))+"%"
+    wnd_spd = emoji_wnd_allign(str(valueorNA(r.json().get(
+            "current_condition").get("wnd_spd"))),False)
+    wnd_dir = valueorNA(r.json().get("current_condition").get("wnd_dir"))
+    wind_now = wnd_spd + "(" + wnd_dir + ")"
+    pression_now = str(valueorNA(r.json().get(
+            "current_condition").get("pressure")))+" Hp"
+    headers = ['date', 'condition', 'température', 'précipitations']
+    data = []
+    for i in [0, 1, 2, 3, 4]:
+        pluie = "."
+        date_i = valueorNA(r.json().get("fcst_day_"+str(i)).get("date"))
+        day_short_i = valueorNA(r.json().get(
+                "fcst_day_"+str(i)).get("day_short"))
+        day = date_i + " ("+day_short_i + ")"
+        condition = emoji(valueorNA(r.json().get(
+                "fcst_day_"+str(i)).get("condition")))
+        temp = emoji_tmp(str(valueorNA(r.json().get("fcst_day_"+str(i))).get("tmin"))) + \
+                "-> " + \
+                emoji_tmp_right(str(valueorNA(r.json().get("fcst_day_"+str(i)).get("tmax"))))
+        is_snow_day = False
+        for h in range(0, 24):
+            hourly_pluie = valueorNA(r.json().get(
+                    "fcst_day_"+str(i)).get("hourly_data").get(str(h)+"H00").get("APCPsfc"))
+            if hourly_pluie != ".":
+                if pluie == ".":
+                    pluie = 0
+                if hourly_pluie != 0 and r.json().get("fcst_day_"+str(i)).get("hourly_data").get(str(h)+"H00").get("ISSNOW")>0:
+                    is_snow_day = True                        
+                pluie = pluie+hourly_pluie
+        if pluie == ".":
+            pluie = emoji_rain(str("."),False)
+        elif pluie > 0:
+            pluie = emoji_rain(str(round(pluie, 1)),is_snow_day)
+        else:
+             pluie = emoji_rain(str("0"),False)
+        if day !=". (.)":     
+            data.append([day, condition, temp, pluie])
+
+    if not compute_args().condensate:
+        print("")
+        if not is_gps:
+            print(my_colored("ville       : " + city + " " + infos, "yellow"))
+            print(my_colored("altitude    : " + elevation, "yellow"))
+            print("")
+        else:
+            print(my_colored("coord. gps. : " + gps, "yellow"))
+            print(my_colored("altitude    : " + elevation, "yellow"))
+            print("")            
+        if time_now != ". .":
+            print(my_colored("heure       : " + time_now, "green"))
+            print(my_colored("condition   : " + condition_now, "green"))
+            print(my_colored("température : " + temp_now, "green"))
+            print(my_colored("humidité    : " + humidity_now, "green"))
+            print(my_colored("vent        : " + wind_now, "green"))
+            print(my_colored("pression    : " + pression_now, "green"))
+            print(my_colored("lev./couch. : " + sunrise+" - "+sunset, "green"))
+        else:
+            print(my_colored("soleil      : " + sunrise+" - "+sunset, "green"))                
+        print("")
+        if data != []:
+            table = columnar(data, headers, no_borders=False,wrap_max=0)
+            print(table)
+    else:
+        print(my_colored(time_now + " " + city + " " + infos + " " + elevation+ " " + sunrise + "-" + sunset, "green"))
+        print(my_colored(condition + " " + temp_now + " " + humidity_now + " "+wind_now + " "+pression_now+ " (" + altprev + ") ", "green"))
+        table = columnar(data, no_borders=True,wrap_max=0)
+        print(table)
+
+
+def obtain_info_town(vjson, url, r):
+    print_debug(
+            "recherche informations de la VILLE depuis https://www.prevision-meteo.ch/services/json/list-cities")
+    try:
+        i = 0
+        while True:
+            if vjson.get(str(i)).get("country") is not None and vjson.get(str(i)).get("country") == 'FRA':
+                if unidecode.unidecode(url.lower()) == unidecode.unidecode(vjson.get(str(i)).get("url").lower()):
+                    npa = vjson.get(str(i)).get("npa")
+                    country = vjson.get(str(i)).get("country")
+                    print_debug("CODE_POSTAL : " + npa)
+                    print_debug("COUNTRY : " + country)
+                    infos = "("+country + " - " + npa+")"
+                    break
+            i = i+1
+            infos = ""
+        return infos
+    except Exception:
+        print(my_colored("erreur : la VILLE n'est pas en France", "red"))
+        print(my_colored("essayez de trouver un paramètre correct avec \"pyweatherfr -s '" +
+                  compute_args().town+"'\"", "yellow"))
+        sys.exit(1)
 
 def display_error(r):
     print(my_colored("erreur : pas de données trouvées", "red"))
@@ -430,6 +462,7 @@ def display_error(r):
     exit(1)
 
 def obtain_url_and_town_from_ip():
+    global is_gps
     with urllib.request.urlopen("https://geolocation-db.com/json") as url:
         print_debug(
                 "recherche de la localisation depuis https://geolocation-db.com/json")
@@ -441,22 +474,21 @@ def obtain_url_and_town_from_ip():
                     "attention : pas de ville trouvée avec l'ip, utilisation des coordonnées GPS...", "yellow"))
             print_debug("COORDONNEES_GPS :" + "latitude=" +
                             str(data['latitude'])+" longitude="+str(data['longitude']))
+            is_gps = True
             url = "lat="+str(data['latitude']) + \
                     "lng="+str(data['longitude'])
             print_debug("URL : " + url)
         else:
-            print_debug("VILLE : " + town)
             url = town
             print_debug("URL : " + url)
-    return [url, town]
+    return url
 
 def obtain_url_and_town_from_gps():
     print_debug("COORDONNEES_GPS :" + "latitude=" +
                     str(compute_args().gps[0])+" longitude="+str(compute_args().gps[1]))
     url = "lat="+compute_args().gps[0]+"lng="+compute_args().gps[1]
     print_debug("URL : " + url)
-    town = None
-    return [url, town]
+    return url
 
 def obtain_url_and_town_from_cp(vjson):
     post = compute_args().post.zfill(5)
@@ -468,10 +500,8 @@ def obtain_url_and_town_from_cp(vjson):
         while True:
             if vjson.get(str(i)).get("country") is not None and vjson.get(str(i)).get("country") == 'FRA':
                 if str(post) == vjson.get(str(i)).get("npa"):
-                    town = vjson.get(str(i)).get("name")
-                    print_debug("VILLE : " + town)
                     url = vjson.get(str(i)).get("url")
-                    print_debug("URL : " + town)
+                    print_debug("URL : " + url)
                     break
             i = i+1
     except Exception:
@@ -480,17 +510,13 @@ def obtain_url_and_town_from_cp(vjson):
         print(my_colored(
                 "essayez avec un autre code postal, ou avec le code postal principal de la ville", "yellow"))
         sys.exit(1)
-    return [url, town]     
+    return url    
 
 def obtain_url_and_town():
-    town = unidecode.unidecode(
+    url = unidecode.unidecode(
             compute_args().town.lower()).replace(" ", "-")
-    print_debug("VILLE : " +
-                    unidecode.unidecode(compute_args().town.lower()).replace(" ", "-"))
-    url = town
-    print_debug("URL : " +
-                    unidecode.unidecode(compute_args().town.lower()).replace(" ", "-"))
-    return url, town
+    print_debug("URL : " + url)
+    return url
 
 def search_town(vjson):
     search = compute_args().search
@@ -545,7 +571,7 @@ def print_debug(message):
 
 def valueorNA(my_string):
     global incomplete_data
-    if my_string is None:
+    if my_string is None or my_string =='NA':
         incomplete_data = True
         return "."
     return my_string
