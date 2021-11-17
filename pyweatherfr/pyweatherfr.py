@@ -243,6 +243,7 @@ def find():
     global is_gps
     incomplete_data = False
     is_gps = False
+    doublon_cp=False
 
     vjson = recuperation_data_villes()
 
@@ -251,7 +252,7 @@ def find():
     elif compute_args().town:
         url = obtain_url_and_town()
     elif compute_args().post:
-        url = obtain_url_and_town_from_cp(vjson)
+        url,doublon_cp = obtain_url_and_town_from_cp(vjson)
     elif compute_args().gps:
         is_gps = True
         url = obtain_url_and_town_from_gps()
@@ -281,6 +282,13 @@ def find():
                 "yellow",
             )
         )
+    if doublon_cp:
+         print(
+            my_colored(
+                "attention : il existe plusieurs villes associées au code postal. Jouez \"pyweather -s " + compute_args().post+"\"" + " pour trouver la ville souhaitée ",
+                "yellow",
+            )
+        )           
 
 
 def previsions_detaillees(r, infos, city):
@@ -689,32 +697,38 @@ def obtain_url_and_town_from_cp(vjson):
     )
     i = 0
     try:
+        trouve=False
+        doublon=False
         while True:
             if (
                 vjson.get(str(i)).get("country") is not None
                 and vjson.get(str(i)).get("country") == "FRA"
             ):
                 if str(post) == vjson.get(str(i)).get("npa"):
-                    url = vjson.get(str(i)).get("url")
-                    print_debug("URL : " + url)
-                    break
+                    if not trouve:
+                        url = vjson.get(str(i)).get("url")
+                        print_debug("URL : " + url)
+                    if trouve:
+                        doublon=True    
+                    trouve = True
             i = i + 1
     except Exception:
-        print(
-            my_colored(
-                "erreur : pas de ville trouvée avec le code postal "
-                + str(post),
-                "red",
+        if not trouve:
+            print(
+                my_colored(
+                    "erreur : pas de ville trouvée avec le code postal "
+                    + str(post),
+                    "red",
+                )
             )
-        )
-        print(
-            my_colored(
-                "essayez avec un autre code postal, ou avec le code postal principal de la ville",
-                "yellow",
+            print(
+                my_colored(
+                    "essayez avec un autre code postal, ou avec le code postal principal de la ville",
+                    "yellow",
+                )
             )
-        )
-        sys.exit(1)
-    return url
+            sys.exit(1)
+    return url,doublon
 
 
 def obtain_url_and_town():

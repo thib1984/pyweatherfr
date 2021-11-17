@@ -1,7 +1,6 @@
 # TODO 
 
-- [ ] pyweatherfr -s 29217 ? duplicate?
-
+- [ ] Refacto and deduplicate code (bis)
 # 1.4.2 (WIP coming soon)
 
 - [x] Refacto and deduplicate code
@@ -9,6 +8,7 @@
 - [x] arrondi affichage coordonnees GPS
 - [x] pyweatherfr -s "La Rochelle" fix
 - [x] Fix if no data (ex : Étival-lès-le-Mans) (bis)
+- [x] pyweatherfr -p 29217 ? duplicate?
 # 1.4.1
 
 - [x] requests import
