@@ -1,7 +1,7 @@
 # TODO 
 
 - [ ] Refacto and deduplicate code (bis)
-# 1.4.2 (WIP coming soon)
+# 1.4.2
 
 - [x] Refacto and deduplicate code
 - [x] date format "Lun. 15/11/2020"
@@ -9,6 +9,7 @@
 - [x] pyweatherfr -s "La Rochelle" fix
 - [x] Fix if no data (ex : Étival-lès-le-Mans) (bis)
 - [x] pyweatherfr -p 29217 ? duplicate?
+- [x] rework -c option
 # 1.4.1
 
 - [x] requests import

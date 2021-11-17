@@ -285,7 +285,7 @@ def find():
     if doublon_cp:
          print(
             my_colored(
-                "attention : il existe plusieurs villes associées au code postal. Jouez \"pyweather -s " + compute_args().post+"\"" + " pour trouver la ville souhaitée ",
+                "attention : il existe plusieurs villes associées au code postal. Si besoin, jouez \"pyweather -s " + compute_args().post+"\"" + " pour trouver la ville souhaitée ",
                 "yellow",
             )
         )           
@@ -531,7 +531,7 @@ def print_generic_data_town(infos, city, gps, elevation):
     if not is_gps:
         print(
             my_colored(
-                "ville       : " + city + " " + infos, "yellow"
+                "ville       : " + re.sub(" \([0-9]+\)", "", city) + " " + infos, "yellow"
             )
         )
         print(my_colored("altitude    : " + elevation, "yellow"))
