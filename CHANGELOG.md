@@ -6,6 +6,7 @@
 
 - [ ] Refacto and deduplicate code
 - [ ] date format "Lun. 15 nov."
+- [ ] arrondi affichage coordonnees GPS
 
 # 1.4.1
 
