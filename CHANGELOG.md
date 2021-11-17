@@ -4,10 +4,11 @@
 
 # 1.4.2 (WIP coming soon)
 
-- [ ] Refacto and deduplicate code
-- [ ] date format "Lun. 15 nov."
-- [ ] arrondi affichage coordonnees GPS
-
+- [x] Refacto and deduplicate code
+- [x] date format "Lun. 15/11/2020"
+- [x] arrondi affichage coordonnees GPS
+- [x] pyweatherfr -s "La Rochelle" fix
+- [x] Fix if no data (ex : Étival-lès-le-Mans) (bis)
 # 1.4.1
 
 - [x] requests import
@@ -15,7 +16,6 @@
 
 # 1.4.0
 
-- [x] cache town cities (5Mo!) : 1 month
 - [x] fix emoji : Averses de neige faible
 - [x] afficher altitude prévision
 - [x] snow or rain for precipitations
