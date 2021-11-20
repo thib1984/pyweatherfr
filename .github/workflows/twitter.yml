@@ -22,7 +22,7 @@ jobs:
       #installation          
       - name: install pyweatherfr 
         run: |
-          pip install pyweatherfr && pyweatherfr nantes
+          pip install pyweatherfr && pyweatherfr nantes && mkdir export
       - name: execute
         run: pyweatherfr nantes > export/export.txt
       - name: Generate pngs
