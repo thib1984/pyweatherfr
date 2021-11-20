@@ -27,7 +27,7 @@ jobs:
       - name: Launch one
         run: mkdir export && mkdir snaps && pyweatherfr nantes
       - name: Launch two
-        run: pyweather nantes > export/export.txt
+        run: pyweatherfr nantes > export/export.txt
       - name: Generate pngs
         uses: sharadcodes/code-snap-action@v1.0
         with:
