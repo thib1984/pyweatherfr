@@ -1,15 +1,19 @@
 from twython import Twython
+# required libraries
+import os
 
-consumer_key        = 'ABCDEFGHIJKLKMNOPQRSTUVWXYZ'
-consumer_secret     = '1234567890ABCDEFGHIJKLMNOPQRSTUVXYZ'
-access_token        = 'ZYXWVUTSRQPONMLKJIHFEDCBA'
-access_token_secret = '0987654321ZYXWVUTSRQPONMLKJIHFEDCBA'
+# get emails and password from environment variables
+CONSUMER_KEY = os.environ.get("CONSUMER_KEY")
+CONSUMER_SECRET = os.environ.get("CONSUMER_SECRET")
+ACCESS_TOKEN = os.environ.get("ACCESS_TOKEN")
+ACCESS_TOKEN_SECRET = os.environ.get("ACCESS_TOKEN_SECRET")
+
 
 twitter = Twython(
-    consumer_key,
-    consumer_secret,
-    access_token,
-    access_token_secret
+    CONSUMER_KEY,
+    CONSUMER_SECRET,
+    ACCESS_TOKEN,
+    ACCESS_TOKEN_SECRET
 )
 
 message = "Hello world!"

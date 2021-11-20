@@ -20,13 +20,10 @@ jobs:
         run: |
           python -m pip install --upgrade pip
       #installation          
-      - name: install pypodo
+      - name: install pyweatherfr 
         run: |
-          pip install .
-      #test
-      - name: Launch one
-        run: mkdir export && mkdir snaps && pyweatherfr nantes
-      - name: Launch two
+          pip install pyweatherfr && pyweatherfr nantes
+      - name: execute
         run: pyweatherfr nantes > export/export.txt
       - name: Generate pngs
         uses: sharadcodes/code-snap-action@v1.0
@@ -37,5 +34,10 @@ jobs:
       - name: list
         run: ls snaps/*
       - name: tweet
+        env: 
+          CONSUMER_KEY: ${{ secrets.CONSUMER_KEY }}
+          CONSUMER_SECRET: ${{ secrets.CONSUMER_SECRET }}
+          ACCESS_TOKEN: ${{ secrets.ACCESS_TOKEN }}
+          ACCESS_TOKEN_SECRET: ${{ secrets.ACCESS_TOKEN_SECRET }}
         run: pip install twython && python .github/tweet.py  
     
