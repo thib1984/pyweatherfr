@@ -15,7 +15,7 @@ twitter = Twython(
 )
 
 message = "Hello world - here's a picture!"
-image = open('snaps/export.png', 'rb')
+image = open('export/export.png', 'rb')
 response = twitter.upload_media(media=image)
 media_id = [response['media_id']]
 

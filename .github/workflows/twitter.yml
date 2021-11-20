@@ -33,7 +33,7 @@ jobs:
       - name: export png
         run: carbon-now -h -t export.png export/export.txt  
       - name: list
-        run: ls snaps/*
+        run: ls export/*
       - name: tweet
         env: 
           CONSUMER_KEY: ${{ secrets.CONSUMER_KEY }}
