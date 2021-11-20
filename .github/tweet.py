@@ -21,5 +21,4 @@ media_id = [response['media_id']]
 
 twitter.update_status(status=message, media_ids=media_id)
 
-twitter.update_status(status=message)
 print("Tweeted: %s" % message)
