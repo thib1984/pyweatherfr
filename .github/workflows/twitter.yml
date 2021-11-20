@@ -31,7 +31,7 @@ jobs:
       - name: execute
         run: pyweatherfr nantes > export/export.txt
       - name: export png
-        run: carbon-now export/export.txt  
+        run: carbon-now -h export/export.txt  
       - name: list
         run: ls snaps/*
       - name: tweet
