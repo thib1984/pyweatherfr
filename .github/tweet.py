@@ -14,7 +14,7 @@ twitter = Twython(
     ACCESS_TOKEN_SECRET
 )
 
-message = "Meteo du jour sur Nantes. Image obtenue depuis l'outil pyweatherfr. Source data : http://prevision-meteo.ch "
+message = "#Meteo du jour sur #Nantes. Image obtenue depuis l'outil pyweatherfr. Source data : http://prevision-meteo.ch "
 image = open('export.png', 'rb')
 response = twitter.upload_media(media=image)
 media_id = [response['media_id']]
