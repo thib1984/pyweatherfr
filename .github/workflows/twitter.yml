@@ -1,10 +1,10 @@
-name: test ubuntulatest pythonlatest
+name: auto twitter
 
 on:
   workflow_dispatch:
 
 jobs:
-  full_test:       
+  twitter:       
     runs-on: 'ubuntu-20.04'
     name: test package with ubuntu20.04 et python3.9
     steps:
