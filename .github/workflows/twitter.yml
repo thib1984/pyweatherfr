@@ -25,12 +25,12 @@ jobs:
           pip install pyweatherfr && pyweatherfr nantes && mkdir export
       - name: execute
         run: pyweatherfr nantes > export/export.txt
-      - name: Generate pngs
-        uses: sharadcodes/code-snap-action@v1.0
-        with:
-          source_folder: "export" # This field is required and it is the folder which contains the source files.
-          output_folder: "snaps" # This field is required and it is the folder which contains the snaps.
-          syntax_theme: "emacs" # This field is required and it is the syntax highlighting theme that will be used.        
+      # - name: Generate pngs
+      #   uses: sharadcodes/code-snap-action@v1.0
+      #   with:
+      #     source_folder: "export" # This field is required and it is the folder which contains the source files.
+      #     output_folder: "snaps" # This field is required and it is the folder which contains the snaps.
+      #     syntax_theme: "emacs" # This field is required and it is the syntax highlighting theme that will be used.        
       - name: list
         run: ls snaps/*
       - name: tweet
