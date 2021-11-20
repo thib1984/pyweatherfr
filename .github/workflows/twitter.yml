@@ -36,4 +36,6 @@ jobs:
           syntax_theme: "emacs" # This field is required and it is the syntax highlighting theme that will be used.        
       - name: list
         run: ls snaps/*
+      - name: tweet
+        run: pip install twython && python .github/tweet.py  
     
