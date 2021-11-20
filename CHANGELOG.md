@@ -1,6 +1,13 @@
 # TODO 
 
 - [ ] Refacto and deduplicate code (bis)
+- [ ] Allign (cf carbon)
+
+# 1.4.3 (WIP)
+
+- [x] Allign sun
+- [x] Supprimer pression
+- [x] 0H00 -> 0H ?
 # 1.4.2
 
 - [x] Refacto and deduplicate code

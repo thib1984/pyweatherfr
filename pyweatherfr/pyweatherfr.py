@@ -133,7 +133,7 @@ def emoji_allign(key, allign):
         return key
 
     if key == "Ensoleillé":
-        return SUN + " " + key + " "
+        return SUN + "  " + key + " "
 
     if key == "Nuit claire":
         return NIGHT_CLEAR + "  " + key + " "
@@ -320,7 +320,6 @@ def previsions_detaillees(r, infos, city):
         "condition",
         "température",
         "humidité",
-        "pression",
         "précipitations",
         "vent",
     ]
@@ -328,11 +327,10 @@ def previsions_detaillees(r, infos, city):
     is_snow_day = False
     for h in range(0, 24):
         hourly_data = json_day.get("hourly_data").get(str(h) + "H00")
-        hour = str(h) + "H00"
+        hour = str(h) + "H"
         cond = emoji(valueorNA(hourly_data.get("CONDITION")))
         temp = emoji_tmp(str(valueorNA(hourly_data.get("TMP2m"))))
         hum = str(valueorNA(hourly_data.get("RH2m"))) + "%"
-        pression = str(valueorNA(hourly_data.get("PRMSL"))) + "Hp"
         if hourly_data.get("APCPsfc") is None:
             pluie = emoji_rain(str("."), False)
         elif hourly_data.get("APCPsfc") == 0:
@@ -357,7 +355,7 @@ def previsions_detaillees(r, infos, city):
         )
         if json_day.get("date"):
             data.append(
-                [hour, cond, temp, hum, pression, pluie, wind]
+                [hour, cond, temp, hum, pluie, wind]
             )
     if total_pluie == ".":
         total_pluie = emoji_rain_allign(str("."), False, False)
@@ -427,14 +425,6 @@ def previsions_generiques(r, infos, city):
         r.json().get("current_condition").get("wnd_dir")
     )
     wind_now = wnd_spd + "(" + wnd_dir + ")"
-    pression_now = (
-        str(
-            valueorNA(
-                r.json().get("current_condition").get("pressure")
-            )
-        )
-        + " Hp"
-    )
     headers = ["date", "condition", "température", "précipitations"]
     data = []
     for i in [0, 1, 2, 3, 4]:
@@ -509,7 +499,6 @@ def previsions_generiques(r, infos, city):
         print(my_colored("température : " + temp_now, "green"))
         print(my_colored("humidité    : " + humidity_now, "green"))
         print(my_colored("vent        : " + wind_now, "green"))
-        print(my_colored("pression    : " + pression_now, "green"))
     print(
         my_colored(
             "lev./couch. : " + sunrise + " - " + sunset, "green"
