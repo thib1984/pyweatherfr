@@ -25,9 +25,9 @@ jobs:
           pip install .
       #test
       - name: Launch one
-        uses: mkdir export && mkdir snaps && pyweatherfr nantes
+        run: mkdir export && mkdir snaps && pyweatherfr nantes
       - name: Launch two
-        uses: pyweather nantes > export/export.txt
+        run: pyweather nantes > export/export.txt
       - name: Generate pngs
         uses: sharadcodes/code-snap-action@v1.0
         with:
@@ -35,5 +35,5 @@ jobs:
           output_folder: "snaps" # This field is required and it is the folder which contains the snaps.
           syntax_theme: "emacs" # This field is required and it is the syntax highlighting theme that will be used.        
       - name: list
-        uses: ls snaps/*
+        run: ls snaps/*
     
