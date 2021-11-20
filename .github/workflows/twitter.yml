@@ -6,7 +6,7 @@ on:
 jobs:
   twitter:       
     runs-on: 'ubuntu-20.04'
-    name: test package with ubuntu20.04 et python3.9
+    name: publish daily weather for nantes in twitter
     steps:
       #preparation
       - name: checkout
