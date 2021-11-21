@@ -32,10 +32,44 @@ jobs:
           pip install pyweatherfr && pyweatherfr nantes && mkdir export
       - name: execute
         run: pyweatherfr nantes -j 0 > export/export.txt
-      - name: export png
-        run: carbon-now -h -t export export/export.txt  
-      - name: list
-        run: ls export/*
+      #5 tests (unstable)    
+      - name: export_png_1
+        id: export_png_1 
+        timeout-minutes: 3
+        continue-on-error: true
+        run: carbon-now -h -t export export/export.txt
+      - name: export_png_2
+        id: export_png_2
+        timeout-minutes: 3
+        if: steps.export_png_1.outcome=='failure'
+        continue-on-error: true
+        run: carbon-now -h -t export export/export.txt 
+      - name: export_png_3
+        id: export_png_3
+        timeout-minutes: 3
+        if: steps.export_png_2.outcome=='failure'
+        continue-on-error: true
+        run: carbon-now -h -t export export/export.txt 
+      - name: export_png_4
+        id: export_png_4
+        timeout-minutes: 3
+        if: steps.export_png_3.outcome=='failure'
+        continue-on-error: true
+        run: carbon-now -h -t export export/export.txt 
+      - name: export_png_5
+        id: export_png_5
+        timeout-minutes: 3
+        if: steps.export_png_4.outcome=='failure'
+        continue-on-error: true 
+        run: carbon-now -h -t export export/export.txt
+      - name: set the status              # set the workflow status if command failed
+        if: always()
+        run: |
+          if ${{ steps.export_png_1.outcome=='success' || steps.export_png_2.outcome=='success' || steps.export_png_3.outcome=='success' || steps.export_png_4.outcome=='success' || steps.export_png_5.outcome=='success' }}; then
+             echo fine
+          else
+             exit 1
+          fi   
       - name: tweet
         env: 
           CONSUMER_KEY: ${{ secrets.CONSUMER_KEY }}
