@@ -6,6 +6,7 @@ CONSUMER_KEY = os.environ.get("CONSUMER_KEY")
 CONSUMER_SECRET = os.environ.get("CONSUMER_SECRET")
 ACCESS_TOKEN = os.environ.get("ACCESS_TOKEN")
 ACCESS_TOKEN_SECRET = os.environ.get("ACCESS_TOKEN_SECRET")
+VERSION = os.environ.get("VERSION")
 
 twitter = Twython(
     CONSUMER_KEY,
@@ -14,7 +15,7 @@ twitter = Twython(
     ACCESS_TOKEN_SECRET
 )
 
-message = "Nouvelle #Release pour #pyweatherfr . Rendez vous sur http://github.com/thib1984/pyweatherfr ! Ou directement 'pyweatherfr -u' si l'outil est déjà installé sur votre poste. "
+message = "Nouvelle #Release pour #pyweatherfr : " + VERSION + " . Rendez vous sur http://github.com/thib1984/pyweatherfr ! Ou directement 'pyweatherfr -u' si l'outil est déjà installé sur votre poste. "
 
 twitter.update_status(status=message)
 
