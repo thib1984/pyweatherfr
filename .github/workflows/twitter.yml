@@ -42,5 +42,5 @@ jobs:
           CONSUMER_SECRET: ${{ secrets.CONSUMER_SECRET }}
           ACCESS_TOKEN: ${{ secrets.ACCESS_TOKEN }}
           ACCESS_TOKEN_SECRET: ${{ secrets.ACCESS_TOKEN_SECRET }}
-        run: pip install twython && python .github/daily_tweet.py.py  
+        run: pip install twython && python .github/daily_tweet.py  
     
