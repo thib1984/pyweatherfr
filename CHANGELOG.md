@@ -3,10 +3,10 @@
 - [ ] Refacto and deduplicate code (bis)
 - [ ] Allign (cf carbon)
 
-# 1.4.3 (WIP)
+# 1.4.3
 
 - [x] Allign sun
-- [x] Supprimer pression
+- [x] Delete pression
 - [x] 0H00 -> 0H ?
 # 1.4.2
 
