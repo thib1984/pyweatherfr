@@ -14,11 +14,8 @@ twitter = Twython(
     ACCESS_TOKEN_SECRET
 )
 
-message = "#Meteo du jour sur #Nantes. Image obtenue depuis l'outil #pyweatherfr . Source data : http://prevision-meteo.ch "
-image = open('export.png', 'rb')
-response = twitter.upload_media(media=image)
-media_id = [response['media_id']]
+message = "Nouvelle #Release pour #pyweatherfr . Rendez vous sur http://github.com/thib1984/pyweatherfr ! Ou directement 'pyweatherfr -u' si l'outil est déjà installé sur votre poste. "
 
-twitter.update_status(status=message, media_ids=media_id)
+twitter.update_status(status=message)
 
 print("Tweeted: %s" % message)
