@@ -38,5 +38,5 @@ jobs:
           ACCESS_TOKEN: ${{ secrets.ACCESS_TOKEN }}
           ACCESS_TOKEN_SECRET: ${{ secrets.ACCESS_TOKEN_SECRET }}
           VERSION: ${{ steps.vars.outputs.relase_tag }}
-        run: pip install twython && python .github/publish_tweet.py.py           
+        run: pip install twython && python .github/publish_tweet.py           
 
