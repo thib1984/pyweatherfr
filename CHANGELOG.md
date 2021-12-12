@@ -2,10 +2,6 @@
 
 - [ ] Refacto and deduplicate code (bis)
 - [ ] Allign (cf carbon)
-
-# 1.4.5
-
-- [x] Increase version to publish tweet release on official twitter account
 # 1.4.4
 
 - [x] Allign sun
