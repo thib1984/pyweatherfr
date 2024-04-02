@@ -2,7 +2,7 @@
 pyweatherfr use case
 """
 
-import argparse
+import datetime
 import sys
 import requests
 import unidecode
@@ -12,10 +12,16 @@ from termcolor import colored
 import json
 import urllib.request
 import os
-import tempfile
 import time
 from pathlib import Path
 import re
+
+#meteofrance
+import openmeteo_requests
+import requests_cache
+import pandas as pd
+from retry_requests import retry
+#meteofrance
 
 incomplete_data = False
 
@@ -258,6 +264,8 @@ def find():
         url = obtain_url_and_town_from_gps()
     else:
         url = obtain_url_and_town_from_ip()
+
+
     print_debug(
         "recherche prévision depuis http://prevision-meteo.ch/services/json/"
         + url
@@ -271,7 +279,9 @@ def find():
     else:
         infos = obtain_info_town(vjson, url, r)
         city = r.json().get("city_info").get("name")
-    if compute_args().jour == -1:
+    if compute_args().now:
+        previsions_courantes(r, infos, city)
+    elif compute_args().jour == -1:
         previsions_generiques(r, infos, city)
     else:
         previsions_detaillees(r, infos, city)
@@ -293,92 +303,26 @@ def find():
 
 def previsions_detaillees(r, infos, city):
     gps, elevation, sunrise, sunset = obtain_data(r)
-    json_day = r.json().get("fcst_day_" + str(compute_args().jour))
-    date = valueorNA(json_day.get("date"))
-    if date != ".":
-        date = date.replace(".", "/")
-    day = valueorNA(json_day.get("day_short"))
-    date_long_format = day + " " + date
-    temp_delta = (
-        emoji_tmp_allign(str(valueorNA(json_day.get("tmin"))), False)
-        + "-> "
-        + emoji_tmp_allign_right(
-            str(valueorNA(json_day.get("tmax"))), False
-        )
-    )
-    condition = emoji_allign(
-        valueorNA(
-            r.json()
-            .get("fcst_day_" + str(compute_args().jour))
-            .get("condition")
-        ),
-        False,
-    )
-    total_pluie = "."
+    print_generic_data_town(infos, city, gps, elevation)
+    # Utilisation d'une expression régulière pour extraire les nombres
+    matches = re.findall(r"[-+]?\d*\.\d+|\d+", gps)
+
+    # Récupération des deux nombres extraits
+    latitude = float(matches[0])
+    longitude = float(matches[1])
+    hourly_temperature_2m,hourly_apparent_temperature,hourly_precipitation, hourly_wind_speed_10m, hourly_wind_gusts_10m, hourly_wind_direction_10m=specific_day(latitude,longitude,compute_args().jour)
     headers = [
         "heure",
-        "condition",
         "température",
         "humidité",
         "précipitations",
         "vent",
     ]
     data = []
-    is_snow_day = False
     for h in range(0, 24):
-        hourly_data = json_day.get("hourly_data").get(str(h) + "H00")
-        hour = str(h) + "H"
-        cond = emoji(valueorNA(hourly_data.get("CONDITION")))
-        temp = emoji_tmp(str(valueorNA(hourly_data.get("TMP2m"))))
-        hum = str(valueorNA(hourly_data.get("RH2m"))) + "%"
-        if hourly_data.get("APCPsfc") is None:
-            pluie = emoji_rain(str("."), False)
-        elif hourly_data.get("APCPsfc") == 0:
-            pluie = emoji_rain(str("0"), False)
-            if total_pluie == ".":
-                total_pluie = 0
-        else:
-            pluie = emoji_rain(
-                str(hourly_data.get("APCPsfc")),
-                hourly_data.get("ISSNOW") >= 1,
-            )
-            if total_pluie == ".":
-                total_pluie = 0
-            if hourly_data.get("ISSNOW") > 0:
-                is_snow_day = True
-            total_pluie = total_pluie + hourly_data.get("APCPsfc")
-        wind = (
-            emoji_wnd(str(valueorNA(hourly_data.get("WNDSPD10m"))))
-            + "("
-            + str(valueorNA(hourly_data.get("WNDDIRCARD10")))
-            + ") "
-        )
-        if json_day.get("date"):
-            data.append(
-                [hour, cond, temp, hum, pluie, wind]
-            )
-    if total_pluie == ".":
-        total_pluie = emoji_rain_allign(str("."), False, False)
-    elif total_pluie > 0:
-        total_pluie = emoji_rain_allign(
-            str(round(total_pluie, 1)), is_snow_day, False
-        )
-    else:
-        total_pluie = emoji_rain_allign(str("0"), False, False)
-    print_generic_data_town(infos, city, gps, elevation)
-    if date_long_format != ". .":
-        print(
-            my_colored("date        : " + date_long_format, "green")
-        )
-        print(my_colored("température : " + temp_delta, "green"))
-        print(my_colored("précip.     : " + total_pluie, "green"))
-        print(my_colored("condition   : " + condition, "green"))
-    if compute_args().jour == 0:
-        print(
-            my_colored(
-                "soleil      : " + sunrise + " - " + sunset, "green"
-            )
-        )
+        data.append([datetime.datetime.strftime(datetime.datetime.now().replace(hour=0, minute=0, second=0, microsecond=0)+ datetime.timedelta(days=compute_args().jour)+ datetime.timedelta(hours=h), "%Y-%m-%d %H:%M"),f"{hourly_temperature_2m[h]:.1f}° ({hourly_apparent_temperature[h]:.1f}°)",f"{hourly_precipitation[h]:.1f}mm",f"{hourly_wind_speed_10m[h]:.1f}km/h ({hourly_wind_gusts_10m[h]:.1f}km/h) - {hourly_wind_direction_10m[h]:.1f}°"])
+    headers = ["date", "température", "précipitations", "vent"]
+
     if data != []:
         if compute_args().condensate:
             table = columnar(data, no_borders=True, wrap_max=0)
@@ -390,127 +334,48 @@ def previsions_detaillees(r, infos, city):
         print(table)
 
 
+
+
+    # Affichage des résultats
+
+def previsions_courantes(r, infos, city):
+    gps, elevation, sunrise, sunset = obtain_data(r)
+    print_generic_data_town(infos, city, gps, elevation)
+
+    matches = re.findall(r"[-+]?\d*\.\d+|\d+", gps)
+    latitude = float(matches[0])
+    longitude = float(matches[1])
+    
+    current_temperature_2m,current_apparent_temperature,current_relative_humidity_2m,current_precipitation,current_surface_pressure,current_wind_speed_10m,current_wind_gusts_10m,current_wind_direction_10m=current(latitude,longitude)
+    print(my_colored(f"température   : {current_temperature_2m:.1f}° ({current_apparent_temperature:.1f}°)", "green"))
+    print(my_colored(f"humidité      : {current_relative_humidity_2m:.1f}%", "green"))
+    print(my_colored(f"precipitation : {current_precipitation:.1f}mm", "green"))
+    print(my_colored(f"pression      : {current_surface_pressure:.1f}Hp", "green"))
+    print(my_colored(f"vent          : {current_wind_speed_10m:.1f}km/h ({current_wind_gusts_10m:.1f}km/h) - {current_wind_direction_10m:.1f}°", "green"))
+
 def previsions_generiques(r, infos, city):
     gps, elevation, sunrise, sunset = obtain_data(r)
-    condition_now = emoji_allign(
-        valueorNA(r.json().get("current_condition").get("condition")),
-        False,
-    )
-    date = valueorNA(r.json().get("current_condition").get("date"))
-    if date != ".":
-        date = date.replace(".", "/")
-    hour = valueorNA(r.json().get("current_condition").get("hour"))
-    time_now = date + " " + hour
-    temp_now = emoji_tmp_allign(
-        str(valueorNA(r.json().get("current_condition").get("tmp"))),
-        False,
-    )
-    humidity_now = (
-        str(
-            valueorNA(
-                r.json().get("current_condition").get("humidity")
-            )
-        )
-        + "%"
-    )
-    wnd_spd = emoji_wnd_allign(
-        str(
-            valueorNA(
-                r.json().get("current_condition").get("wnd_spd")
-            )
-        ),
-        False,
-    )
-    wnd_dir = valueorNA(
-        r.json().get("current_condition").get("wnd_dir")
-    )
-    wind_now = wnd_spd + "(" + wnd_dir + ")"
-    headers = ["date", "condition", "température", "précipitations"]
-    data = []
-    for i in [0, 1, 2, 3, 4]:
-        pluie = "."
-        date_i = valueorNA(
-            r.json().get("fcst_day_" + str(i)).get("date")
-        )
-        if date_i != ".":
-            date_i = date_i.replace(".", "/")
-        day_short_i = valueorNA(
-            r.json().get("fcst_day_" + str(i)).get("day_short")
-        )
-        day = day_short_i + " " + date_i
-        condition = emoji(
-            valueorNA(
-                r.json().get("fcst_day_" + str(i)).get("condition")
-            )
-        )
-        temp = (
-            emoji_tmp(
-                str(
-                    valueorNA(r.json().get("fcst_day_" + str(i))).get(
-                        "tmin"
-                    )
-                )
-            )
-            + "-> "
-            + emoji_tmp_right(
-                str(
-                    valueorNA(
-                        r.json().get("fcst_day_" + str(i)).get("tmax")
-                    )
-                )
-            )
-        )
-        is_snow_day = False
-        for h in range(0, 24):
-            hourly_pluie = valueorNA(
-                r.json()
-                .get("fcst_day_" + str(i))
-                .get("hourly_data")
-                .get(str(h) + "H00")
-                .get("APCPsfc")
-            )
-            if hourly_pluie != ".":
-                if pluie == ".":
-                    pluie = 0
-                if (
-                    hourly_pluie != 0
-                    and r.json()
-                    .get("fcst_day_" + str(i))
-                    .get("hourly_data")
-                    .get(str(h) + "H00")
-                    .get("ISSNOW")
-                    > 0
-                ):
-                    is_snow_day = True
-                pluie = pluie + hourly_pluie
-        if pluie == ".":
-            pluie = emoji_rain(str("."), False)
-        elif pluie > 0:
-            pluie = emoji_rain(str(round(pluie, 1)), is_snow_day)
-        else:
-            pluie = emoji_rain(str("0"), False)
-        if day != ". .":
-            data.append([day, condition, temp, pluie])
 
     print_generic_data_town(infos, city, gps, elevation)
-    if time_now != ". .":
-        print(my_colored("date        : " + time_now, "green"))
-        print(my_colored("condition   : " + condition_now, "green"))
-        print(my_colored("température : " + temp_now, "green"))
-        print(my_colored("humidité    : " + humidity_now, "green"))
-        print(my_colored("vent        : " + wind_now, "green"))
-    print(
-        my_colored(
-            "lev./couch. : " + sunrise + " - " + sunset, "green"
-        )
-    )
-    if data != []:
+
+    matches = re.findall(r"[-+]?\d*\.\d+|\d+", gps)
+    latitude = float(matches[0])
+    longitude = float(matches[1])
+    
+    date_debut,daily_temperature_2m_min,daily_temperature_2m_max,daily_apparent_temperature_min, daily_apparent_temperature_max, daily_precipitation_sum, daily_wind_speed_10m_max, daily_wind_gusts_10m_max, daily_wind_direction_10m_dominant=resume(latitude,longitude)
+    data2 = []
+    for i in [0, 1, 2, 3]:
+        data2.append([datetime.datetime.strftime(datetime.datetime.now().replace(hour=0, minute=0, second=0, microsecond=0)+ datetime.timedelta(hours=24*i), "%Y-%m-%d"),f"{daily_temperature_2m_min[i]:.1f}° ({daily_apparent_temperature_min[i]:.1f}°) -> {daily_temperature_2m_max[i]:.1f}° ({daily_apparent_temperature_max[i]:.1f}°)",f"{daily_precipitation_sum[i]:.1f}mm"])
+    headers = ["date", "température", "précipitations"]
+
+
+    if data2 != []:
         if compute_args().condensate:
-            table = columnar(data, no_borders=True, wrap_max=0)
+            table = columnar(data2, no_borders=True, wrap_max=0)
         else:
             print("")
             table = columnar(
-                data, headers, no_borders=False, wrap_max=0
+                data2, headers, no_borders=False, wrap_max=0
             )
         print(table)
 
@@ -520,14 +385,14 @@ def print_generic_data_town(infos, city, gps, elevation):
     if not is_gps:
         print(
             my_colored(
-                "ville       : " + re.sub(" \([0-9]+\)", "", city) + " " + infos, "yellow"
+                "ville         : " + re.sub(" \([0-9]+\)", "", city) + " " + infos, "yellow"
             )
         )
-        print(my_colored("altitude    : " + elevation, "yellow"))
+        print(my_colored("altitude      : " + elevation, "yellow"))
         print("")
     else:
-        print(my_colored("coord. gps. : " + gps, "yellow"))
-        print(my_colored("altitude    : " + elevation, "yellow"))
+        print(my_colored("coord. gps.   : " + gps, "yellow"))
+        print(my_colored("altitude      : " + elevation, "yellow"))
         print("")
 
 
@@ -846,3 +711,98 @@ def valueorNA(my_string):
         incomplete_data = True
         return "."
     return my_string
+
+def resume(latitude,longitude):
+    # Setup the Open-Meteo API client with cache and retry on error
+    #cache_session = requests_cache.CachedSession('.cache', expire_after = 3600)
+    retry_session = retry(retries = 5, backoff_factor = 0.2)
+    openmeteo = openmeteo_requests.Client(session = retry_session)
+
+    # Make sure all required weather variables are listed here
+    # The order of variables in hourly or daily is important to assign them correctly below
+    url = "https://api.open-meteo.com/v1/meteofrance"
+    params = {
+        "timezone": "Europe/Paris",
+        "latitude": latitude,
+        "longitude": longitude,
+        "daily": ["temperature_2m_max", "temperature_2m_min", "apparent_temperature_max", "apparent_temperature_min", "precipitation_sum", "wind_speed_10m_max", "wind_gusts_10m_max", "wind_direction_10m_dominant"]
+    }
+    responses = openmeteo.weather_api(url, params=params)
+
+    # Process first location. Add a for-loop for multiple locations or weather models
+    response = responses[0]
+
+    # Process daily data. The order of variables needs to be the same as requested.
+    daily = response.Daily()
+    daily_temperature_2m_max = daily.Variables(0).ValuesAsNumpy()
+    daily_temperature_2m_min = daily.Variables(1).ValuesAsNumpy()
+    daily_apparent_temperature_max = daily.Variables(2).ValuesAsNumpy()
+    daily_apparent_temperature_min = daily.Variables(3).ValuesAsNumpy()
+    daily_precipitation_sum = daily.Variables(4).ValuesAsNumpy()
+    daily_wind_speed_10m_max = daily.Variables(5).ValuesAsNumpy()
+    daily_wind_gusts_10m_max = daily.Variables(6).ValuesAsNumpy()
+    daily_wind_direction_10m_dominant = daily.Variables(7).ValuesAsNumpy()
+    date_debut= pd.to_datetime(daily.Time(), unit = "s", utc = True)
+    return date_debut,daily_temperature_2m_min,daily_temperature_2m_max,daily_apparent_temperature_min, daily_apparent_temperature_max, daily_precipitation_sum, daily_wind_speed_10m_max, daily_wind_gusts_10m_max, daily_wind_direction_10m_dominant
+
+
+def specific_day(latitude,longitude,day):
+    #cache_session = requests_cache.CachedSession('.cache', expire_after = 3600)
+    retry_session = retry(retries = 5, backoff_factor = 0.2)
+    openmeteo = openmeteo_requests.Client(session = retry_session)
+    url = "https://api.open-meteo.com/v1/meteofrance"
+    params = {
+        "timezone": "Europe/Paris",
+        "latitude": latitude,
+        "longitude": longitude,
+        "hourly": ["temperature_2m", "apparent_temperature", "precipitation", "wind_speed_10m", "wind_gusts_10m", "wind_direction_10m"],
+        "start_date": (datetime.datetime.now()+ datetime.timedelta(days=day)).strftime('%Y-%m-%d'),
+        "end_date": (datetime.datetime.now()+ datetime.timedelta(days=day+1)).strftime('%Y-%m-%d'),
+    }
+    responses = openmeteo.weather_api(url, params=params)
+
+    # Process first location. Add a for-loop for multiple locations or weather models
+    response = responses[0]
+
+    # Process daily data. The order of variables needs to be the same as requested.
+    hourly = response.Hourly()
+    hourly_temperature_2m = hourly.Variables(0).ValuesAsNumpy()
+    hourly_apparent_temperature = hourly.Variables(1).ValuesAsNumpy()
+    hourly_precipitation = hourly.Variables(2).ValuesAsNumpy()
+    hourly_wind_speed_10m = hourly.Variables(3).ValuesAsNumpy()
+    hourly_wind_gusts_10m = hourly.Variables(4).ValuesAsNumpy()
+    hourly_wind_direction_10m = hourly.Variables(5).ValuesAsNumpy()
+    return hourly_temperature_2m,hourly_apparent_temperature,hourly_precipitation, hourly_wind_speed_10m, hourly_wind_gusts_10m, hourly_wind_direction_10m
+
+
+
+def current(latitude,longitude):
+    #cache_session = requests_cache.CachedSession('.cache', expire_after = 3600)
+    retry_session = retry(retries = 5, backoff_factor = 0.2)
+    openmeteo = openmeteo_requests.Client(session = retry_session)
+
+    url = "https://api.open-meteo.com/v1/meteofrance"
+    params = {
+        "latitude": latitude,
+        "longitude": longitude,
+        "current": ["temperature_2m", "relative_humidity_2m", "apparent_temperature", "precipitation", "rain", "snowfall", "weather_code", "surface_pressure", "wind_speed_10m", "wind_direction_10m", "wind_gusts_10m"],
+    }
+    responses = openmeteo.weather_api(url, params=params)
+
+    response = responses[0]
+
+    current = response.Current()
+    current_temperature_2m = current.Variables(0).Value()
+    current_relative_humidity_2m = current.Variables(1).Value()
+    current_apparent_temperature = current.Variables(2).Value()
+    current_precipitation = current.Variables(3).Value()
+    current_surface_pressure = current.Variables(7).Value()
+    current_wind_speed_10m = current.Variables(8).Value()
+    current_wind_direction_10m = current.Variables(9).Value()
+    current_wind_gusts_10m = current.Variables(10).Value()
+
+
+    return current_temperature_2m,current_apparent_temperature,current_relative_humidity_2m,current_precipitation,current_surface_pressure,current_wind_speed_10m,current_wind_gusts_10m,current_wind_direction_10m
+
+
+

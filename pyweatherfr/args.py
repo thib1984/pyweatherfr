@@ -48,13 +48,19 @@ def compute_args():
         help="affichage des données météo par nom de ville -si absent, la VILLE est déduite de l'ip-",
     )
     my_parser.add_argument(
+        "-n",
+        "--now",
+        action="store_true",
+        help="affichage des données météo détaillées actuelles",
+    )    
+    my_parser.add_argument(
         "-j",
         "--jour",
         metavar="JOUR",
         action="store",
         type=int,
         default=-1,
-        choices=range(0, 5),
+        choices=range(0, 4),
         help="affichage des données météo détaillées pour [JOUR] (0 pour le jour actuel, 1 pour le J+1, ...)",
     ) 
     my_group.add_argument(
@@ -83,7 +89,6 @@ def compute_args():
         help="ville ou code postal à rechercher",
     )        
     my_parser.add_argument(
-        "-n",
         "--nocolor",
         action="store_true",
         help="désactiver couleur et emojis en sortie -à utiliser en cas de problème d'affichage-",
