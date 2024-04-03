@@ -46,6 +46,27 @@ WIND = "\U0001F6A9"
 COLD = "\U0001F9CA"
 WARM = "\U0001F321"
 
+HOME = "\U0001F3E0"
+BOUSSOLE = "\U0001F9ED"
+THERMO = "\U0001F321"
+HUMIDITE = "\U0001F4A7"
+PLUIE = "\U0001F327"
+
+FLECHE_N = "\U0000FE0F"
+FLECHE_NW ="\U0000FE0F"
+FLECHE_W ="\U0000FE0F"
+
+FLECHE_SW ="\U0000FE0F"
+
+FLECHE_S ="\U0000FE0F"
+
+FLECHE_SE ="\U0000FE0F"
+
+FLECHE_E ="\U0000FE0F"
+
+FLECHE_NE ="\U0000FE0F"
+
+
 
 def emoji_rain(key, isSnow):
     return emoji_rain_allign(key, isSnow, True)
@@ -317,11 +338,48 @@ def previsions_detaillees(r, infos, city):
         "humidité",
         "précipitations",
         "vent",
+        "direction",
+        "warning"
     ]
     data = []
     for h in range(0, 24):
-        data.append([datetime.datetime.strftime(datetime.datetime.now().replace(hour=0, minute=0, second=0, microsecond=0)+ datetime.timedelta(days=compute_args().jour)+ datetime.timedelta(hours=h), "%Y-%m-%d %H:%M"),f"{hourly_temperature_2m[h]:.1f}° ({hourly_apparent_temperature[h]:.1f}°)",f"{hourly_precipitation[h]:.1f}mm",f"{hourly_wind_speed_10m[h]:.1f}km/h ({hourly_wind_gusts_10m[h]:.1f}km/h) - {hourly_wind_direction_10m[h]:.1f}°"])
-    headers = ["date", "température", "précipitations", "vent"]
+        warning=""
+        temp = f"{hourly_temperature_2m[h]:.1f}° ({hourly_apparent_temperature[h]:.1f}°)"
+        if float(hourly_temperature_2m[h])<0 or float(hourly_apparent_temperature[h])<0:
+            warning=warning+" "+print_emoji(COLD)
+        if hourly_temperature_2m[h]>30 or hourly_apparent_temperature[h]>30:           
+            warning=warning+" "+print_emoji(WARM)            
+        pluie = f"{hourly_precipitation[h]:.1f}mm"
+        if hourly_precipitation[h]>0:
+            warning=warning+" "+print_emoji(DROPLET) 
+        vent = f"{hourly_wind_speed_10m[h]:.1f}km/h ({hourly_wind_gusts_10m[h]:.1f}km/h)"  
+
+
+
+        if hourly_wind_direction_10m[h]<=22.5 or hourly_wind_direction_10m[h]>=360-22.5:
+            direction="N"
+        if hourly_wind_direction_10m[h]<=360-22.5 and hourly_wind_direction_10m[h]>360-22.5-45:
+            direction="NW"
+        if hourly_wind_direction_10m[h]<=360-22.5-45 and hourly_wind_direction_10m[h]>360-22.5-90:
+            direction="W"
+        if hourly_wind_direction_10m[h]<=360-22.5-90 and hourly_wind_direction_10m[h]>360-22.5-135:
+            direction="SW"
+        if hourly_wind_direction_10m[h]<=360-22.5-135 and hourly_wind_direction_10m[h]>360-22.5-180:
+            direction="S"
+        if hourly_wind_direction_10m[h]<=360-22.5-180 and hourly_wind_direction_10m[h]>360-22.5-225:
+            direction="SE"
+        if hourly_wind_direction_10m[h]<=360-22.5-225 and hourly_wind_direction_10m[h]>360-22.5-270:
+            direction="E"
+        if hourly_wind_direction_10m[h]<=360-22.5-270 and hourly_wind_direction_10m[h]>360-22.5-315:
+            direction="NE"
+
+        vent=vent
+        if hourly_wind_speed_10m[h]>30 or hourly_wind_gusts_10m[h]>50:
+            warning=warning+" "+print_emoji(WIND)
+
+
+        data.append([datetime.datetime.strftime(datetime.datetime.now().replace(hour=0, minute=0, second=0, microsecond=0)+ datetime.timedelta(days=compute_args().jour)+ datetime.timedelta(hours=h), "%Y-%m-%d %H:%M"),temp,pluie,vent,direction,warning])
+    headers = ["date", "température (ressenties)", "précipitations", "vent (rafales)","direction","warnings"]
 
     if data != []:
         if compute_args().condensate:
@@ -347,9 +405,9 @@ def previsions_courantes(r, infos, city):
     longitude = float(matches[1])
     
     current_temperature_2m,current_apparent_temperature,current_relative_humidity_2m,current_precipitation,current_surface_pressure,current_wind_speed_10m,current_wind_gusts_10m,current_wind_direction_10m=current(latitude,longitude)
-    print(my_colored(f"température   : {current_temperature_2m:.1f}° ({current_apparent_temperature:.1f}°)", "green"))
-    print(my_colored(f"humidité      : {current_relative_humidity_2m:.1f}%", "green"))
-    print(my_colored(f"precipitation : {current_precipitation:.1f}mm", "green"))
+    print(my_colored(print_emoji(THERMO) + f" température   : {current_temperature_2m:.1f}° ({current_apparent_temperature:.1f}°)", "green"))
+    print(my_colored(print_emoji(HUMIDITE) + f" humidité      : {current_relative_humidity_2m:.1f}%", "green"))
+    print(my_colored(print_emoji(PLUIE) + f" precipitation : {current_precipitation:.1f}mm", "green"))
     print(my_colored(f"pression      : {current_surface_pressure:.1f}Hp", "green"))
     print(my_colored(f"vent          : {current_wind_speed_10m:.1f}km/h ({current_wind_gusts_10m:.1f}km/h) - {current_wind_direction_10m:.1f}°", "green"))
 
@@ -365,7 +423,15 @@ def previsions_generiques(r, infos, city):
     date_debut,daily_temperature_2m_min,daily_temperature_2m_max,daily_apparent_temperature_min, daily_apparent_temperature_max, daily_precipitation_sum, daily_wind_speed_10m_max, daily_wind_gusts_10m_max, daily_wind_direction_10m_dominant=resume(latitude,longitude)
     data2 = []
     for i in [0, 1, 2, 3]:
-        data2.append([datetime.datetime.strftime(datetime.datetime.now().replace(hour=0, minute=0, second=0, microsecond=0)+ datetime.timedelta(hours=24*i), "%Y-%m-%d"),f"{daily_temperature_2m_min[i]:.1f}° ({daily_apparent_temperature_min[i]:.1f}°) -> {daily_temperature_2m_max[i]:.1f}° ({daily_apparent_temperature_max[i]:.1f}°)",f"{daily_precipitation_sum[i]:.1f}mm"])
+        pluie = f"{daily_precipitation_sum[i]:.1f}mm"
+        if daily_precipitation_sum[i]>0:
+            pluie = pluie + print_emoji(DROPLET)
+        temp = f"{daily_temperature_2m_min[i]:.1f}° ({daily_apparent_temperature_min[i]:.1f}°) -> {daily_temperature_2m_max[i]:.1f}° ({daily_apparent_temperature_max[i]:.1f}°)"
+        if daily_temperature_2m_min[i] <0 or daily_apparent_temperature_min[i] < 0 or daily_temperature_2m_max[i] <0 or daily_apparent_temperature_max[i] <0:
+            temp = temp + print_emoji(COLD)
+        if daily_temperature_2m_min[i] >30 or daily_apparent_temperature_min[i] >30 or daily_temperature_2m_max[i] >30 or daily_apparent_temperature_max[i] >30:
+            temp = temp + print_emoji(WARM)        
+        data2.append([datetime.datetime.strftime(datetime.datetime.now().replace(hour=0, minute=0, second=0, microsecond=0)+ datetime.timedelta(hours=24*i), "%Y-%m-%d"),temp,pluie])
     headers = ["date", "température", "précipitations"]
 
 
@@ -380,12 +446,16 @@ def previsions_generiques(r, infos, city):
         print(table)
 
 
+def print_emoji(emoji):
+    if compute_args().nocolor:
+        return ""
+    return emoji
+
 def print_generic_data_town(infos, city, gps, elevation):
     print("")
     if not is_gps:
         print(
-            my_colored(
-                "ville         : " + re.sub(" \([0-9]+\)", "", city) + " " + infos, "yellow"
+            my_colored("ville         : " + re.sub(" \([0-9]+\)", "", city) + " " + infos, "yellow"
             )
         )
         print(my_colored("altitude      : " + elevation, "yellow"))
