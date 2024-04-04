@@ -377,9 +377,15 @@ def previsions_detaillees(r, infos, city):
         if hourly_wind_speed_10m[h]>30 or hourly_wind_gusts_10m[h]>50:
             warning=warning+" "+print_emoji(WIND)
 
-
-        data.append([datetime.datetime.strftime(datetime.datetime.now().replace(hour=0, minute=0, second=0, microsecond=0)+ datetime.timedelta(days=compute_args().jour)+ datetime.timedelta(hours=h), "%Y-%m-%d %H:%M"),temp,pluie,vent,direction,warning])
-    headers = ["date", "température (ressenties)", "précipitations", "vent (rafales)","direction","warnings"]
+        if compute_args().nocolor:
+            data.append([datetime.datetime.strftime(datetime.datetime.now().replace(hour=0, minute=0, second=0, microsecond=0)+ datetime.timedelta(days=compute_args().jour)+ datetime.timedelta(hours=h), "%Y-%m-%d %H:%M"),temp,pluie,vent,direction])    
+        else:
+            data.append([datetime.datetime.strftime(datetime.datetime.now().replace(hour=0, minute=0, second=0, microsecond=0)+ datetime.timedelta(days=compute_args().jour)+ datetime.timedelta(hours=h), "%Y-%m-%d %H:%M"),temp,pluie,vent,direction,warning])
+    
+    if compute_args().nocolor:
+        headers = ["date", "température (ressenties)", "précipitations", "vent (rafales)","direction"]
+    else:
+        headers = ["date", "température (ressenties)", "précipitations", "vent (rafales)","direction","warnings"]
 
     if data != []:
         if compute_args().condensate:
@@ -405,11 +411,28 @@ def previsions_courantes(r, infos, city):
     longitude = float(matches[1])
     
     current_temperature_2m,current_apparent_temperature,current_relative_humidity_2m,current_precipitation,current_surface_pressure,current_wind_speed_10m,current_wind_gusts_10m,current_wind_direction_10m=current(latitude,longitude)
-    print(my_colored(print_emoji(THERMO) + f" température   : {current_temperature_2m:.1f}° ({current_apparent_temperature:.1f}°)", "green"))
-    print(my_colored(print_emoji(HUMIDITE) + f" humidité      : {current_relative_humidity_2m:.1f}%", "green"))
-    print(my_colored(print_emoji(PLUIE) + f" precipitation : {current_precipitation:.1f}mm", "green"))
-    print(my_colored(f"pression      : {current_surface_pressure:.1f}Hp", "green"))
-    print(my_colored(f"vent          : {current_wind_speed_10m:.1f}km/h ({current_wind_gusts_10m:.1f}km/h) - {current_wind_direction_10m:.1f}°", "green"))
+    data=[]
+    if compute_args().nocolor:
+        data.append(["température",f"{current_temperature_2m:.1f}° ({current_apparent_temperature:.1f}°)"])
+        data.append(["humidité",f"{current_relative_humidity_2m:.1f}%"])
+        data.append(["precipitation",f"{current_precipitation:.1f}mm"])
+        data.append(["pression",f"{current_surface_pressure:.1f}Hp"])
+        data.append(["vent",f"{current_wind_speed_10m:.1f}km/h ({current_wind_gusts_10m:.1f}km/h) - {current_wind_direction_10m:.1f}°"])
+    else:
+        data.append(["température",f"{current_temperature_2m:.1f}° ({current_apparent_temperature:.1f}°)"])
+        data.append(["humidité",f"{current_relative_humidity_2m:.1f}%"])
+        data.append(["precipitation",f"{current_precipitation:.1f}mm"])
+        data.append(["pression",f"{current_surface_pressure:.1f}Hp"])
+        data.append(["vent",f"{current_wind_speed_10m:.1f}km/h ({current_wind_gusts_10m:.1f}km/h) - {current_wind_direction_10m:.1f}°"])
+
+    if compute_args().condensate:
+        table = columnar(data, no_borders=True, wrap_max=0)
+    else:
+        print("")
+        table = columnar(
+            data, no_borders=False, wrap_max=0
+        )
+    print(table) 
 
 def previsions_generiques(r, infos, city):
     gps, elevation, sunrise, sunset = obtain_data(r)
@@ -453,17 +476,25 @@ def print_emoji(emoji):
 
 def print_generic_data_town(infos, city, gps, elevation):
     print("")
-    if not is_gps:
-        print(
-            my_colored("ville         : " + re.sub(" \([0-9]+\)", "", city) + " " + infos, "yellow"
-            )
-        )
-        print(my_colored("altitude      : " + elevation, "yellow"))
-        print("")
+
+    data=[]
+    if compute_args().nocolor:
+        data.append([re.sub(" \([0-9]+\)", "", city) + " " + infos])
+        data.append([gps + " / alt. " + elevation])
     else:
-        print(my_colored("coord. gps.   : " + gps, "yellow"))
-        print(my_colored("altitude      : " + elevation, "yellow"))
-        print("")
+        data.append([HOME, re.sub(" \([0-9]+\)", "", city) + " " + infos])
+        data.append([BOUSSOLE, gps + " / alt. " + elevation])           
+    if compute_args().condensate:
+        table = columnar(
+                data, no_borders=True, wrap_max=0
+            )
+    else:
+         table = columnar(
+                data, no_borders=False, wrap_max=0
+            )           
+    
+    print(table)
+
 
 
 def obtain_data(r):
