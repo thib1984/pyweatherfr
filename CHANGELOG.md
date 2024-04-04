@@ -2,6 +2,11 @@
 
 - [ ] Refacto and deduplicate code (bis)
 - [ ] Allign (cf carbon)
+
+# 2.0.0
+
+- [x] switch to api meteo france
+
 # 1.4.4
 
 - [x] Allign sun

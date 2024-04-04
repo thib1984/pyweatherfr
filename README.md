@@ -1,15 +1,19 @@
 # :sunny: :umbrella: :cloud: pyweatherfr
 
-pyweatherfr affiche les prévisions méteo pour les communes françaises dans votre terminal. Il utilise les API https://www.prevision-meteo.ch et https://geolocation-db.com/json.
+pyweatherfr affiche les prévisions méteo pour les communes françaises dans votre terminal. Il utilise les API de méteoFrance, https://www.prevision-meteo.ch et https://geolocation-db.com/json.
 
 
 # 🚀 Comment utiliser **pyweatherfr**
 
 pyweatherfr \[VILLE\]
 
-exemple : ``pyweatherfr Grenoble`` affiche les prévisions météo pour Grenoble
+exemple : ``pyweatherfr Grenoble`` affiche les prévisions météo pour Grenoble sur 4 jours
 
-pyweatherfr \[TOWN\] -j [INT(0-4)]
+pyweatherfr -n \[VILLE\]
+
+exemple : ``pyweatherfr -n Grenoble`` affiche les données météo pour Grenoble 
+
+pyweatherfr \[TOWN\] -j [INT(0-3)]
 
 exemple : ``pyweatherfr Grenoble -j 1`` affiche les prévisions météo détaillées pour Grenoble à J+1
 
@@ -27,7 +31,7 @@ exemple : `` pyweatherfr -g 45 5`` affiche les prévisions météo pour les coor
   - ``-h/--help``    montrer l'aide
   - ``-u/--update``  update pyweatherfr
   - ``-c/--condensate``  condense la sortie
-  - ``-n/--nocolor``  désactive les couleurs et les emojis en sortie
+  - ``--nocolor``  désactive les couleurs et les emojis en sortie
   - ``-v/--verbose``  mode verbeux
   - ``-C/--cache``  met à jour le cache du nom des villes (cache par défaut 30j)
   
