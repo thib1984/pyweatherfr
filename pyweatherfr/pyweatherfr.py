@@ -48,6 +48,7 @@ WARM = "\U0001F321"
 
 HOME = "\U0001F3E0"
 BOUSSOLE = "\U0001F9ED"
+CLOCK = "\U000023F0"
 THERMO = "\U0001F321"
 HUMIDITE = "\U0001F4A7"
 PLUIE = "\U0001F327"
@@ -359,11 +360,11 @@ def previsions_detaillees(r, infos, city):
         if hourly_wind_direction_10m[h]<=22.5 or hourly_wind_direction_10m[h]>=360-22.5:
             direction="N"
         if hourly_wind_direction_10m[h]<=360-22.5 and hourly_wind_direction_10m[h]>360-22.5-45:
-            direction="NW"
+            direction="NO"
         if hourly_wind_direction_10m[h]<=360-22.5-45 and hourly_wind_direction_10m[h]>360-22.5-90:
             direction="W"
         if hourly_wind_direction_10m[h]<=360-22.5-90 and hourly_wind_direction_10m[h]>360-22.5-135:
-            direction="SW"
+            direction="SO"
         if hourly_wind_direction_10m[h]<=360-22.5-135 and hourly_wind_direction_10m[h]>360-22.5-180:
             direction="S"
         if hourly_wind_direction_10m[h]<=360-22.5-180 and hourly_wind_direction_10m[h]>360-22.5-225:
@@ -446,16 +447,21 @@ def previsions_generiques(r, infos, city):
     date_debut,daily_temperature_2m_min,daily_temperature_2m_max,daily_apparent_temperature_min, daily_apparent_temperature_max, daily_precipitation_sum, daily_wind_speed_10m_max, daily_wind_gusts_10m_max, daily_wind_direction_10m_dominant=resume(latitude,longitude)
     data2 = []
     for i in [0, 1, 2, 3]:
+        warning=""
         pluie = f"{daily_precipitation_sum[i]:.1f}mm"
         if daily_precipitation_sum[i]>0:
-            pluie = pluie + print_emoji(DROPLET)
+            warning = warning + print_emoji(DROPLET)
         temp = f"{daily_temperature_2m_min[i]:.1f}° ({daily_apparent_temperature_min[i]:.1f}°) -> {daily_temperature_2m_max[i]:.1f}° ({daily_apparent_temperature_max[i]:.1f}°)"
         if daily_temperature_2m_min[i] <0 or daily_apparent_temperature_min[i] < 0 or daily_temperature_2m_max[i] <0 or daily_apparent_temperature_max[i] <0:
-            temp = temp + print_emoji(COLD)
+            warning = warning + print_emoji(COLD)
         if daily_temperature_2m_min[i] >30 or daily_apparent_temperature_min[i] >30 or daily_temperature_2m_max[i] >30 or daily_apparent_temperature_max[i] >30:
-            temp = temp + print_emoji(WARM)        
-        data2.append([datetime.datetime.strftime(datetime.datetime.now().replace(hour=0, minute=0, second=0, microsecond=0)+ datetime.timedelta(hours=24*i), "%Y-%m-%d"),temp,pluie])
-    headers = ["date", "température", "précipitations"]
+            warning = warning + print_emoji(WARM)        
+        if compute_args().nocolor:
+            data2.append([datetime.datetime.strftime(datetime.datetime.now().replace(hour=0, minute=0, second=0, microsecond=0)+ datetime.timedelta(hours=24*i), "%Y-%m-%d"),temp,pluie])
+            headers = ["date", "température", "précipitations"]
+        else:
+            data2.append([datetime.datetime.strftime(datetime.datetime.now().replace(hour=0, minute=0, second=0, microsecond=0)+ datetime.timedelta(hours=24*i), "%Y-%m-%d"),temp,pluie,warning])
+            headers = ["date", "température", "précipitations","warning"]    
 
 
     if data2 != []:
@@ -481,9 +487,12 @@ def print_generic_data_town(infos, city, gps, elevation):
     if compute_args().nocolor:
         data.append([re.sub(" \([0-9]+\)", "", city) + " " + infos])
         data.append([gps + " / alt. " + elevation])
+        data.append([datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S")])
     else:
         data.append([HOME, re.sub(" \([0-9]+\)", "", city) + " " + infos])
         data.append([BOUSSOLE, gps + " / alt. " + elevation])           
+        data.append([CLOCK,datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S")])
+
     if compute_args().condensate:
         table = columnar(
                 data, no_borders=True, wrap_max=0
@@ -815,8 +824,8 @@ def valueorNA(my_string):
 
 def resume(latitude,longitude):
     # Setup the Open-Meteo API client with cache and retry on error
-    #cache_session = requests_cache.CachedSession('.cache', expire_after = 3600)
-    retry_session = retry(retries = 5, backoff_factor = 0.2)
+    cache_session = requests_cache.CachedSession(get_user_config_directory_pyweather()+'.cache', expire_after = 3600)
+    retry_session = retry(cache_session, retries = 5, backoff_factor = 0.2)
     openmeteo = openmeteo_requests.Client(session = retry_session)
 
     # Make sure all required weather variables are listed here
@@ -848,8 +857,8 @@ def resume(latitude,longitude):
 
 
 def specific_day(latitude,longitude,day):
-    #cache_session = requests_cache.CachedSession('.cache', expire_after = 3600)
-    retry_session = retry(retries = 5, backoff_factor = 0.2)
+    cache_session = requests_cache.CachedSession(get_user_config_directory_pyweather()+ '.cache', expire_after = 3600)
+    retry_session = retry(cache_session, retries = 5, backoff_factor = 0.2)
     openmeteo = openmeteo_requests.Client(session = retry_session)
     url = "https://api.open-meteo.com/v1/meteofrance"
     params = {
@@ -878,8 +887,8 @@ def specific_day(latitude,longitude,day):
 
 
 def current(latitude,longitude):
-    #cache_session = requests_cache.CachedSession('.cache', expire_after = 3600)
-    retry_session = retry(retries = 5, backoff_factor = 0.2)
+    cache_session = requests_cache.CachedSession(get_user_config_directory_pyweather() + '.cache', expire_after = 3600)
+    retry_session = retry(cache_session, retries = 5, backoff_factor = 0.2)
     openmeteo = openmeteo_requests.Client(session = retry_session)
 
     url = "https://api.open-meteo.com/v1/meteofrance"
