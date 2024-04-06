@@ -3,6 +3,9 @@
 - [ ] Refacto and deduplicate code (bis)
 - [ ] Allign (cf carbon)
 
+# 2.0.2
+
+- [x] add some data and snow
 
 # 2.0.1
 
