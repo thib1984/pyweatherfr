@@ -335,7 +335,7 @@ def previsions_detaillees(r, infos, city):
     # Récupération des deux nombres extraits
     latitude = float(matches[0])
     longitude = float(matches[1])
-    hourly_temperature_2m,hourly_apparent_temperature,hourly_precipitation, hourly_wind_speed_10m, hourly_wind_gusts_10m, hourly_wind_direction_10m,surface_pressure=specific_day(latitude,longitude,compute_args().jour)
+    hourly_temperature_2m,hourly_apparent_temperature,hourly_precipitation, hourly_wind_speed_10m, hourly_wind_gusts_10m, hourly_wind_direction_10m,surface_pressure,current_weather_code=specific_day(latitude,longitude,compute_args().jour)
     data = []
     for h in range(0, 24):
         warning=""
@@ -376,16 +376,17 @@ def previsions_detaillees(r, infos, city):
         if surface_pressure[h]>1030:
             warning=warning+" "+print_emoji(ELEPHANT)     
         if surface_pressure[h]<990:
-            warning=warning+" "+print_emoji(PLUME)                 
+            warning=warning+" "+print_emoji(PLUME)
+        weather,emojiweather=traduction(current_weather_code[h])                     
         if compute_args().nocolor:
-            data.append([datetime.datetime.strftime(datetime.datetime.now().replace(hour=0, minute=0, second=0, microsecond=0)+ datetime.timedelta(days=compute_args().jour)+ datetime.timedelta(hours=h), "%Y-%m-%d %H:%M"),temp,pluie,vent,direction,pression])    
+            data.append([datetime.datetime.strftime(datetime.datetime.now().replace(hour=0, minute=0, second=0, microsecond=0)+ datetime.timedelta(days=compute_args().jour)+ datetime.timedelta(hours=h), "%Y-%m-%d %H:%M"),weather,temp,pluie,vent,direction,pression])    
         else:
-            data.append([datetime.datetime.strftime(datetime.datetime.now().replace(hour=0, minute=0, second=0, microsecond=0)+ datetime.timedelta(days=compute_args().jour)+ datetime.timedelta(hours=h), "%Y-%m-%d %H:%M"),temp,pluie,vent,direction,pression,warning])
+            data.append([datetime.datetime.strftime(datetime.datetime.now().replace(hour=0, minute=0, second=0, microsecond=0)+ datetime.timedelta(days=compute_args().jour)+ datetime.timedelta(hours=h), "%Y-%m-%d %H:%M"),emojiweather + " " + weather,temp,pluie,vent,direction,pression,warning])
     
     if compute_args().nocolor:
-        headers = ["date", "température (ressenties)", "précipitations", "vent (rafales)","direction","pression"]
+        headers = ["date", "temps", "température (ressenties)", "précipitations", "vent (rafales)","direction","pression"]
     else:
-        headers = ["date", "température (ressenties)", "précipitations", "vent (rafales)","direction","pression","warnings"]
+        headers = ["date", "temps", "température (ressenties)", "précipitations", "vent (rafales)","direction","pression","warnings"]
 
     if data != []:
         if compute_args().condensate:
@@ -398,10 +399,28 @@ def previsions_detaillees(r, infos, city):
         print(table)
 
 
-
-
-    # Affichage des résultats
-
+def traduction(current_weather_code):
+    if current_weather_code==0 or current_weather_code==1 or current_weather_code==2:
+        return ["ciel clair", SUN]
+    if current_weather_code>=3 and current_weather_code<=12:
+        return ["nuageux", CLOUD]    
+    if current_weather_code>=13 and current_weather_code<=19:
+        return ["pluie proche", RAIN] 
+    if current_weather_code>=20 and current_weather_code<=29:
+        return ["fin de pluie" , RAIN]          
+    if current_weather_code>=30 and current_weather_code<=39:
+        return ["tempete de poussière, sable ou neige", FOG]
+    if current_weather_code>=40 and current_weather_code<=49:
+        return ["brouillard", FOG]    
+    if current_weather_code>=50 and current_weather_code<=59:
+        return ["bruine", RAIN]
+    if current_weather_code>=60 and current_weather_code<=69:
+        return ["pluie", RAIN]
+    if current_weather_code>=70 and current_weather_code<=79:
+        return ["neige", SNOW]    
+    if current_weather_code>=80 and current_weather_code<=99:
+        return ["averse / orage", ORAGE_PLUIE]   
+             
 def previsions_courantes(r, infos, city):
     gps, elevation, sunrise, sunset = obtain_data(r)
     print_generic_data_town(infos, city, gps, elevation)
@@ -410,7 +429,8 @@ def previsions_courantes(r, infos, city):
     latitude = float(matches[0])
     longitude = float(matches[1])
     
-    current_temperature_2m,current_apparent_temperature,current_relative_humidity_2m,current_precipitation,current_surface_pressure,current_wind_speed_10m,current_wind_gusts_10m,current_wind_direction_10m=current(latitude,longitude)
+    current_temperature_2m,current_apparent_temperature,current_relative_humidity_2m,current_precipitation,current_surface_pressure,current_wind_speed_10m,current_wind_gusts_10m,current_wind_direction_10m,current_weather_code=current(latitude,longitude)
+    current_weather,emojiweather=traduction(current_weather_code)
     data=[]
     if current_wind_direction_10m>=22.5 or current_wind_direction_10m>=360-22.5:
         direction="N"
@@ -434,6 +454,8 @@ def previsions_courantes(r, infos, city):
         data.append(["precipitation",f"{current_precipitation:.1f}mm"])
         data.append(["pression",f"{current_surface_pressure:.1f}Hp"])
         data.append(["vent",f"{current_wind_speed_10m:.1f}km/h ({current_wind_gusts_10m:.1f}km/h) - "+direction])
+        data.append(["temps",current_weather])
+        
     else:
         if current_temperature_2m>30 or current_apparent_temperature>30:
             data.append(["température",f"{current_temperature_2m:.1f}° ({current_apparent_temperature:.1f}°)",WARM])
@@ -453,14 +475,11 @@ def previsions_courantes(r, infos, city):
             data.append(["pression",f"{current_surface_pressure:.1f}Hp",PLUME])
         else:              
             data.append(["pression",f"{current_surface_pressure:.1f}Hp",""])
-
-
-
         if current_wind_speed_10m>30 or current_wind_gusts_10m>50:       
             data.append(["vent",f"{current_wind_speed_10m:.1f}km/h ({current_wind_gusts_10m:.1f}km/h) - "+direction,WIND])
         else:
             data.append(["vent",f"{current_wind_speed_10m:.1f}km/h ({current_wind_gusts_10m:.1f}km/h) - "+direction,""])   
-
+        data.append(["temps",emojiweather + " "  + current_weather,""])
     if compute_args().condensate:
         table = columnar(data, no_borders=True, wrap_max=0)
     else:
@@ -479,7 +498,7 @@ def previsions_generiques(r, infos, city):
     latitude = float(matches[0])
     longitude = float(matches[1])
     
-    date_debut,daily_temperature_2m_min,daily_temperature_2m_max,daily_apparent_temperature_min, daily_apparent_temperature_max, daily_precipitation_sum, daily_wind_speed_10m_max, daily_wind_gusts_10m_max, daily_wind_direction_10m_dominant=resume(latitude,longitude)
+    date_debut,daily_temperature_2m_min,daily_temperature_2m_max,daily_apparent_temperature_min, daily_apparent_temperature_max, daily_precipitation_sum, daily_wind_speed_10m_max, daily_wind_gusts_10m_max, daily_wind_direction_10m_dominant,weather_code=resume(latitude,longitude)
     data2 = []
     for i in [0, 1, 2, 3]:
         warning=""
@@ -490,13 +509,14 @@ def previsions_generiques(r, infos, city):
         if daily_temperature_2m_min[i] <0 or daily_apparent_temperature_min[i] < 0 or daily_temperature_2m_max[i] <0 or daily_apparent_temperature_max[i] <0:
             warning = warning + print_emoji(COLD)
         if daily_temperature_2m_min[i] >30 or daily_apparent_temperature_min[i] >30 or daily_temperature_2m_max[i] >30 or daily_apparent_temperature_max[i] >30:
-            warning = warning + print_emoji(WARM)        
+            warning = warning + print_emoji(WARM) 
+        weather,emojiweather=traduction(weather_code[i])          
         if compute_args().nocolor:
-            data2.append([datetime.datetime.strftime(datetime.datetime.now().replace(hour=0, minute=0, second=0, microsecond=0)+ datetime.timedelta(hours=24*i), "%Y-%m-%d"),temp,pluie])
-            headers = ["date", "température", "précipitations"]
+            data2.append([datetime.datetime.strftime(datetime.datetime.now().replace(hour=0, minute=0, second=0, microsecond=0)+ datetime.timedelta(hours=24*i), "%Y-%m-%d"),weather,temp,pluie])
+            headers = ["date", "temps", "température", "précipitations"]
         else:
-            data2.append([datetime.datetime.strftime(datetime.datetime.now().replace(hour=0, minute=0, second=0, microsecond=0)+ datetime.timedelta(hours=24*i), "%Y-%m-%d"),temp,pluie,warning])
-            headers = ["date", "température", "précipitations","warning"]    
+            data2.append([datetime.datetime.strftime(datetime.datetime.now().replace(hour=0, minute=0, second=0, microsecond=0)+ datetime.timedelta(hours=24*i), "%Y-%m-%d"),emojiweather + " " + weather,temp,pluie,warning])
+            headers = ["date", "temps", "température", "précipitations","warning"]    
 
 
     if data2 != []:
@@ -870,7 +890,7 @@ def resume(latitude,longitude):
         "timezone": "Europe/Paris",
         "latitude": latitude,
         "longitude": longitude,
-        "daily": ["temperature_2m_max", "temperature_2m_min", "apparent_temperature_max", "apparent_temperature_min", "precipitation_sum", "wind_speed_10m_max", "wind_gusts_10m_max", "wind_direction_10m_dominant"]
+        "daily": ["temperature_2m_max", "temperature_2m_min", "apparent_temperature_max", "apparent_temperature_min", "precipitation_sum", "wind_speed_10m_max", "wind_gusts_10m_max", "wind_direction_10m_dominant","weather_code"]
     }
     responses = openmeteo.weather_api(url, params=params)
 
@@ -887,8 +907,9 @@ def resume(latitude,longitude):
     daily_wind_speed_10m_max = daily.Variables(5).ValuesAsNumpy()
     daily_wind_gusts_10m_max = daily.Variables(6).ValuesAsNumpy()
     daily_wind_direction_10m_dominant = daily.Variables(7).ValuesAsNumpy()
+    weather_code= daily.Variables(8).ValuesAsNumpy()
     date_debut= pd.to_datetime(daily.Time(), unit = "s", utc = True)
-    return date_debut,daily_temperature_2m_min,daily_temperature_2m_max,daily_apparent_temperature_min, daily_apparent_temperature_max, daily_precipitation_sum, daily_wind_speed_10m_max, daily_wind_gusts_10m_max, daily_wind_direction_10m_dominant
+    return date_debut,daily_temperature_2m_min,daily_temperature_2m_max,daily_apparent_temperature_min, daily_apparent_temperature_max, daily_precipitation_sum, daily_wind_speed_10m_max, daily_wind_gusts_10m_max, daily_wind_direction_10m_dominant,weather_code
 
 
 def specific_day(latitude,longitude,day):
@@ -900,7 +921,7 @@ def specific_day(latitude,longitude,day):
         "timezone": "Europe/Paris",
         "latitude": latitude,
         "longitude": longitude,
-        "hourly": ["temperature_2m", "apparent_temperature", "precipitation", "wind_speed_10m", "wind_gusts_10m", "wind_direction_10m", "pressure_msl"],
+        "hourly": ["temperature_2m", "apparent_temperature", "precipitation", "wind_speed_10m", "wind_gusts_10m", "wind_direction_10m", "pressure_msl","weather_code"],
         "start_date": (datetime.datetime.now()+ datetime.timedelta(days=day)).strftime('%Y-%m-%d'),
         "end_date": (datetime.datetime.now()+ datetime.timedelta(days=day+1)).strftime('%Y-%m-%d'),
     }
@@ -918,7 +939,8 @@ def specific_day(latitude,longitude,day):
     hourly_wind_gusts_10m = hourly.Variables(4).ValuesAsNumpy()
     hourly_wind_direction_10m = hourly.Variables(5).ValuesAsNumpy()
     surface_pressure = hourly.Variables(6).ValuesAsNumpy()
-    return hourly_temperature_2m,hourly_apparent_temperature,hourly_precipitation, hourly_wind_speed_10m, hourly_wind_gusts_10m, hourly_wind_direction_10m, surface_pressure
+    weather_code = hourly.Variables(7).ValuesAsNumpy()
+    return hourly_temperature_2m,hourly_apparent_temperature,hourly_precipitation, hourly_wind_speed_10m, hourly_wind_gusts_10m, hourly_wind_direction_10m, surface_pressure, weather_code
 
 
 
@@ -942,13 +964,14 @@ def current(latitude,longitude):
     current_relative_humidity_2m = current.Variables(1).Value()
     current_apparent_temperature = current.Variables(2).Value()
     current_precipitation = current.Variables(3).Value()
+    current_weather_code= current.Variables(6).Value()
     current_surface_pressure = current.Variables(7).Value()
     current_wind_speed_10m = current.Variables(8).Value()
     current_wind_direction_10m = current.Variables(9).Value()
     current_wind_gusts_10m = current.Variables(10).Value()
 
 
-    return current_temperature_2m,current_apparent_temperature,current_relative_humidity_2m,current_precipitation,current_surface_pressure,current_wind_speed_10m,current_wind_gusts_10m,current_wind_direction_10m
+    return current_temperature_2m,current_apparent_temperature,current_relative_humidity_2m,current_precipitation,current_surface_pressure,current_wind_speed_10m,current_wind_gusts_10m,current_wind_direction_10m,current_weather_code
 
 
 
