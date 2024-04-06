@@ -3,6 +3,12 @@
 - [ ] Refacto and deduplicate code (bis)
 - [ ] Allign (cf carbon)
 
+# 2.0.3
+
+- [x] add hours of precipitations
+- [x] clean code
+- [x] refacto emoji
+
 # 2.0.2
 
 - [x] add some data and snow
