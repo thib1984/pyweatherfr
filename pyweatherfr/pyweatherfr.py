@@ -339,6 +339,8 @@ def previsions_detaillees(r, infos, city):
     data = []
     for h in range(0, 24):
         warning=""
+        if compute_args().jour==0 and 0<h-int(datetime.datetime.now().strftime('%H'))<=1:
+            warning=warning+CLOCK
         temp = f"{hourly_temperature_2m[h]:.1f}° ({hourly_apparent_temperature[h]:.1f}°)"
         if float(hourly_temperature_2m[h])<0 or float(hourly_apparent_temperature[h])<0:
             warning=warning+" "+print_emoji(COLD)
@@ -502,6 +504,8 @@ def previsions_generiques(r, infos, city):
     data2 = []
     for i in [0, 1, 2, 3]:
         warning=""
+        if i==0:
+            warning=warning+CLOCK
         pluie = f"{daily_precipitation_sum[i]:.1f}mm"
         if daily_precipitation_sum[i]>0:
             warning = warning + print_emoji(RAIN)
