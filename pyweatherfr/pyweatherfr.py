@@ -174,6 +174,8 @@ def previsions_detaillees(r, infos, city):
         current_weather_code,
         snowfall,
         relative_humidity_2m,
+        sunshine_duration,
+        cloud_cover       
     ) = specific_day(latitude, longitude, compute_args().jour)
     data = []
     for h in range(0, 24):
@@ -212,6 +214,7 @@ def previsions_detaillees(r, infos, city):
             warning = warning + " " + PLUME
         weather, emojiweather = traduction(current_weather_code[h])
         humidity = f"{relative_humidity_2m[h]:.0f}%"
+        soleil_nuage = f"{sunshine_duration[h]/60:.0f}% - {cloud_cover[h]:.0f}%"
         if compute_args().nocolor:
             data.append(
                 [
@@ -230,6 +233,7 @@ def previsions_detaillees(r, infos, city):
                     direction,
                     pression,
                     humidity,
+                    soleil_nuage,
                 ]
             )
         else:
@@ -250,6 +254,7 @@ def previsions_detaillees(r, infos, city):
                     direction,
                     pression,
                     humidity,
+                    soleil_nuage,
                     warning,
                 ]
             )
@@ -264,6 +269,7 @@ def previsions_detaillees(r, infos, city):
             "direction",
             "pression",
             "humidité",
+            "soleil / nuage"
         ]
     else:
         headers = [
@@ -275,6 +281,7 @@ def previsions_detaillees(r, infos, city):
             "direction",
             "pression",
             "humidité",
+            "soleil / nuage",            
             "warnings",
         ]
 
@@ -483,11 +490,12 @@ def previsions_generiques(r, infos, city):
         weather_code,
         snowfall,
         precipitation_hours,
+        sunshine_duration,
     ) = resume(latitude, longitude)
     data2 = []
     for i in [0, 1, 2, 3]:
         warning = ""
-        pluie = f"{daily_precipitation_sum[i]:.1f}mm ({precipitation_hours[i]:.1f}h)"
+        pluie = f"{daily_precipitation_sum[i]:.1f}mm"
         if snowfall[i] >= WARNING_SNOW:
             warning = warning + " " + SNOW
         elif daily_precipitation_sum[i] >= WARNING_RAIN:
@@ -516,7 +524,7 @@ def previsions_generiques(r, infos, city):
         vent = vent
         if daily_wind_speed_10m_max[i] >= WARNING_WIND or daily_wind_gusts_10m_max[i] >= WARNING_WIND_GUST:
             warning = warning + " " + WIND
-
+        duree = f"{precipitation_hours[i]:.0f}h / {sunshine_duration[i]/3600:.0f}h "
         if compute_args().nocolor:
             data2.append(
                 [
@@ -532,6 +540,7 @@ def previsions_generiques(r, infos, city):
                     pluie,
                     vent,
                     direction,
+                    duree
                 ]
             )
             headers = [
@@ -541,6 +550,7 @@ def previsions_generiques(r, infos, city):
                 "précipitations",
                 "vent (rafales)",
                 "direction",
+                "pluie/soleil"
             ]
         else:
             data2.append(
@@ -557,6 +567,7 @@ def previsions_generiques(r, infos, city):
                     pluie,
                     vent,
                     direction,
+                    duree,
                     warning,
                 ]
             )
@@ -567,6 +578,7 @@ def previsions_generiques(r, infos, city):
                 "précipitations",
                 "vent (rafales)",
                 "direction",
+                "pluie/soleil",
                 "warning",
             ]
 
@@ -896,7 +908,8 @@ def resume(latitude, longitude):
             "wind_direction_10m_dominant",
             "weather_code",
             "snowfall_sum",
-            "precipitation_hours"
+            "precipitation_hours",
+            "sunshine_duration"
         ],
     }
     responses = openmeteo.weather_api(url, params=params)
@@ -917,6 +930,7 @@ def resume(latitude, longitude):
     weather_code = daily.Variables(8).ValuesAsNumpy()
     snowfall = daily.Variables(9).ValuesAsNumpy()
     precipitation_hours= daily.Variables(10).ValuesAsNumpy()
+    sunshine_duration= daily.Variables(11).ValuesAsNumpy()
     date_debut = pd.to_datetime(daily.Time(), unit="s", utc=True)
     return (
         date_debut,
@@ -931,6 +945,7 @@ def resume(latitude, longitude):
         weather_code,
         snowfall,
         precipitation_hours,
+        sunshine_duration
     )
 
 
@@ -956,6 +971,8 @@ def specific_day(latitude, longitude, day):
             "weather_code",
             "snowfall",
             "relative_humidity_2m",
+            "sunshine_duration",
+            "cloud_cover" 
         ],
         "start_date": (datetime.datetime.now() + datetime.timedelta(days=day)).strftime(
             "%Y-%m-%d"
@@ -981,6 +998,8 @@ def specific_day(latitude, longitude, day):
     weather_code = hourly.Variables(7).ValuesAsNumpy()
     snowfall = hourly.Variables(8).ValuesAsNumpy()
     relative_humidity_2m = hourly.Variables(9).ValuesAsNumpy()
+    sunshine_duration = hourly.Variables(10).ValuesAsNumpy()
+    cloud_cover = hourly.Variables(11).ValuesAsNumpy()
     return (
         hourly_temperature_2m,
         hourly_apparent_temperature,
@@ -992,7 +1011,9 @@ def specific_day(latitude, longitude, day):
         weather_code,
         snowfall,
         relative_humidity_2m,
-    )
+        sunshine_duration,
+        cloud_cover
+                )
 
 
 def current(latitude, longitude):
