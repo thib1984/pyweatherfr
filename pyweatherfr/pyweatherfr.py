@@ -214,7 +214,7 @@ def previsions_detaillees(r, infos, city):
             warning = warning + " " + PLUME
         weather, emojiweather = traduction(current_weather_code[h])
         humidity = f"{relative_humidity_2m[h]:.0f}%"
-        soleil_nuage = f"{sunshine_duration[h]/60:.0f}% - {cloud_cover[h]:.0f}%"
+        soleil_nuage = f"{sunshine_duration[h]/60:.0f}% / {cloud_cover[h]:.0f}%"
         if compute_args().nocolor:
             data.append(
                 [
@@ -524,7 +524,7 @@ def previsions_generiques(r, infos, city):
         vent = vent
         if daily_wind_speed_10m_max[i] >= WARNING_WIND or daily_wind_gusts_10m_max[i] >= WARNING_WIND_GUST:
             warning = warning + " " + WIND
-        duree = f"{precipitation_hours[i]:.0f}h / {sunshine_duration[i]/3600:.0f}h "
+        duree = f"{precipitation_hours[i]:.0f}h / {sunshine_duration[i]/3600:.0f}h"
         if compute_args().nocolor:
             data2.append(
                 [

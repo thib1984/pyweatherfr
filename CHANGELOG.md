@@ -3,6 +3,10 @@
 - [ ] Refacto and deduplicate code (bis)
 - [ ] Allign (cf carbon)
 
+# 2.0.4
+
+- [x] add nuage/soleil %
+
 # 2.0.3
 
 - [x] add hours of precipitations
