@@ -4,6 +4,7 @@
 - [ ] mode debug sur l'api meteo france
 - [ ] capture et rejeu de l'erreur a a l appel api meteo france
 - [ ] mode full pour humidité/pression/soleil etc
+- [ ] mode minimal pour temps / pluie uniquement (uniquement emoji si non compact)
 - [ ] previsions -n ajouter data comme -j 
 - [ ] gestion des emojis aux largeurs fantaisistes
 
