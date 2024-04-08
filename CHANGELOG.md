@@ -1,4 +1,4 @@
-# TODO 
+# TODO 3.0.0 
 
 - [ ] supprimer -p et rechercher par code postal comme par ville
 - [ ] mode debug sur l'api meteo france
@@ -7,6 +7,7 @@
 - [ ] mode minimal pour temps / pluie uniquement (uniquement emoji si non compact)
 - [ ] previsions -n ajouter data comme -j 
 - [ ] gestion des emojis aux largeurs fantaisistes
+- [ ] mode passé pour récuperer les données de la veille avant veille
 
 # 2.0.4
 
