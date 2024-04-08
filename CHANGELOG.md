@@ -5,6 +5,7 @@
 - [ ] capture et rejeu de l'erreur a a l appel api meteo france
 - [ ] mode full pour humidité/pression/soleil etc
 - [ ] previsions -n ajouter data comme -j 
+- [ ] gestion des emojis aux largeurs fantaisistes
 
 # 2.0.4
 
