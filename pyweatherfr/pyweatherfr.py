@@ -912,6 +912,7 @@ def resume(latitude, longitude):
             "sunshine_duration"
         ],
     }
+    print_debug("appel api meteo france "+url+"?"+'&'.join([f'{key}={",".join(value) if isinstance(value, list) else value}' for key, value in params.items()]))
     responses = openmeteo.weather_api(url, params=params)
 
     # Process first location. Add a for-loop for multiple locations or weather models
@@ -981,6 +982,7 @@ def specific_day(latitude, longitude, day):
             datetime.datetime.now() + datetime.timedelta(days=day + 1)
         ).strftime("%Y-%m-%d"),
     }
+    print_debug("appel api meteo france "+url+"?"+'&'.join([f'{key}={",".join(value) if isinstance(value, list) else value}' for key, value in params.items()]))
     responses = openmeteo.weather_api(url, params=params)
 
     # Process first location. Add a for-loop for multiple locations or weather models
@@ -1041,6 +1043,7 @@ def current(latitude, longitude):
             "wind_gusts_10m",
         ],
     }
+    print_debug("appel api meteo france "+url+"?"+'&'.join([f'{key}={",".join(value) if isinstance(value, list) else value}' for key, value in params.items()]))
     responses = openmeteo.weather_api(url, params=params)
 
     response = responses[0]
