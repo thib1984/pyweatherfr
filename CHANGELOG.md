@@ -1,7 +1,10 @@
 # TODO 
 
-- [ ] Refacto and deduplicate code (bis)
-- [ ] Allign (cf carbon)
+- [ ] supprimer -p et rechercher par code postal comme par ville
+- [ ] mode debug sur l'api meteo france
+- [ ] capture et rejeu de l'erreur a a l appel api meteo france
+- [ ] mode full pour humidité/pression/soleil etc
+- [ ] previsions -n ajouter data comme -j 
 
 # 2.0.4
 
