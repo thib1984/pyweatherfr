@@ -1,20 +1,20 @@
 # TODO 3.0.0 
 
-- [ ] supprimer -p et rechercher par code postal comme par ville
-- [ ] capture et rejeu de l'erreur a a l appel api meteo france
+
 - [ ] mode full pour humidité/pression/soleil etc
 - [ ] mode minimal pour temps / pluie uniquement (uniquement emoji si non compact)
 - [ ] previsions -n ajouter data comme -j 
 - [ ] gestion des emojis aux largeurs fantaisistes
 - [ ] mode passé pour récuperer les données de la veille avant veille
 - [ ] emoji nuit claire, nuit nuageuse
-- [ ] corrections libellés colonnes
-- [ ] adaptation pring debug sur ancienne api
-
+- [] séparer durée soleil / couverture nuage
 # 3.0.0
 
+- [x] corrections libellés colonnes
 - [x] mode debug sur l'api meteo france
-
+- [x] supprimer -p et rechercher par code postal comme par ville
+- [x] capture et rejeu de l'erreur a a l appel url
+- [x] adaptation pring debug sur ancienne api
 
 # 2.0.4
 

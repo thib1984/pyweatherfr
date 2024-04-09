@@ -108,8 +108,6 @@ def find():
     if compute_args().search:
         search_town(vjson)
     elif compute_args().town:
-        url = obtain_url_and_town()
-    elif compute_args().post:
         url, doublon_cp = obtain_url_and_town_from_cp(vjson)
     elif compute_args().gps:
         is_gps = True
@@ -121,8 +119,11 @@ def find():
         "recherche prévision depuis http://prevision-meteo.ch/services/json/" + url
     )
     r = requests.get("http://prevision-meteo.ch/services/json/" + url)
-    if r.json().get("errors"):
-        display_error(r)
+    try:
+        if r.json().get("errors"):
+            display_error(r)
+    except Exception:
+        print(r)        
     if is_gps:
         infos = "(" + url + ")"
         city = "."
@@ -146,7 +147,7 @@ def find():
         print(
             my_colored(
                 'attention : il existe plusieurs villes associées au code postal. Si besoin, jouez "pyweather -s '
-                + compute_args().post
+                + compute_args().town
                 + '"'
                 + " pour trouver la ville souhaitée ",
                 "yellow",
@@ -263,25 +264,25 @@ def previsions_detaillees(r, infos, city):
         headers = [
             "date",
             "temps",
-            "température (ressenties)",
+            "température (ressentie)",
             "précipitations",
             "vent (rafales)",
-            "direction",
+            "direction vent",
             "pression",
             "humidité",
-            "soleil / nuage"
+            "durée soleil / couverture nuage"
         ]
     else:
         headers = [
             "date",
             "temps",
-            "température (ressenties)",
+            "température (ressentie)",
             "précipitations",
             "vent (rafales)",
-            "direction",
+            "direction vent",
             "pression",
             "humidité",
-            "soleil / nuage",            
+            "durée soleil / couverture nuage",            
             "warnings",
         ]
 
@@ -392,7 +393,7 @@ def previsions_courantes(r, infos, city):
     if compute_args().nocolor:
         data.append(
             [
-                "température",
+                "température (ressentie)",
                 f"{current_temperature_2m:.1f}° ({current_apparent_temperature:.1f}°)",
             ]
         )
@@ -412,7 +413,7 @@ def previsions_courantes(r, infos, city):
         if current_temperature_2m >= WARNING_WARM or current_apparent_temperature >= WARNING_WARM:
             data.append(
                 [
-                    "température",
+                    "température (ressentie)",
                     f"{current_temperature_2m:.1f}° ({current_apparent_temperature:.1f}°)",
                     WARM,
                 ]
@@ -546,11 +547,11 @@ def previsions_generiques(r, infos, city):
             headers = [
                 "date",
                 "temps",
-                "température",
+                "température (ressentie)",
                 "précipitations",
                 "vent (rafales)",
                 "direction",
-                "pluie/soleil"
+                "durée pluie / soleil"
             ]
         else:
             data2.append(
@@ -574,11 +575,11 @@ def previsions_generiques(r, infos, city):
             headers = [
                 "date",
                 "temps",
-                "température",
+                "température (ressentie)",
                 "précipitations",
                 "vent (rafales)",
-                "direction",
-                "pluie/soleil",
+                "direction vent",
+                "durée pluie / soleil",
                 "warning",
             ]
 
@@ -667,7 +668,7 @@ def display_error(r):
     print_debug(r.json().get("errors")[0].get("code"))
     print_debug(r.json().get("errors")[0].get("text"))
     print_debug(r.json().get("errors")[0].get("description"))
-    if compute_args().town or compute_args().post:
+    if compute_args().town:
         print(
             my_colored(
                 "essayez de trouver un paramètre correct avec \"pyweatherfr -s '"
@@ -732,50 +733,50 @@ def obtain_url_and_town_from_gps():
 
 
 def obtain_url_and_town_from_cp(vjson):
-    post = compute_args().post.zfill(5)
-    print_debug("CODE_POSTAL : " + str(post))
-    print_debug(
-        "recherche de la VILLE et de l'URL depuis https://www.prevision-meteo.ch/services/json/list-cities"
-    )
-    i = 0
-    try:
-        trouve = False
-        doublon = False
-        while True:
-            if (
-                vjson.get(str(i)).get("country") is not None
-                and vjson.get(str(i)).get("country") == "FRA"
-            ):
-                if str(post) == vjson.get(str(i)).get("npa"):
-                    if not trouve:
-                        url = vjson.get(str(i)).get("url")
-                        print_debug("URL : " + url)
-                    if trouve:
-                        doublon = True
-                    trouve = True
-            i = i + 1
-    except Exception:
-        if not trouve:
-            print(
-                my_colored(
-                    "erreur : pas de ville trouvée avec le code postal " + str(post),
-                    "red",
+    town = compute_args().town
+    doublon = False
+    if town.isnumeric():
+        post = town
+        print_debug("CODE_POSTAL : " + str(post))
+        print_debug(
+            "recherche de la VILLE et de l'URL depuis https://www.prevision-meteo.ch/services/json/list-cities"
+        )
+        i = 0
+        try:
+            trouve = False
+            while True:
+                if (
+                    vjson.get(str(i)).get("country") is not None
+                    and vjson.get(str(i)).get("country") == "FRA"
+                ):
+                    if str(post) == vjson.get(str(i)).get("npa"):
+                        if not trouve:
+                            url = vjson.get(str(i)).get("url")
+                            print_debug("URL : " + url)
+                        if trouve:
+                            doublon = True
+                        trouve = True
+                i = i + 1
+        except Exception:
+            if not trouve:
+                print(
+                    my_colored(
+                        "erreur : pas de ville trouvée avec le code postal " + str(post),
+                        "red",
+                    )
                 )
-            )
-            print(
-                my_colored(
-                    "essayez avec un autre code postal, ou avec le code postal principal de la ville",
-                    "yellow",
+                print(
+                    my_colored(
+                        "essayez avec un autre code postal, ou avec le code postal principal de la ville ou encore le nom de la ville",
+                        "yellow",
+                    )
                 )
-            )
-            sys.exit(1)
-    return url, doublon
-
-
-def obtain_url_and_town():
-    url = unidecode.unidecode(compute_args().town.lower()).replace(" ", "-")
-    print_debug("URL : " + url)
-    return url
+                sys.exit(1)
+        return url, doublon
+    else:
+        url = unidecode.unidecode(town.lower()).replace(" ", "-")
+        print_debug("URL : " + url)
+        return url, doublon
 
 
 def search_town(vjson):
@@ -812,7 +813,7 @@ def search_town(vjson):
                             + npa
                             + "), exécutez 'pyweatherfr "
                             + url
-                            + "' or 'pyweatherfr -p "
+                            + "' or 'pyweatherfr  "
                             + npa
                             + "'",
                             "yellow",

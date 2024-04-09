@@ -45,7 +45,7 @@ def compute_args():
         metavar="VILLE",
         type=str,
         nargs="?",
-        help="affichage des données météo par nom de ville -si absent, la VILLE est déduite de l'ip-",
+        help="affichage des données météo par nom de ville ou code postal -si absent, la VILLE est déduite de l'ip-",
     )
     my_parser.add_argument(
         "-n",
@@ -63,14 +63,6 @@ def compute_args():
         choices=range(0, 4),
         help="affichage des données météo détaillées pour [JOUR] (0 pour le jour actuel, 1 pour le J+1, ...)",
     ) 
-    my_group.add_argument(
-        "-p",
-        "--post",
-        action="store",
-        metavar="CODE_POSTAL",
-        type=str,
-        help="affichage des données météo par CODE_POSTAL",
-    )  
     my_group.add_argument(
         "-g",
         "--gps",
