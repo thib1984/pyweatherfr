@@ -1,15 +1,15 @@
-# TODO 3.0.0 
-
+# A VENIR 3.0.1 
 
 - [ ] mode full pour humidité/pression/soleil etc
 - [ ] mode minimal pour temps / pluie uniquement (uniquement emoji si non compact)
 - [ ] previsions -n ajouter data comme -j 
 - [ ] gestion des emojis aux largeurs fantaisistes
-- [ ] mode passé pour récuperer les données de la veille avant veille
 - [ ] emoji nuit claire, nuit nuageuse
-- [] séparer durée soleil / couverture nuage
-# 3.0.0
+- [ ] séparer durée soleil / couverture nuage
 
+# 3.0.0 
+
+- [x] mode passé pour récuperer les données de la veille avant veille
 - [x] corrections libellés colonnes
 - [x] mode debug sur l'api meteo france
 - [x] supprimer -p et rechercher par code postal comme par ville

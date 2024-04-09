@@ -59,9 +59,9 @@ def compute_args():
         metavar="JOUR",
         action="store",
         type=int,
-        default=-1,
-        choices=range(0, 4),
-        help="affichage des données météo détaillées pour [JOUR] (0 pour le jour actuel, 1 pour le J+1, ...)",
+        default=1000,
+        choices=range(-100, 4),
+        help="affichage des données météo détaillées pour [JOUR] (0 pour le jour actuel, 1 pour le J+1, ..., -1 pour J-1, ...)",
     ) 
     my_group.add_argument(
         "-g",

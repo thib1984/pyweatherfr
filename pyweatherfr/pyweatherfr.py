@@ -129,10 +129,14 @@ def find():
         city = "."
     else:
         infos = obtain_info_town(vjson, url, r)
+        try:
+            city = r.json().get("city_info").get("name")
+        except Exception:
+            print(r)  
         city = r.json().get("city_info").get("name")
     if compute_args().now:
         previsions_courantes(r, infos, city)
-    elif compute_args().jour == -1:
+    elif compute_args().jour == 1000:
         previsions_generiques(r, infos, city)
     else:
         previsions_detaillees(r, infos, city)
