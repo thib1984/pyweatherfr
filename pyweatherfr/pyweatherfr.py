@@ -431,7 +431,10 @@ def previsions_generiques(ville, dpt, lat, long):
         sunshine_duration,
     ) = resume(lat, long)
     data2 = []
-    for i in [0, 1, 2, 3]:
+    fin = 3
+    if compute_args().past!=0:
+        fin=-1
+    for i in range(0,len(daily_precipitation_sum)):
         warning = ""
         pluie = f"{daily_precipitation_sum[i]:.1f}mm"
         if snowfall[i] >= WARNING_SNOW:
@@ -497,7 +500,8 @@ def previsions_generiques(ville, dpt, lat, long):
                         datetime.datetime.now().replace(
                             hour=0, minute=0, second=0, microsecond=0
                         )
-                        + datetime.timedelta(hours=24 * i),
+                        + datetime.timedelta(hours=24 * i)
+                        + datetime.timedelta(days=-1*compute_args().past),
                         "%Y-%m-%d",
                     ),
                     emojiweather + " " + weather,
@@ -624,8 +628,10 @@ def obtain_url_and_town_from_cp():
         if ville == None:
             ville = location.raw.get("address").get("municipality")
         if ville == None:
-            ville = location.raw.get("address").get("city")            
+            ville = location.raw.get("address").get("city")
         dpt = location.raw.get("address").get("county")
+        if dpt ==None:
+            dpt=""
         cp = location.raw.get("address").get("postcode")
         if cp == None:
             cp = ""
@@ -682,8 +688,14 @@ def resume(latitude, longitude):
     # Make sure all required weather variables are listed here
     # The order of variables in hourly or daily is important to assign them correctly below
     url = "https://api.open-meteo.com/v1/meteofrance"
+    date_debut = (datetime.datetime.now() + datetime.timedelta(days=-1*compute_args().past)).strftime("%Y-%m-%d")
+    date_fin = (datetime.datetime.now() + datetime.timedelta(days=3)).strftime("%Y-%m-%d")
+    if compute_args().past!=0:
+        date_fin = (datetime.datetime.now() + datetime.timedelta(days=-1)).strftime("%Y-%m-%d")    
     params = {
         "timezone": "Europe/Paris",
+        "start_date": date_debut,
+	    "end_date": date_fin,
         "latitude": latitude,
         "longitude": longitude,
         "daily": [

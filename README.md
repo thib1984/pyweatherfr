@@ -27,10 +27,11 @@ exemple : ``pyweatherfr Grenoble -j 1`` affiche les prévisions météo détaill
 
 exemple : ``pyweatherfr Grenoble -j -2`` affiche les données météo détaillées pour Grenoble à J-2
 
-exemple : ``pyweatherfr 38700`` affiche les prévisions météo pour le code postal 38700
-
 attention : le paramètre peut être compris entre - 100 et 3
 
+pyweatherfr \[TOWN\] -p [INT]
+
+exemple : ``pyweatherfr Grenoble -p 10`` affiche les données météo détaillées pour Grenoble de J-10 à J-1
 
 
 

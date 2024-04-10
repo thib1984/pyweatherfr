@@ -62,6 +62,16 @@ def compute_args():
         default=1000,
         choices=range(-100, 4),
         help="affichage des données météo détaillées pour [JOUR] (0 pour le jour actuel, 1 pour le J+1, ..., -1 pour J-1, ...)",
+    )
+    my_parser.add_argument(
+        "-p",
+        "--past",
+        metavar="JOUR PASSE",
+        action="store",
+        type=int,
+        default=0,
+        choices=range(1, 100),
+        help="affichage des données météo génériques depuis [JOUR PASSE] (-10 pour J-10 à J-1, ...)",
     )         
     my_group.add_argument(
         "-g",
