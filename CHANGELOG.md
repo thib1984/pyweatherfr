@@ -1,5 +1,7 @@
 # A VENIR 4.0.0
 
+- [ ] améliorer infos villes si ville ou dpt non renseignés
+- [ ] securiser la saisie du choix de ville
 - [ ] mode full pour humidité/pression/soleil etc
 - [ ] mode minimal pour temps / pluie uniquement (uniquement emoji si non nocolor)
 - [ ] previsions -n ajouter data comme -j 
