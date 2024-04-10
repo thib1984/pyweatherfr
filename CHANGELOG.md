@@ -1,11 +1,13 @@
 # A VENIR 3.0.1 
 
 - [ ] mode full pour humidité/pression/soleil etc
-- [ ] mode minimal pour temps / pluie uniquement (uniquement emoji si non compact)
+- [ ] mode minimal pour temps / pluie uniquement (uniquement emoji si non nocolor)
 - [ ] previsions -n ajouter data comme -j 
 - [ ] gestion des emojis aux largeurs fantaisistes
 - [ ] emoji nuit claire, nuit nuageuse
 - [ ] séparer durée soleil / couverture nuage
+- [ ] vérifier durée soleil hourly/daily
+- [x] retry sur erreur 502 de l'ancienne api
 
 # 3.0.0 
 

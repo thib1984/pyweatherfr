@@ -116,23 +116,36 @@ def find():
         url = obtain_url_and_town_from_ip()
 
     print_debug(
-        "recherche prévision depuis http://prevision-meteo.ch/services/json/" + url
+        "recherche data gps depuis http://prevision-meteo.ch/services/json/" + url
     )
-    r = requests.get("http://prevision-meteo.ch/services/json/" + url)
-    try:
-        if r.json().get("errors"):
-            display_error(r)
-    except Exception:
-        print(r)        
+
+    retry_count = 3
+    retry_delay = 1  # en secondes
+
+    for _ in range(retry_count):
+        try:
+            r = requests.get("http://prevision-meteo.ch/services/json/" + url)
+            # Vérifier le code d'état HTTP
+            if r.status_code // 100 == 5:  # Vérifie si le code d'erreur est dans la gamme 5xx
+                raise Exception("Erreur 5xx rencontrée")
+            else:
+                # Traitement de la réponse normale ici
+                print_debug("Requête réussie")
+                break  # Sortir de la boucle si la requête réussit
+        except Exception as e:
+            print_debug(f"Erreur: {e}")
+            print_debug("Tentative de nouvelle requête dans {} seconde(s)...".format(retry_delay))
+            time.sleep(retry_delay)
+    else:
+        print_debug("Toutes les tentatives ont échoué")
+        print(my_colored("erreur : url http://prevision-meteo.ch/services/json/" + url + " KO", "red"))
+        exit(1)
+
     if is_gps:
         infos = "(" + url + ")"
         city = "."
     else:
         infos = obtain_info_town(vjson, url, r)
-        try:
-            city = r.json().get("city_info").get("name")
-        except Exception:
-            print(r)  
         city = r.json().get("city_info").get("name")
     if compute_args().now:
         previsions_courantes(r, infos, city)
@@ -635,7 +648,7 @@ def obtain_data(r):
 
 def obtain_info_town(vjson, url, r):
     print_debug(
-        "recherche informations de la VILLE depuis https://www.prevision-meteo.ch/services/json/list-cities"
+        "recherche informations de la VILLE"
     )
     try:
         i = 0
