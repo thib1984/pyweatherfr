@@ -1,19 +1,27 @@
 # :sunny: :umbrella: :cloud: pyweatherfr
 
-pyweatherfr affiche les prévisions méteo pour les communes françaises dans votre terminal. Il utilise les API de méteoFrance, https://www.prevision-meteo.ch et https://geolocation-db.com/json.
+pyweatherfr affiche les prévisions méteo pour les communes françaises dans votre terminal. Il utilise l'API de MéteoFrance
 
 
 # 🚀 Comment utiliser **pyweatherfr**
+
+pyweatherfr affiche les prévisions météo sur 4 jours en se basant sur l'ip
 
 pyweatherfr \[VILLE\]
 
 exemple : ``pyweatherfr Grenoble`` affiche les prévisions météo pour Grenoble sur 4 jours
 
+exemple : ``pyweatherfr 38700`` affiche les prévisions météo pour le code postal 38700
+
 pyweatherfr -n \[VILLE\]
 
 exemple : ``pyweatherfr -n Grenoble`` affiche les données météo pour Grenoble 
 
-pyweatherfr \[TOWN\] -j [INT(0-3)]
+pyweatherfr -g \[COORDONNEES_GPS\]
+
+exemple : `` pyweatherfr -g 45 5`` affiche les prévisions météo pour les coordonnées GPS (latitude : 45 et longitude : 5)
+
+pyweatherfr \[TOWN\] -j [INT]
 
 exemple : ``pyweatherfr Grenoble -j 1`` affiche les prévisions météo détaillées pour Grenoble à J+1
 
@@ -21,9 +29,9 @@ exemple : ``pyweatherfr Grenoble -j -2`` affiche les données météo détaillé
 
 exemple : ``pyweatherfr 38700`` affiche les prévisions météo pour le code postal 38700
 
-pyweatherfr -g \[COORDONNEES_GPS\]
+attention : le paramètre peut être compris entre - 100 et 3
 
-exemple : `` pyweatherfr -g 45 5`` affiche les prévisions météo pour les coordonnées GPS (latitude : 45 et longitude : 5)
+
 
 
 ## Autres options

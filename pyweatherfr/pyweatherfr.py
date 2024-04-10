@@ -2,35 +2,23 @@
 pyweatherfr use case
 """
 
-#TODO
-import geopy,certifi,ssl
-from geopy.geocoders import Nominatim
-#TODO
-
 
 from pyweatherfr.args import compute_args
 
-
+import geopy,certifi,ssl
 import datetime
 import sys
-import requests
-import unidecode
 import json
 import urllib.request
 import os
-import time
-import re
 import openmeteo_requests
 import requests_cache
+import columnar
+import termcolor
+import pathlib
+import retry_requests
+import geopy
 
-import pandas as pd
-
-from columnar import columnar
-from termcolor import colored
-from pathlib import Path
-from retry_requests import retry
-
-incomplete_data = False
 
 DOSSIER_CONFIG_PYWEATHER = "pyweatherfr"
 
@@ -80,113 +68,49 @@ def get_user_config_directory_pyweather():
         appdata = os.getenv("LOCALAPPDATA")
         if appdata:
             ze_path = os.path.join(appdata, DOSSIER_CONFIG_PYWEATHER, "")
-            Path(ze_path).mkdir(parents=True, exist_ok=True)
+            pathlib.Path(ze_path).mkdir(parents=True, exist_ok=True)
             return ze_path
         appdata = os.getenv("APPDATA")
         if appdata:
             ze_path = os.path.join(appdata, DOSSIER_CONFIG_PYWEATHER, "")
-            Path(ze_path).mkdir(parents=True, exist_ok=True)
+            pathlib.Path(ze_path).mkdir(parents=True, exist_ok=True)
             return ze_path
         print(my_colored("erreur : impossible de créer le dossier de config", "red"))
         sys.exit(1)
     xdg_config_home = os.getenv("XDG_CONFIG_HOME")
     if xdg_config_home:
         ze_path = os.path.join(xdg_config_home, "")
-        Path(ze_path).mkdir(parents=True, exist_ok=True)
+        pathlib.Path(ze_path).mkdir(parents=True, exist_ok=True)
         return ze_path
     ze_path = os.path.join(
         os.path.expanduser("~"), ".config", DOSSIER_CONFIG_PYWEATHER, ""
     )
-    Path(ze_path).mkdir(parents=True, exist_ok=True)
+    pathlib.Path(ze_path).mkdir(parents=True, exist_ok=True)
     return ze_path
 
 
 def find():
 
-    global incomplete_data
-    global is_gps
-    incomplete_data = False
-    is_gps = False
-    doublon_cp = False
-
-    vjson = recuperation_data_villes()
-
-    if compute_args().search:
-        search_town(vjson)
-    elif compute_args().town:
-        url, doublon_cp = obtain_url_and_town_from_cp(vjson)
+    if compute_args().town:
+        ville, dpt, lat, long = obtain_url_and_town_from_cp()
     elif compute_args().gps:
-        is_gps = True
-        url = obtain_url_and_town_from_gps()
+        ville, dpt, lat, long = obtain_url_and_town_from_gps()
     else:
-        url = obtain_url_and_town_from_ip()
+        ville, dpt, lat, long = obtain_url_and_town_from_ip()
 
-    print_debug(
-        "recherche data gps depuis http://prevision-meteo.ch/services/json/" + url
-    )
-
-    retry_count = 3
-    retry_delay = 1  # en secondes
-
-    for _ in range(retry_count):
-        try:
-            r = requests.get("http://prevision-meteo.ch/services/json/" + url)
-            # Vérifier le code d'état HTTP
-            if r.status_code // 100 == 5:  # Vérifie si le code d'erreur est dans la gamme 5xx
-                raise Exception("Erreur 5xx rencontrée")
-            else:
-                # Traitement de la réponse normale ici
-                print_debug("Requête réussie")
-                break  # Sortir de la boucle si la requête réussit
-        except Exception as e:
-            print_debug(f"Erreur: {e}")
-            print_debug("Tentative de nouvelle requête dans {} seconde(s)...".format(retry_delay))
-            time.sleep(retry_delay)
-    else:
-        print_debug("Toutes les tentatives ont échoué")
-        print(my_colored("erreur : url http://prevision-meteo.ch/services/json/" + url + " KO", "red"))
-        exit(1)
-
-    if is_gps:
-        infos = "(" + url + ")"
-        city = "."
-    else:
-        infos = obtain_info_town(vjson, url, r)
-        city = r.json().get("city_info").get("name")
     if compute_args().now:
-        previsions_courantes(r, infos, city)
+        previsions_courantes(ville, dpt, lat, long)
     elif compute_args().jour == 1000:
-        previsions_generiques(r, infos, city)
+        previsions_generiques(ville, dpt, lat, long)
     else:
-        previsions_detaillees(r, infos, city)
-    if incomplete_data == True:
-        print(
-            my_colored(
-                "attention : données incomplètes, vous pouvez essayer une autre ville pour plus de précision",
-                "yellow",
-            )
-        )
-    if doublon_cp:
-        print(
-            my_colored(
-                'attention : il existe plusieurs villes associées au code postal. Si besoin, jouez "pyweather -s '
-                + compute_args().town
-                + '"'
-                + " pour trouver la ville souhaitée ",
-                "yellow",
-            )
-        )
+        previsions_detaillees(ville, dpt, lat, long)
 
 
-def previsions_detaillees(r, infos, city):
-    gps, elevation, sunrise, sunset = obtain_data(r)
-    print_generic_data_town(infos, city, gps, elevation)
-    # Utilisation d'une expression régulière pour extraire les nombres
-    matches = re.findall(r"[-+]?\d*\.\d+|\d+", gps)
 
-    # Récupération des deux nombres extraits
-    latitude = float(matches[0])
-    longitude = float(matches[1])
+def previsions_detaillees(ville, dpt, lat, long):
+    print_generic_data_town(ville, dpt, lat, long)
+
+
     (
         hourly_temperature_2m,
         hourly_apparent_temperature,
@@ -200,7 +124,7 @@ def previsions_detaillees(r, infos, city):
         relative_humidity_2m,
         sunshine_duration,
         cloud_cover       
-    ) = specific_day(latitude, longitude, compute_args().jour)
+    ) = specific_day(lat, long, compute_args().jour)
     data = []
     for h in range(0, 24):
         warning = ""
@@ -311,10 +235,10 @@ def previsions_detaillees(r, infos, city):
 
     if data != []:
         if compute_args().condensate:
-            table = columnar(data, no_borders=True, wrap_max=0)
+            table = columnar.columnar(data, no_borders=True, wrap_max=0)
         else:
             print("")
-            table = columnar(data, headers, no_borders=False, wrap_max=0)
+            table = columnar.columnar(data, headers, no_borders=False, wrap_max=0)
         print(table)
 
 def calculer_direction(direction_vent_degres):
@@ -388,13 +312,8 @@ def traduction(current_weather_code):
         return ["averse / orage", ORAGE_PLUIE]
 
 
-def previsions_courantes(r, infos, city):
-    gps, elevation, sunrise, sunset = obtain_data(r)
-    print_generic_data_town(infos, city, gps, elevation)
-
-    matches = re.findall(r"[-+]?\d*\.\d+|\d+", gps)
-    latitude = float(matches[0])
-    longitude = float(matches[1])
+def previsions_courantes(ville, dpt, lat, long):
+    print_generic_data_town(ville, dpt, lat, long)
 
     (
         current_temperature_2m,
@@ -408,7 +327,7 @@ def previsions_courantes(r, infos, city):
         current_weather_code,
         snowfall
 
-    ) = current(latitude, longitude)
+    ) = current(lat, long)
     current_weather, emojiweather = traduction(current_weather_code)
     data = []
     direction = calculer_direction(current_wind_direction_10m)
@@ -485,24 +404,19 @@ def previsions_courantes(r, infos, city):
             )
         data.append(["temps", emojiweather + " " + current_weather, ""])
     if compute_args().condensate:
-        table = columnar(data, no_borders=True, wrap_max=0)
+        table = columnar.columnar(data, no_borders=True, wrap_max=0)
     else:
         print("")
-        table = columnar(data, no_borders=False, wrap_max=0)
+        table = columnar.columnar(data, no_borders=False, wrap_max=0)
     print(table)
 
 
-def previsions_generiques(r, infos, city):
-    gps, elevation, sunrise, sunset = obtain_data(r)
+def previsions_generiques(ville, dpt, lat, long):
 
-    print_generic_data_town(infos, city, gps, elevation)
+    print_generic_data_town(ville, dpt, lat, long)
 
-    matches = re.findall(r"[-+]?\d*\.\d+|\d+", gps)
-    latitude = float(matches[0])
-    longitude = float(matches[1])
 
     (
-        date_debut,
         daily_temperature_2m_min,
         daily_temperature_2m_max,
         daily_apparent_temperature_min,
@@ -515,7 +429,7 @@ def previsions_generiques(r, infos, city):
         snowfall,
         precipitation_hours,
         sunshine_duration,
-    ) = resume(latitude, longitude)
+    ) = resume(lat, long)
     data2 = []
     for i in [0, 1, 2, 3]:
         warning = ""
@@ -608,82 +522,32 @@ def previsions_generiques(r, infos, city):
 
     if data2 != []:
         if compute_args().condensate:
-            table = columnar(data2, no_borders=True, wrap_max=0)
+            table = columnar.columnar(data2, no_borders=True, wrap_max=0)
         else:
             print("")
-            table = columnar(data2, headers, no_borders=False, wrap_max=0)
+            table = columnar.columnar(data2, headers, no_borders=False, wrap_max=0)
         print(table)
 
 
-def print_generic_data_town(infos, city, gps, elevation):
+def print_generic_data_town(ville, dpt, lat, long):
     print("")
 
     data = []
     if compute_args().nocolor:
-        data.append([re.sub(" \([0-9]+\)", "", city) + " " + infos])
-        data.append([gps + " / alt. " + elevation])
+        data.append(ville + " (" + dpt + ")")
+        data.append("lat.: " + lat + " / long.: " +long)
         data.append([datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S")])
     else:
-        data.append([HOME, re.sub(" \([0-9]+\)", "", city) + " " + infos])
-        data.append([BOUSSOLE, gps + " / alt. " + elevation])
+        data.append([HOME, ville + " (" + dpt + ")"])
+        data.append([BOUSSOLE, "lat.: " + lat + " / long.: " +long])
         data.append([CLOCK, datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S")])
 
     if compute_args().condensate:
-        table = columnar(data, no_borders=True, wrap_max=0)
+        table = columnar.columnar(data, no_borders=True, wrap_max=0)
     else:
-        table = columnar(data, no_borders=False, wrap_max=0)
+        table = columnar.columnar(data, no_borders=False, wrap_max=0)
 
     print(table)
-
-
-def obtain_data(r):
-    gps = (
-        "lat. "
-        + str(round(float(r.json().get("city_info").get("latitude")), 5))
-        + " / long. "
-        + str(round(float(r.json().get("city_info").get("longitude")), 5))
-    )
-    if not is_gps:
-        elevation = valueorNA(r.json().get("city_info").get("elevation")) + "m"
-    else:
-        elevation = valueorNA(r.json().get("forecast_info").get("elevation")) + "m"
-    sunrise = valueorNA(r.json().get("city_info").get("sunrise"))
-    sunset = valueorNA(r.json().get("city_info").get("sunset"))
-    return gps, elevation, sunrise, sunset
-
-
-def obtain_info_town(vjson, url, r):
-    print_debug(
-        "recherche informations de la VILLE"
-    )
-    try:
-        i = 0
-        while True:
-            if (
-                vjson.get(str(i)).get("country") is not None
-                and vjson.get(str(i)).get("country") == "FRA"
-            ):
-                if unidecode.unidecode(url.lower()) == unidecode.unidecode(
-                    vjson.get(str(i)).get("url").lower()
-                ):
-                    npa = vjson.get(str(i)).get("npa")
-                    print_debug("CODE_POSTAL : " + npa)
-                    infos = "(" + npa + ")"
-                    break
-            i = i + 1
-            infos = ""
-        return infos
-    except Exception:
-        print(my_colored("erreur : la VILLE n'est pas en France", "red"))
-        print(
-            my_colored(
-                "essayez de trouver un paramètre correct avec \"pyweatherfr -s '"
-                + compute_args().town
-                + "'\"",
-                "yellow",
-            )
-        )
-        sys.exit(1)
 
 
 def display_error(r):
@@ -711,35 +575,19 @@ def display_error(r):
 
 
 def obtain_url_and_town_from_ip():
-    global is_gps
+
     with urllib.request.urlopen("https://geolocation-db.com/json") as url:
         print_debug(
             "recherche de la localisation depuis https://geolocation-db.com/json"
         )
         data = json.loads(url.read().decode())
         print_debug(str(data))
-        town = data["city"]
-        if town is None:
-            print(
-                my_colored(
-                    "attention : pas de ville trouvée avec l'ip, utilisation des coordonnées GPS...",
-                    "yellow",
-                )
-            )
-            print_debug(
-                "COORDONNEES_GPS :"
-                + "latitude="
-                + str(data["latitude"])
-                + " longitude="
-                + str(data["longitude"])
-            )
-            is_gps = True
-            url = "lat=" + str(data["latitude"]) + "lng=" + str(data["longitude"])
-            print_debug("URL : " + url)
-        else:
-            url = town
-            print_debug("URL : " + url)
-    return url
+        ville = data["city"]
+        lat = str(data["latitude"])
+        long = str(data["longitude"])
+        dpt = str(data["postal"])
+        return ville, dpt, lat, long 
+    
 
 
 def obtain_url_and_town_from_gps():
@@ -750,166 +598,70 @@ def obtain_url_and_town_from_gps():
         + " longitude="
         + str(compute_args().gps[1])
     )
-    url = "lat=" + compute_args().gps[0] + "lng=" + compute_args().gps[1]
-    print_debug("URL : " + url)
-    return url
+    return "", "", str(compute_args().gps[0]), str(compute_args().gps[1])
 
 
-def obtain_url_and_town_from_cp(vjson):
+def obtain_url_and_town_from_cp():
+
     town = compute_args().town
-    doublon = False
-    if town.isnumeric():
-        post = town
-        print_debug("CODE_POSTAL : " + str(post))
-        print_debug(
-            "recherche de la VILLE et de l'URL depuis https://www.prevision-meteo.ch/services/json/list-cities"
-        )
-        i = 0
-        try:
-            trouve = False
-            while True:
-                if (
-                    vjson.get(str(i)).get("country") is not None
-                    and vjson.get(str(i)).get("country") == "FRA"
-                ):
-                    if str(post) == vjson.get(str(i)).get("npa"):
-                        if not trouve:
-                            url = vjson.get(str(i)).get("url")
-                            print_debug("URL : " + url)
-                        if trouve:
-                            doublon = True
-                        trouve = True
-                i = i + 1
-        except Exception:
-            if not trouve:
-                print(
-                    my_colored(
-                        "erreur : pas de ville trouvée avec le code postal " + str(post),
-                        "red",
-                    )
-                )
-                print(
-                    my_colored(
-                        "essayez avec un autre code postal, ou avec le code postal principal de la ville ou encore le nom de la ville",
-                        "yellow",
-                    )
-                )
-                sys.exit(1)
-        return url, doublon
-    else:
-        url = unidecode.unidecode(town.lower()).replace(" ", "-")
-        print_debug("URL : " + url)
-        return url, doublon
-
-
-def search_town(vjson):
-    search = compute_args().search
-
     ctx = ssl.create_default_context(cafile=certifi.where())
     geopy.geocoders.options.default_ssl_context = ctx
     
     # Création d'un objet géocodeur Nominatim
-    geolocator = Nominatim(user_agent="my_geocoder")
+    geolocator = geopy.geocoders.Nominatim(user_agent="my_geocoder")
     
     # Géocodage d'une adresse
-    locations = geolocator.geocode(search + ", France",exactly_one=False,addressdetails=True)
+    locations = geolocator.geocode(town + ", France",exactly_one=False,addressdetails=True)
     
     # Affichage des informations de localisation
+    choix = []
+    if locations == None:
+        print(my_colored("erreur : aucune ville trouvée", "red")) 
+        exit(1)    
     for location in locations:
-        print(location.raw.get("address"))
-        print(location.raw.get("address").get("village") + " " + location.raw.get("address").get("postcode") + " " + str(location.raw.get("lat")) + " " + str(location.raw.get("lon")))
-
-
-
-
-
-    print_debug(
-        "recherche de la ville depuis https://www.prevision-meteo.ch/services/json/list-cities"
-    )
-    trouve = False
-    i = 0
-    try:
-        while True:
-            if (
-                vjson.get(str(i)).get("country") is not None
-                and vjson.get(str(i)).get("country") == "FRA"
-            ):
-                name = re.sub(" \([0-9]+\)", "", vjson.get(str(i)).get("name")).replace(
-                    " ", "-"
-                )
-                npa = vjson.get(str(i)).get("npa")
-                url = vjson.get(str(i)).get("url")
-                if (
-                    str(search) == npa
-                    or unidecode.unidecode(search.lower()).replace(" ", "-")
-                    in unidecode.unidecode(name.lower().replace(" ", "-"))
-                    or unidecode.unidecode(name.lower().replace(" ", "-"))
-                    in unidecode.unidecode(search.lower().replace(" ", "-"))
-                ):
-                    trouve = True
-                    print(
-                        my_colored(
-                            "pour "
-                            + name
-                            + " ("
-                            + npa
-                            + "), exécutez 'pyweatherfr "
-                            + url
-                            + "' or 'pyweatherfr  "
-                            + npa
-                            + "'",
-                            "yellow",
-                        )
-                    )
-            i = i + 1
-    except Exception:
-        if not trouve:
-            print(my_colored("erreur : pas de ville trouvée", "red"))
-        sys.exit(1)
-
-
-def recuperation_data_villes():
-    tmp_json = "villes.json"
-    if (
-        compute_args().cache
-        or not os.path.exists(get_user_config_directory_pyweather() + tmp_json)
-        or (
-            time.time()
-            - os.stat(get_user_config_directory_pyweather() + tmp_json).st_mtime
-            > 86400 * 30
-        )
-    ):
-        print(
-            my_colored(
-                "cache des villes absent, expiré ou reset, en cours de téléchargement...",
-                "yellow",
-            )
-        )
-        vjson = requests.get(
-            "https://www.prevision-meteo.ch/services/json/list-cities"
-        ).json()
-        print_debug(
-            "enregistrement du cache dans "
-            + get_user_config_directory_pyweather()
-            + tmp_json
-        )
-        with open(get_user_config_directory_pyweather() + tmp_json, "w") as f:
-            json.dump(vjson, f)
-    else:
-        print_debug(
-            "recupération du cache depuis "
-            + get_user_config_directory_pyweather()
-            + tmp_json
-        )
-        with open(get_user_config_directory_pyweather() + tmp_json, "r") as f:
-            vjson = json.load(f)
-    return vjson
+        print_debug(str(location.raw))
+        ville = location.raw.get("address").get("village")
+        if ville == None:
+            ville = location.raw.get("address").get("municipality")
+        if ville == None:
+            ville = location.raw.get("address").get("city")            
+        dpt = location.raw.get("address").get("county")
+        cp = location.raw.get("address").get("postcode")
+        if cp == None:
+            cp = ""
+        lat = location.raw.get("lat")
+        long = location.raw.get("lon")
+        print_debug(ville+"-"+dpt+"-"+lat+"-"+long)
+        if ville.lower() == town.lower() or cp.lower() == town.lower(): 
+            if ville+"-"+dpt not in [item[0] for item in choix]:  # Vérifier si ville+"-"+dpt n'est pas déjà présent dans choix
+                choix.append([ville+"-"+dpt, ville, dpt, lat, long])
+    if len(choix)==1:
+        choice = choix[0]
+        ville = choice[1]
+        dpt = choice[2]
+        lat = choice[3]
+        long = choice[4]
+        return ville, dpt, lat, long    
+    if len(choix)==0:
+        print(my_colored("erreur : aucune ville trouvée", "red")) 
+        exit(1)
+    i=0    
+    for choice in choix:
+        i=i+1
+        print("["+str(i)+"] " + choice[1] + " (" + choice[2]+ ")")
+    toto = input("Quelle ville?")
+    choice = choix[int(toto)]
+    ville = choice[1]
+    dpt = choice[2]
+    lat = choice[3]
+    long = choice[4]
+    return ville, dpt, lat, long
 
 
 def my_colored(message, color):
     if compute_args().nocolor:
         return message
-    return colored(message, color)
+    return termcolor.colored(message, color)
 
 
 def print_debug(message):
@@ -917,12 +669,6 @@ def print_debug(message):
         print("debug : " + message)
 
 
-def valueorNA(my_string):
-    global incomplete_data
-    if my_string is None or my_string == "NA":
-        incomplete_data = True
-        return "."
-    return my_string
 
 
 def resume(latitude, longitude):
@@ -930,7 +676,7 @@ def resume(latitude, longitude):
     cache_session = requests_cache.CachedSession(
         get_user_config_directory_pyweather() + ".cache", expire_after=3600
     )
-    retry_session = retry(cache_session, retries=5, backoff_factor=0.2)
+    retry_session = retry_requests.retry(cache_session, retries=5, backoff_factor=0.2)
     openmeteo = openmeteo_requests.Client(session=retry_session)
 
     # Make sure all required weather variables are listed here
@@ -975,9 +721,7 @@ def resume(latitude, longitude):
     snowfall = daily.Variables(9).ValuesAsNumpy()
     precipitation_hours= daily.Variables(10).ValuesAsNumpy()
     sunshine_duration= daily.Variables(11).ValuesAsNumpy()
-    date_debut = pd.to_datetime(daily.Time(), unit="s", utc=True)
     return (
-        date_debut,
         daily_temperature_2m_min,
         daily_temperature_2m_max,
         daily_apparent_temperature_min,
@@ -997,7 +741,7 @@ def specific_day(latitude, longitude, day):
     cache_session = requests_cache.CachedSession(
         get_user_config_directory_pyweather() + ".cache", expire_after=3600
     )
-    retry_session = retry(cache_session, retries=5, backoff_factor=0.2)
+    retry_session = retry_requests.retry(cache_session, retries=5, backoff_factor=0.2)
     openmeteo = openmeteo_requests.Client(session=retry_session)
     url = "https://api.open-meteo.com/v1/meteofrance"
     params = {
@@ -1065,7 +809,7 @@ def current(latitude, longitude):
     cache_session = requests_cache.CachedSession(
         get_user_config_directory_pyweather() + ".cache", expire_after=3600
     )
-    retry_session = retry(cache_session, retries=5, backoff_factor=0.2)
+    retry_session = retry_requests.retry(cache_session, retries=5, backoff_factor=0.2)
     openmeteo = openmeteo_requests.Client(session=retry_session)
 
     url = "https://api.open-meteo.com/v1/meteofrance"

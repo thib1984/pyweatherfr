@@ -7,9 +7,9 @@
 - [ ] emoji nuit claire, nuit nuageuse
 - [ ] séparer durée soleil / couverture nuage
 - [ ] vérifier durée soleil hourly/daily
-- [ ] intégration geopy
-- [x] retry sur erreur 502 de l'ancienne api
 - [ ] mode passé pour le journalier
+- [x] intégration geopy
+- [x] retry sur erreur 502 de l'ancienne api
 
 # 3.0.0 
 

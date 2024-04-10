@@ -52,7 +52,7 @@ def compute_args():
         "--now",
         action="store_true",
         help="affichage des données météo détaillées actuelles",
-    )    
+    )
     my_parser.add_argument(
         "-j",
         "--jour",
@@ -62,7 +62,7 @@ def compute_args():
         default=1000,
         choices=range(-100, 4),
         help="affichage des données météo détaillées pour [JOUR] (0 pour le jour actuel, 1 pour le J+1, ..., -1 pour J-1, ...)",
-    ) 
+    )         
     my_group.add_argument(
         "-g",
         "--gps",
@@ -71,15 +71,7 @@ def compute_args():
         nargs=2,
         type=str,
         help="affichage des données météo par coordonnées GPS",
-    )
-    my_group.add_argument(
-        "-s",
-        "--search",
-        action="store",
-        metavar="RECHERCHE",
-        type=str,
-        help="ville ou code postal à rechercher",
-    )        
+    )      
     my_parser.add_argument(
         "--nocolor",
         action="store_true",

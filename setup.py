@@ -11,7 +11,7 @@ setup(
     author_email="thibault.garcon@gmail.com",
     license="MIT",
     packages=["pyweatherfr"],
-    install_requires=["columnar","termcolor", "colorama","unidecode","requests","openmeteo_requests","requests_cache","pandas","retry_requests","geopy"],
+    install_requires=["columnar","termcolor", "colorama","openmeteo_requests","requests_cache","retry_requests","geopy"],
     zip_safe=False,
     entry_points={
         "console_scripts": [
