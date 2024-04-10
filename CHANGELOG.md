@@ -5,8 +5,8 @@
 - [ ] previsions -n ajouter data comme -j 
 - [ ] gestion des emojis aux largeurs fantaisistes
 - [ ] emoji nuit claire, nuit nuageuse
-- [ ] séparer durée soleil / couverture nuage
-- [ ] vérifier durée soleil hourly/daily
+- [x] vérifier durée soleil hourly/daily
+- [x] séparer durée soleil / couverture nuage
 - [x] mode passé pour le générique
 - [x] intégration geopy
 - [x] retry sur erreur 502 de l'ancienne api

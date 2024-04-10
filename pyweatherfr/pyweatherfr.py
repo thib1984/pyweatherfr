@@ -162,7 +162,8 @@ def previsions_detaillees(ville, dpt, lat, long):
             warning = warning + " " + PLUME
         weather, emojiweather = traduction(current_weather_code[h])
         humidity = f"{relative_humidity_2m[h]:.0f}%"
-        soleil_nuage = f"{sunshine_duration[h]/60:.0f}% / {cloud_cover[h]:.0f}%"
+        duree_soleil = f"{sunshine_duration[h]/60:.0f}'"
+        couv_nuage = f" {cloud_cover[h]:.0f}%"        
         if compute_args().nocolor:
             data.append(
                 [
@@ -181,7 +182,8 @@ def previsions_detaillees(ville, dpt, lat, long):
                     direction,
                     pression,
                     humidity,
-                    soleil_nuage,
+                    duree_soleil,
+                    couv_nuage,
                 ]
             )
         else:
@@ -202,7 +204,8 @@ def previsions_detaillees(ville, dpt, lat, long):
                     direction,
                     pression,
                     humidity,
-                    soleil_nuage,
+                    duree_soleil,
+                    couv_nuage,
                     warning,
                 ]
             )
@@ -217,7 +220,8 @@ def previsions_detaillees(ville, dpt, lat, long):
             "direction vent",
             "pression",
             "humidité",
-            "durée soleil / couverture nuage"
+            "durée soleil",
+            "couverture nuage"            
         ]
     else:
         headers = [
@@ -229,7 +233,8 @@ def previsions_detaillees(ville, dpt, lat, long):
             "direction vent",
             "pression",
             "humidité",
-            "durée soleil / couverture nuage",            
+            "durée soleil",
+            "couverture nuage",            
             "warnings",
         ]
 
@@ -465,7 +470,8 @@ def previsions_generiques(ville, dpt, lat, long):
         vent = vent
         if daily_wind_speed_10m_max[i] >= WARNING_WIND or daily_wind_gusts_10m_max[i] >= WARNING_WIND_GUST:
             warning = warning + " " + WIND
-        duree = f"{precipitation_hours[i]:.0f}h / {sunshine_duration[i]/3600:.0f}h"
+        duree_pluie = f"{precipitation_hours[i]:.0f}h"
+        duree_soleil = f"{sunshine_duration[i]/3600:.1f}h"
         if compute_args().nocolor:
             data2.append(
                 [
@@ -481,7 +487,8 @@ def previsions_generiques(ville, dpt, lat, long):
                     pluie,
                     vent,
                     direction,
-                    duree
+                    duree_pluie,
+                    duree_soleil
                 ]
             )
             headers = [
@@ -491,7 +498,8 @@ def previsions_generiques(ville, dpt, lat, long):
                 "précipitations",
                 "vent (rafales)",
                 "direction",
-                "durée pluie / soleil"
+                "durée pluie",
+                "durée soleil"
             ]
         else:
             data2.append(
@@ -509,7 +517,8 @@ def previsions_generiques(ville, dpt, lat, long):
                     pluie,
                     vent,
                     direction,
-                    duree,
+                    duree_pluie,
+                    duree_soleil,
                     warning,
                 ]
             )
@@ -520,7 +529,8 @@ def previsions_generiques(ville, dpt, lat, long):
                 "précipitations",
                 "vent (rafales)",
                 "direction vent",
-                "durée pluie / soleil",
+                "durée pluie",
+                "durée soleil",
                 "warning",
             ]
 
