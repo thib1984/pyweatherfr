@@ -2,6 +2,12 @@
 pyweatherfr use case
 """
 
+#TODO
+import geopy,certifi,ssl
+from geopy.geocoders import Nominatim
+#TODO
+
+
 from pyweatherfr.args import compute_args
 
 
@@ -798,6 +804,25 @@ def obtain_url_and_town_from_cp(vjson):
 
 def search_town(vjson):
     search = compute_args().search
+
+    ctx = ssl.create_default_context(cafile=certifi.where())
+    geopy.geocoders.options.default_ssl_context = ctx
+    
+    # Création d'un objet géocodeur Nominatim
+    geolocator = Nominatim(user_agent="my_geocoder")
+    
+    # Géocodage d'une adresse
+    locations = geolocator.geocode(search + ", France",exactly_one=False,addressdetails=True)
+    
+    # Affichage des informations de localisation
+    for location in locations:
+        print(location.raw.get("address"))
+        print(location.raw.get("address").get("village") + " " + location.raw.get("address").get("postcode") + " " + str(location.raw.get("lat")) + " " + str(location.raw.get("lon")))
+
+
+
+
+
     print_debug(
         "recherche de la ville depuis https://www.prevision-meteo.ch/services/json/list-cities"
     )

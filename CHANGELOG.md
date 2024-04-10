@@ -1,4 +1,4 @@
-# A VENIR 3.0.1 
+# A VENIR 4.0.0
 
 - [ ] mode full pour humidité/pression/soleil etc
 - [ ] mode minimal pour temps / pluie uniquement (uniquement emoji si non nocolor)
@@ -7,7 +7,9 @@
 - [ ] emoji nuit claire, nuit nuageuse
 - [ ] séparer durée soleil / couverture nuage
 - [ ] vérifier durée soleil hourly/daily
+- [ ] intégration geopy
 - [x] retry sur erreur 502 de l'ancienne api
+- [ ] mode passé pour le journalier
 
 # 3.0.0 
 
