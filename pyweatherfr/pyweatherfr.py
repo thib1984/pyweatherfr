@@ -688,15 +688,8 @@ def print_debug(message):
 
 
 def resume(latitude, longitude):
-    # Setup the Open-Meteo API client with cache and retry on error
-    cache_session = requests_cache.CachedSession(
-        get_user_config_directory_pyweather() + ".cache", expire_after=3600
-    )
-    retry_session = retry_requests.retry(cache_session, retries=5, backoff_factor=0.2)
+    retry_session = retry_requests.retry(cache_session(), retries=5, backoff_factor=0.2)
     openmeteo = openmeteo_requests.Client(session=retry_session)
-
-    # Make sure all required weather variables are listed here
-    # The order of variables in hourly or daily is important to assign them correctly below
     url = "https://api.open-meteo.com/v1/meteofrance"
     date_debut = (datetime.datetime.now() + datetime.timedelta(days=-1*compute_args().past)).strftime("%Y-%m-%d")
     date_fin = (datetime.datetime.now() + datetime.timedelta(days=3)).strftime("%Y-%m-%d")
@@ -725,11 +718,7 @@ def resume(latitude, longitude):
     }
     print_debug("appel api meteo france "+url+"?"+'&'.join([f'{key}={",".join(value) if isinstance(value, list) else value}' for key, value in params.items()]))
     responses = openmeteo.weather_api(url, params=params)
-
-    # Process first location. Add a for-loop for multiple locations or weather models
     response = responses[0]
-
-    # Process daily data. The order of variables needs to be the same as requested.
     daily = response.Daily()
     daily_temperature_2m_max = daily.Variables(0).ValuesAsNumpy()
     daily_temperature_2m_min = daily.Variables(1).ValuesAsNumpy()
@@ -760,10 +749,7 @@ def resume(latitude, longitude):
 
 
 def specific_day(latitude, longitude, day):
-    cache_session = requests_cache.CachedSession(
-        get_user_config_directory_pyweather() + ".cache", expire_after=3600
-    )
-    retry_session = retry_requests.retry(cache_session, retries=5, backoff_factor=0.2)
+    retry_session = retry_requests.retry(cache_session(), retries=5, backoff_factor=0.2)
     openmeteo = openmeteo_requests.Client(session=retry_session)
     url = "https://api.open-meteo.com/v1/meteofrance"
     params = {
@@ -793,11 +779,7 @@ def specific_day(latitude, longitude, day):
     }
     print_debug("appel api meteo france "+url+"?"+'&'.join([f'{key}={",".join(value) if isinstance(value, list) else value}' for key, value in params.items()]))
     responses = openmeteo.weather_api(url, params=params)
-
-    # Process first location. Add a for-loop for multiple locations or weather models
     response = responses[0]
-
-    # Process daily data. The order of variables needs to be the same as requested.
     hourly = response.Hourly()
     hourly_temperature_2m = hourly.Variables(0).ValuesAsNumpy()
     hourly_apparent_temperature = hourly.Variables(1).ValuesAsNumpy()
@@ -826,12 +808,14 @@ def specific_day(latitude, longitude, day):
         cloud_cover
                 )
 
-
-def current(latitude, longitude):
-    cache_session = requests_cache.CachedSession(
+def cache_session():
+    return requests_cache.CachedSession(
         get_user_config_directory_pyweather() + ".cache", expire_after=3600
     )
-    retry_session = retry_requests.retry(cache_session, retries=5, backoff_factor=0.2)
+
+
+def current(latitude, longitude):
+    retry_session = retry_requests.retry(cache_session(), retries=5, backoff_factor=0.2)
     openmeteo = openmeteo_requests.Client(session=retry_session)
 
     url = "https://api.open-meteo.com/v1/meteofrance"

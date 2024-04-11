@@ -11,6 +11,7 @@
 - [ ] recherche par date précise pour -j
 - [ ] -j donnerait le jour actuel
 - [ ] recap de la recherche dans le bloc ville
+- [ ] clean code
 
 # 4.0.0 
 
