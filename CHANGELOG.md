@@ -1,4 +1,4 @@
-# A VENIR 4.0.1
+# A VENIR
 
 - [ ] améliorer infos villes si ville ou dpt non renseignés
 - [ ] securiser la saisie du choix de ville
@@ -7,6 +7,10 @@
 - [ ] previsions -n ajouter data comme -j 
 - [ ] gestion des emojis aux largeurs fantaisistes
 - [ ] emoji nuit claire, nuit nuageuse
+- [ ] passer à 100j et non 99
+- [ ] recherche par date précise pour -j
+- [ ] -j donnerait le jour actuel
+- [ ] recap de la recherche dans le bloc ville
 
 # 4.0.0 
 
