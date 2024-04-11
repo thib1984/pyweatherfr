@@ -1,4 +1,4 @@
-# A VENIR 4.0.0
+# A VENIR 4.0.1
 
 - [ ] améliorer infos villes si ville ou dpt non renseignés
 - [ ] securiser la saisie du choix de ville
@@ -7,6 +7,9 @@
 - [ ] previsions -n ajouter data comme -j 
 - [ ] gestion des emojis aux largeurs fantaisistes
 - [ ] emoji nuit claire, nuit nuageuse
+
+# 4.0.0 
+
 - [x] vérifier durée soleil hourly/daily
 - [x] séparer durée soleil / couverture nuage
 - [x] mode passé pour le générique
