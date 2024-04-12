@@ -12,6 +12,10 @@
 - [ ] recap de la recherche dans le bloc ville
 - [ ] clean code
 - [ ] test install cicd
+
+# 4.0.1
+
+- [x] limite le nb de decimales au GPS
 - [x] maj --cache pour cache session en nocache
 - [x] librairie manquante Numpy
 - [x] bug ancenis

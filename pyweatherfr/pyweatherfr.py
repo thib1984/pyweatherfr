@@ -551,12 +551,22 @@ def print_generic_data_town(ville, dpt, lat, long):
 
     data = []
     if compute_args().nocolor:
-        data.append(ville + " (" + dpt + ")")
-        data.append("lat.: " + lat + " / long.: " +long)
+        if (ville is None or ville == "") and (dpt is None or dpt == ""):
+            print_debug("pas de data pour ville/dpt/cp")
+        elif dpt is None or dpt == "":
+            data.append(ville)
+        else:    
+            data.append(ville + " (" + dpt + ")")
+        data.append(f"lat.:  {float(lat):.4f}° / long.: {float(long):.4f}° ")
         data.append([datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S")])
     else:
-        data.append([HOME, ville + " (" + dpt + ")"])
-        data.append([BOUSSOLE, "lat.: " + lat + " / long.: " +long])
+        if (ville is None or ville == "") and (dpt is None or dpt == ""):
+            print_debug("pas de data pour ville/dpt/cp")
+        elif dpt is None or dpt == "":
+            data.append([HOME, ville])
+        else:    
+            data.append([HOME, ville + " (" + dpt + ")"])
+        data.append([BOUSSOLE, f"lat.:  {float(lat):.4f}°  / long.: {float(long):.4f}° "])
         data.append([CLOCK, datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S")])
 
     if compute_args().condensate:
