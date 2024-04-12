@@ -12,6 +12,11 @@
 - [ ] -j donnerait le jour actuel
 - [ ] recap de la recherche dans le bloc ville
 - [ ] clean code
+- [ ] bug ancenis
+- [ ] bug saint-etienne
+- [ ] bug paris
+- [ ] test install cicd
+- [ ] librairie manquante Numpy
 
 # 4.0.0 
 
