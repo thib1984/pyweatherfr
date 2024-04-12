@@ -7,16 +7,18 @@
 - [ ] previsions -n ajouter data comme -j 
 - [ ] gestion des emojis aux largeurs fantaisistes
 - [ ] emoji nuit claire, nuit nuageuse
-- [ ] passer à 100j et non 99
 - [ ] recherche par date précise pour -j
 - [ ] -j donnerait le jour actuel
 - [ ] recap de la recherche dans le bloc ville
 - [ ] clean code
-- [ ] bug ancenis
-- [ ] bug saint-etienne
-- [ ] bug paris
 - [ ] test install cicd
-- [ ] librairie manquante Numpy
+- [x] maj --cache pour cache session en nocache
+- [x] librairie manquante Numpy
+- [x] bug ancenis
+- [x] bug saint-etienne choix
+- [x] bug saint-étienne/etienne
+- [x] passer à 100j et non 99
+
 
 # 4.0.0 
 

@@ -5,7 +5,10 @@ pyweatherfr use case
 
 from pyweatherfr.args import compute_args
 
-import geopy,certifi,ssl
+import unicodedata
+import geopy
+import certifi
+import ssl
 import datetime
 import sys
 import json
@@ -92,11 +95,11 @@ def get_user_config_directory_pyweather():
 def find():
 
     if compute_args().town:
-        ville, dpt, lat, long = obtain_url_and_town_from_cp()
+        ville, dpt, lat, long = obtain_city_data()
     elif compute_args().gps:
-        ville, dpt, lat, long = obtain_url_and_town_from_gps()
+        ville, dpt, lat, long = obtain_city_data_from_gps()
     else:
-        ville, dpt, lat, long = obtain_url_and_town_from_ip()
+        ville, dpt, lat, long = obtain_city_data_from_ip()
 
     if compute_args().now:
         previsions_courantes(ville, dpt, lat, long)
@@ -588,7 +591,7 @@ def display_error(r):
     exit(1)
 
 
-def obtain_url_and_town_from_ip():
+def obtain_city_data_from_ip():
 
     with urllib.request.urlopen("https://geolocation-db.com/json") as url:
         print_debug(
@@ -604,7 +607,7 @@ def obtain_url_and_town_from_ip():
     
 
 
-def obtain_url_and_town_from_gps():
+def obtain_city_data_from_gps():
     print_debug(
         "COORDONNEES_GPS :"
         + "latitude="
@@ -615,7 +618,7 @@ def obtain_url_and_town_from_gps():
     return "", "", str(compute_args().gps[0]), str(compute_args().gps[1])
 
 
-def obtain_url_and_town_from_cp():
+def obtain_city_data():
 
     town = compute_args().town
     ctx = ssl.create_default_context(cafile=certifi.where())
@@ -634,10 +637,12 @@ def obtain_url_and_town_from_cp():
         exit(1)    
     for location in locations:
         print_debug(str(location.raw))
-        ville = location.raw.get("address").get("village")
-        if ville == None:
+        ville = clean_string(location.raw.get("address").get("village"))
+        if ville == None or (location.raw.get("address").get("municipality") != None and clean_string(location.raw.get("address").get("municipality").lower())==clean_string(town.lower())):
             ville = location.raw.get("address").get("municipality")
-        if ville == None:
+        if ville == None or (location.raw.get("address").get("town") != None and clean_string(location.raw.get("address").get("town").lower())==clean_string(town.lower())):
+            ville = location.raw.get("address").get("town")               
+        if ville == None or (location.raw.get("address").get("city") != None and clean_string(location.raw.get("address").get("city").lower())==clean_string(town.lower())):
             ville = location.raw.get("address").get("city")
         dpt = location.raw.get("address").get("county")
         if dpt ==None:
@@ -648,7 +653,7 @@ def obtain_url_and_town_from_cp():
         lat = location.raw.get("lat")
         long = location.raw.get("lon")
         print_debug(ville+"-"+dpt+"-"+lat+"-"+long)
-        if ville.lower() == town.lower() or cp.lower() == town.lower(): 
+        if clean_string(ville.lower()) == clean_string(town.lower()) or cp.lower() == town.lower(): 
             if ville+"-"+dpt not in [item[0] for item in choix]:  # Vérifier si ville+"-"+dpt n'est pas déjà présent dans choix
                 choix.append([ville+"-"+dpt, ville, dpt, lat, long])
     if len(choix)==1:
@@ -665,8 +670,8 @@ def obtain_url_and_town_from_cp():
     for choice in choix:
         i=i+1
         print("["+str(i)+"] " + choice[1] + " (" + choice[2]+ ")")
-    toto = input("Quelle ville?")
-    choice = choix[int(toto)]
+    toto = input("Quelle ville? ")
+    choice = choix[int(toto)-1]
     ville = choice[1]
     dpt = choice[2]
     lat = choice[3]
@@ -809,6 +814,14 @@ def specific_day(latitude, longitude, day):
                 )
 
 def cache_session():
+    if compute_args().nocache:
+        directory = get_user_config_directory_pyweather()
+        file_path = os.path.join(directory, ".cache.sqlite")
+        if os.path.exists(file_path):
+            os.remove(file_path)
+            print_debug("Le cache a été supprimé avec succès.")
+        else:
+            print_debug("Le cache n'existe pas.")
     return requests_cache.CachedSession(
         get_user_config_directory_pyweather() + ".cache", expire_after=3600
     )
@@ -865,3 +878,14 @@ def current(latitude, longitude):
         current_weather_code,
         snowfall
     )
+
+def clean_string(mystring):
+    if mystring is None:
+        return None
+    retour =""
+    nfkd_form = unicodedata.normalize('NFKD', mystring)
+    retour = ''.join([c for c in nfkd_form if not unicodedata.combining(c)])
+    retour = retour.replace(' ', '-').replace("'", '-').replace('"', '-')
+    if mystring!=retour:
+        print_debug(mystring + " modifié en " + retour)
+    return retour

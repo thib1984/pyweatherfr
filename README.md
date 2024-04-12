@@ -42,7 +42,7 @@ exemple : ``pyweatherfr Grenoble -p 10`` affiche les données météo détaillé
   - ``-c/--condensate``  condense la sortie
   - ``--nocolor``  désactive les couleurs et les emojis en sortie
   - ``-v/--verbose``  mode verbeux
-  - ``-C/--cache``  met à jour le cache du nom des villes (cache par défaut 30j)
+  - ``--nocache``  supprime le cache de l'api meteo france avant l'appel
   
 # Démo
 

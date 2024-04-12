@@ -60,7 +60,7 @@ def compute_args():
         action="store",
         type=int,
         default=1000,
-        choices=range(-100, 4),
+        choices=range(-101, 4),
         help="affichage des données météo détaillées pour [JOUR] (0 pour le jour actuel, 1 pour le J+1, ..., -1 pour J-1, ...)",
     )
     my_parser.add_argument(
@@ -70,7 +70,7 @@ def compute_args():
         action="store",
         type=int,
         default=0,
-        choices=range(1, 100),
+        choices=range(1, 101),
         help="affichage des données météo génériques depuis [JOUR PASSE] (-10 pour J-10 à J-1, ...)",
     )         
     my_group.add_argument(
@@ -94,10 +94,9 @@ def compute_args():
         help="condenser la sortie",
     )
     my_parser.add_argument(
-        "-C",
-        "--cache",
+        "--nocache",
         action="store_true",
-        help="rafraichit le cache des villes",
+        help="supprime le cache de l'api meteo france",
     )    
     my_parser.add_argument(
         "-v",
