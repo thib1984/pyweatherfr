@@ -33,6 +33,9 @@ pyweatherfr \[TOWN\] -p [INT]
 
 exemple : ``pyweatherfr Grenoble -p 10`` affiche les données météo détaillées pour Grenoble de J-10 à J-1
 
+pyweatherfr \[TOWN\] -d [STR]
+
+exemple : ``pyweatherfr Grenoble -d 2024-03-30`` affiche les données météo détaillées pour Grenoble au 30/03/2024
 
 
 ## Autres options
@@ -43,6 +46,8 @@ exemple : ``pyweatherfr Grenoble -p 10`` affiche les données météo détaillé
   - ``--nocolor``  désactive les couleurs et les emojis en sortie
   - ``-v/--verbose``  mode verbeux
   - ``--nocache``  supprime le cache de l'api meteo france avant l'appel
+  - ``--utc``    utilise l'heure utc dans les previsions au lieu de l'heure locale de la ville
+  - ``--pc``    utilise l'heure du pc dans les previsions au lieu de l'heure locale de la ville
   
 # Démo
 

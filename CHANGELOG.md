@@ -1,31 +1,41 @@
 # A VENIR
 
-## bugs
-
-- [x] bug basse-terre
-- [ ] securiser la saisie du choix de ville : https://github.com/thib1984/ytdlmusic/blob/main/ytdlmusic/choice.py
-- [ ] gérer fuseau horaire en fonction de la ville (ex Nouméa): https://www.geeksforgeeks.org/get-time-zone-of-a-given-location-using-python/
-
-## optim
-
 - [ ] test install cicd
-- [ ] changer cp to state pour la recherche par ip
-- [ ] améliorer unités from apimeteofrance
 - [ ] previsions -n ajouter data comme -j 
-- [ ] gestion des emojis aux largeurs fantaisistes
-- [ ] emoji nuit claire, nuit nuageuse
-- [ ] recap de la recherche dans le bloc ville
 - [ ] integrer test sur heure soleil si ==3 si lumineux et ou petite pluie
 - [ ] comparer boundingbox openstreetmap pour doublons
-- [ ] ameliorer affichage dpt from openstreetmap basse-terre
-
-## features
+- [ ] ajouter fleche vent
 
 - [ ] mode full pour humidité/pression/soleil etc
 - [ ] mode minimal pour temps / pluie uniquement (uniquement emoji si non nocolor)
-- [ ] recherche par date précise pour -j
-- [ ] -j sans param donnerait le jour actuel
-- [ ] altitude from apimeteofrance
+
+# 4.1.0
+
+## bugs
+
+- [x] bug basse-terre
+- [x] securiser la saisie du choix de ville : https://github.com/thib1984/ytdlmusic/blob/main/ytdlmusic/choice.py
+- [x] gérer fuseau horaire en fonction de la ville (ex Nouméa): https://www.geeksforgeeks.org/get-time-zone-of-a-given-location-using-python/
+- [x] bug --nocolor sur données ville
+- [x] emoji pluie sur données courantes si ==0
+- [x] corrige la possibilite de -p / -j / -n en //
+- [x] test format et range si --date
+
+## optim
+
+- [x] changer cp to state pour la recherche par ip
+- [x] améliorer unités from apimeteofrance
+- [x] ameliorer affichage dpt from openstreetmap basse-terre
+- [x] recap de la recherche dans le bloc ville
+- [x] emoji nuit claire, nuit nuageuse
+- [x] gestion des emojis aux largeurs fantaisistes
+
+## features
+
+- [x] altitude from apimeteofrance
+- [x] -utc ou -local pour la tz
+- [x] -j sans param donnerait le jour actuel
+- [x] recherche par date précise pour -j
 
 ## technic
 

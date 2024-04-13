@@ -47,23 +47,34 @@ def compute_args():
         nargs="?",
         help="affichage des données météo par nom de ville ou code postal -si absent, la VILLE est déduite de l'ip-",
     )
-    my_parser.add_argument(
+    my_2group = my_parser.add_mutually_exclusive_group()
+    my_2group.add_argument(
         "-n",
         "--now",
         action="store_true",
         help="affichage des données météo détaillées actuelles",
     )
-    my_parser.add_argument(
+    my_2group.add_argument(
         "-j",
         "--jour",
         metavar="JOUR",
         action="store",
         type=int,
         default=1000,
+        nargs='?',
+        const=0,        
         choices=range(-101, 4),
         help="affichage des données météo détaillées pour [JOUR] (0 pour le jour actuel, 1 pour le J+1, ..., -1 pour J-1, ...)",
     )
-    my_parser.add_argument(
+    my_2group.add_argument(
+        "-d",
+        "--date",
+        metavar="DATE",
+        action="store",
+        type=str,      
+        help="affichage des données météo détaillées pour [DAY] au format yyyy-mm-dd",
+    )    
+    my_2group.add_argument(
         "-p",
         "--past",
         metavar="JOUR PASSE",
@@ -87,6 +98,17 @@ def compute_args():
         action="store_true",
         help="désactiver couleur et emojis en sortie -à utiliser en cas de problème d'affichage-",
     )
+    group = my_parser.add_mutually_exclusive_group()
+    group.add_argument(
+        "--pc",
+        action="store_true",
+        help="utilise l'heure locale du PC indépendamment de la ville cherchée",
+    )
+    group.add_argument(
+        "--utc",
+        action="store_true",
+        help="utilise l'heure UTC",
+    )          
     my_parser.add_argument(
         "-c",
         "--condensate",

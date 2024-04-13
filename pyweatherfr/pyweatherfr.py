@@ -21,6 +21,9 @@ import termcolor
 import pathlib
 import retry_requests
 import geopy
+import timezonefinder
+import pytz
+import tzlocal
 
 
 DOSSIER_CONFIG_PYWEATHER = "pyweatherfr"
@@ -28,10 +31,11 @@ DOSSIER_CONFIG_PYWEATHER = "pyweatherfr"
 SUN = "\U0001F31E"
 MI_SUN = "\U0001F324"
 CLOUD = "\U0001F325"
+NIGHT_CLOUD = "\U0001f319"
 MI_CLOUD_RAIN = "\U0001F326"
 RAIN = "\U0001F327"
 SNOW = "\U0001F328"
-NIGHT_CLEAR = "\U0001F319"
+NIGHT_CLEAR = "\U0001f319"
 ORAGE = "\U0001F329"
 ORAGE_PLUIE = "\U0001F329" + " " + "\U0001F327"
 FOG = "\U0001F32B"
@@ -56,6 +60,7 @@ FLECHE_E = "\U0000FE0F"
 FLECHE_NE = "\U0000FE0F"
 ELEPHANT = "\U0001F418"
 PLUME = "\U0001FAB6"
+PC ="\U0001f4bb"
 WARNING_WARM=30
 WARNING_FROID=0
 WARNING_SNOW=0.1
@@ -92,6 +97,13 @@ def get_user_config_directory_pyweather():
     return ze_path
 
 
+def est_format_date(chaine):
+    try:
+        datetime.datetime.strptime(chaine, '%Y-%m-%d')
+        return True
+    except ValueError:
+        return False
+
 def find():
 
     if compute_args().town:
@@ -100,19 +112,38 @@ def find():
         ville, dpt, lat, long = obtain_city_data_from_gps()
     else:
         ville, dpt, lat, long = obtain_city_data_from_ip()
-
+    tz=timezonefinder.TimezoneFinder().timezone_at(lng=float(long), lat=float(lat))
+    if not compute_args().date == None:
+        if not est_format_date(compute_args().date):
+            print(my_colored("erreur : format date invalide, format attendu yyyy-mm-dd", "red"))
+            exit(1)
+        diff = (pytz.timezone(tz).localize(datetime.datetime.strptime(compute_args().date, "%Y-%m-%d")) - datetime.datetime.now(tz=pytz.timezone(tz))).days
+        if diff>=4 or diff<100:
+            print(my_colored("erreur : date invalide (-100 à +4 jour de la date actuelle)", "red"))
+            exit(1)    
+    if compute_args().pc:
+        tz=str(tzlocal.get_localzone())
+    if compute_args().utc:
+        tz=str(pytz.utc)              
+    print_debug(tz)
     if compute_args().now:
-        previsions_courantes(ville, dpt, lat, long)
+        previsions_courantes(ville, dpt, lat, long,tz)
+    elif not compute_args().date == None:
+        previsions_detaillees(ville, dpt, lat, long,tz)        
     elif compute_args().jour == 1000:
-        previsions_generiques(ville, dpt, lat, long)
+        previsions_generiques(ville, dpt, lat, long,tz)
     else:
-        previsions_detaillees(ville, dpt, lat, long)
+        previsions_detaillees(ville, dpt, lat, long,tz)
 
 
 
-def previsions_detaillees(ville, dpt, lat, long):
-    print_generic_data_town(ville, dpt, lat, long)
+def previsions_detaillees(ville, dpt, lat, long, tz):
 
+
+    if compute_args().date:
+        day = (pytz.timezone(tz).localize(datetime.datetime.strptime(compute_args().date, "%Y-%m-%d")) - datetime.datetime.now(tz=pytz.timezone(tz))).days
+    else:    
+        day = compute_args().jour
 
     (
         hourly_temperature_2m,
@@ -126,18 +157,33 @@ def previsions_detaillees(ville, dpt, lat, long):
         snowfall,
         relative_humidity_2m,
         sunshine_duration,
-        cloud_cover       
-    ) = specific_day(lat, long, compute_args().jour)
+        cloud_cover,
+        alt,
+        isday   
+    ) = specific_day(lat, long, day, tz)
+    recap ="Prévisions détaillées pour le " + (datetime.datetime.now(tz=pytz.timezone(tz)) + datetime.timedelta(days=compute_args().jour)).strftime(
+            "%Y-%m-%d")
+    if compute_args().pc:
+        recap = recap + " (pc)"
+    elif compute_args().utc:
+        recap = recap + " (utc.)"        
+    else:
+        recap = recap + " (loc.)"    
+    if compute_args().jour<0:
+        recap ="Données détaillées pour le " + (datetime.datetime.now(tz=pytz.timezone(tz)) + datetime.timedelta(days=compute_args().jour)).strftime(
+                "%Y-%m-%d")        
+    print_generic_data_town(ville, dpt, lat, long, alt, recap)
     data = []
     for h in range(0, 24):
         warning = ""
         if (
-            compute_args().jour == 0
-            and 0 < h - int(datetime.datetime.now().strftime("%H")) <= 1
+            (datetime.datetime.now(tz=pytz.timezone(tz)) + datetime.timedelta(days=compute_args().jour)).strftime(
+            "%Y-%m-%d") == datetime.datetime.now(tz=pytz.timezone(tz)).strftime("%Y-%m-%d")
+            and 0 < h - int(datetime.datetime.now(tz=pytz.timezone(tz)).strftime("%H")) <= 1
         ):
             warning = warning + " " + CLOCK
         temp = (
-            f"{hourly_temperature_2m[h]:.1f}° ({hourly_apparent_temperature[h]:.1f}°)"
+            f"{hourly_temperature_2m[h]:.1f}°C ({hourly_apparent_temperature[h]:.1f}°C)"
         )
         if hourly_temperature_2m[h] <= WARNING_FROID or hourly_apparent_temperature[h] <= WARNING_FROID:
             warning = warning + " " + COLD
@@ -163,7 +209,7 @@ def previsions_detaillees(ville, dpt, lat, long):
             warning = warning + " " + ELEPHANT
         if surface_pressure[h] <= WARNING_BP:
             warning = warning + " " + PLUME
-        weather, emojiweather = traduction(current_weather_code[h])
+        weather, emojiweather = traduction(current_weather_code[h],isday[h])
         humidity = f"{relative_humidity_2m[h]:.0f}%"
         duree_soleil = f"{sunshine_duration[h]/60:.0f}'"
         couv_nuage = f" {cloud_cover[h]:.0f}%"        
@@ -171,7 +217,7 @@ def previsions_detaillees(ville, dpt, lat, long):
             data.append(
                 [
                     datetime.datetime.strftime(
-                        datetime.datetime.now().replace(
+                        datetime.datetime.now(tz=pytz.timezone(tz)).replace(
                             hour=0, minute=0, second=0, microsecond=0
                         )
                         + datetime.timedelta(days=compute_args().jour)
@@ -193,7 +239,7 @@ def previsions_detaillees(ville, dpt, lat, long):
             data.append(
                 [
                     datetime.datetime.strftime(
-                        datetime.datetime.now().replace(
+                        datetime.datetime.now(tz=pytz.timezone(tz)).replace(
                             hour=0, minute=0, second=0, microsecond=0
                         )
                         + datetime.timedelta(days=compute_args().jour)
@@ -293,14 +339,18 @@ def calculer_direction(direction_vent_degres):
     return direction
 
 
-def traduction(current_weather_code):
+def traduction(current_weather_code,jour):
     if (
         current_weather_code == 0
         or current_weather_code == 1
         or current_weather_code == 2
     ):
-        return ["ciel clair", SUN]
+        if jour==0:
+            return ["nuit claire ", NIGHT_CLEAR]
+        return ["ciel clair ", SUN]
     if current_weather_code >= 3 and current_weather_code <= 12:
+        if jour==0:
+            return ["nuageux ", NIGHT_CLOUD]        
         return ["nuageux", CLOUD]
     if current_weather_code >= 13 and current_weather_code <= 19:
         return ["pluie proche", RAIN]
@@ -320,8 +370,8 @@ def traduction(current_weather_code):
         return ["averse / orage", ORAGE_PLUIE]
 
 
-def previsions_courantes(ville, dpt, lat, long):
-    print_generic_data_town(ville, dpt, lat, long)
+def previsions_courantes(ville, dpt, lat, long, tz):
+    
 
     (
         current_temperature_2m,
@@ -333,10 +383,21 @@ def previsions_courantes(ville, dpt, lat, long):
         current_wind_gusts_10m,
         current_wind_direction_10m,
         current_weather_code,
-        snowfall
+        snowfall,
+        alt,
+        time,
+        isday
 
-    ) = current(lat, long)
-    current_weather, emojiweather = traduction(current_weather_code)
+    ) = current(lat, long, tz)
+    recap = "Données courantes mesurées à " + datetime.datetime.fromtimestamp(time,tz=pytz.timezone(tz)).strftime('%Y-%m-%d %H:%M') 
+    if compute_args().pc:
+        recap = recap + " (pc)"
+    elif compute_args().utc:
+        recap = recap + " (utc.)"        
+    else:
+        recap = recap + " (loc.)"
+    print_generic_data_town(ville, dpt, lat, long, alt, recap)
+    current_weather, emojiweather = traduction(current_weather_code,isday)
     data = []
     direction = calculer_direction(current_wind_direction_10m)
 
@@ -344,7 +405,7 @@ def previsions_courantes(ville, dpt, lat, long):
         data.append(
             [
                 "température (ressentie)",
-                f"{current_temperature_2m:.1f}° ({current_apparent_temperature:.1f}°)",
+                f"{current_temperature_2m:.1f}°C ({current_apparent_temperature:.1f}°C)",
             ]
         )
         data.append(["humidité", f"{current_relative_humidity_2m:.1f}%"])
@@ -364,7 +425,7 @@ def previsions_courantes(ville, dpt, lat, long):
             data.append(
                 [
                     "température (ressentie)",
-                    f"{current_temperature_2m:.1f}° ({current_apparent_temperature:.1f}°)",
+                    f"{current_temperature_2m:.1f}°C ({current_apparent_temperature:.1f}°C)",
                     WARM,
                 ]
             )
@@ -372,7 +433,7 @@ def previsions_courantes(ville, dpt, lat, long):
             data.append(
                 [
                     "température",
-                    f"{current_temperature_2m:.1f}° ({current_apparent_temperature:.1f}°)",
+                    f"{current_temperature_2m:.1f}°C ({current_apparent_temperature:.1f}°C)",
                     "",
                 ]
             )
@@ -385,7 +446,7 @@ def previsions_courantes(ville, dpt, lat, long):
         elif current_precipitation>=WARNING_RAIN:
             data.append(["precipitation", f"{current_precipitation:.1f}mm", RAIN])
         else:
-            data.append(["precipitation", f"{current_precipitation:.1f}mm", RAIN])
+            data.append(["precipitation", f"{current_precipitation:.1f}mm", ""])
         if current_surface_pressure >= WARNING_HP:
             data.append(["pression", f"{current_surface_pressure:.1f}Hp", ELEPHANT])
         elif current_surface_pressure <= WARNING_BP:
@@ -419,11 +480,9 @@ def previsions_courantes(ville, dpt, lat, long):
     print(table)
 
 
-def previsions_generiques(ville, dpt, lat, long):
+def previsions_generiques(ville, dpt, lat, long, tz):
 
-    print_generic_data_town(ville, dpt, lat, long)
-
-
+    
     (
         daily_temperature_2m_min,
         daily_temperature_2m_max,
@@ -437,7 +496,21 @@ def previsions_generiques(ville, dpt, lat, long):
         snowfall,
         precipitation_hours,
         sunshine_duration,
-    ) = resume(lat, long)
+        alt,
+        debut,
+        fin
+    ) = resume(lat, long, tz)
+    datetime.datetime.fromtimestamp(debut,tz=pytz.timezone(tz)).strftime('%Y-%m-%d')
+    recap = "Prévisions génériques du " + datetime.datetime.fromtimestamp(debut,tz=pytz.timezone(tz)).strftime('%Y-%m-%d') + " au " + (datetime.datetime.fromtimestamp(fin,tz=pytz.timezone(tz))+ datetime.timedelta(days=-1)).strftime('%Y-%m-%d')
+    if compute_args().past!=0:
+        recap = "Données génériques du " + datetime.datetime.fromtimestamp(debut,tz=pytz.timezone(tz)).strftime('%Y-%m-%d') + " au " + (datetime.datetime.fromtimestamp(fin,tz=pytz.timezone(tz))+ datetime.timedelta(days=-1)).strftime('%Y-%m-%d')
+    if compute_args().pc:
+        recap = recap + " (pc)"
+    elif compute_args().utc:
+        recap = recap + " (utc.)"        
+    else:
+        recap = recap + " (loc.)"  
+    print_generic_data_town(ville, dpt, lat, long, alt, recap)
     data = []
     fin = 3
     if compute_args().past!=0:
@@ -449,7 +522,7 @@ def previsions_generiques(ville, dpt, lat, long):
             warning = warning + " " + SNOW
         elif daily_precipitation_sum[i] >= WARNING_RAIN:
             warning = warning + " " + RAIN
-        temp = f"{daily_temperature_2m_min[i]:.1f}° ({daily_apparent_temperature_min[i]:.1f}°) -> {daily_temperature_2m_max[i]:.1f}° ({daily_apparent_temperature_max[i]:.1f}°)"
+        temp = f"{daily_temperature_2m_min[i]:.1f}°C ({daily_apparent_temperature_min[i]:.1f}°C) -> {daily_temperature_2m_max[i]:.1f}°C ({daily_apparent_temperature_max[i]:.1f}°C)"
         if (
             daily_temperature_2m_min[i] <= WARNING_FROID
             or daily_apparent_temperature_min[i] <= WARNING_FROID
@@ -464,7 +537,7 @@ def previsions_generiques(ville, dpt, lat, long):
             or daily_apparent_temperature_max[i] >= WARNING_WARM
         ):
             warning = warning + " " + WARM
-        weather, emojiweather = traduction(weather_code[i])
+        weather, emojiweather = traduction(weather_code[i],1)
 
         vent = f"{daily_wind_speed_10m_max[i]:.1f}km/h ({daily_wind_gusts_10m_max[i]:.1f}km/h)"
         direction=calculer_direction(daily_wind_direction_10m_dominant[i])
@@ -479,7 +552,7 @@ def previsions_generiques(ville, dpt, lat, long):
             data.append(
                 [
                     datetime.datetime.strftime(
-                        datetime.datetime.now().replace(
+                        datetime.datetime.now(tz=pytz.timezone(tz)).replace(
                             hour=0, minute=0, second=0, microsecond=0
                         )
                         + datetime.timedelta(hours=24 * i),
@@ -508,7 +581,7 @@ def previsions_generiques(ville, dpt, lat, long):
             data.append(
                 [
                     datetime.datetime.strftime(
-                        datetime.datetime.now().replace(
+                        datetime.datetime.now(tz=pytz.timezone(tz)).replace(
                             hour=0, minute=0, second=0, microsecond=0
                         )
                         + datetime.timedelta(hours=24 * i)
@@ -546,7 +619,7 @@ def previsions_generiques(ville, dpt, lat, long):
         print(table)
 
 
-def print_generic_data_town(ville, dpt, lat, long):
+def print_generic_data_town(ville, dpt, lat, long, alt, recap):
     print("")
 
     data = []
@@ -554,11 +627,12 @@ def print_generic_data_town(ville, dpt, lat, long):
         if (ville is None or ville == "") and (dpt is None or dpt == ""):
             print_debug("pas de data pour ville/dpt/cp")
         elif dpt is None or dpt == "":
-            data.append(ville)
+            data.append([ville])
         else:    
-            data.append(ville + " (" + dpt + ")")
-        data.append(f"lat.:  {float(lat):.4f}° / long.: {float(long):.4f}° ")
-        data.append([datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S")])
+            data.append([ville + " (" + dpt + ")"])
+        data.append([f"lat.:  {float(lat):.4f}° / long.: {float(long):.4f}° / alt.: {float(alt):.0f}m "])
+        #data.append([datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S")])
+        data.append([recap])
     else:
         if (ville is None or ville == "") and (dpt is None or dpt == ""):
             print_debug("pas de data pour ville/dpt/cp")
@@ -566,9 +640,9 @@ def print_generic_data_town(ville, dpt, lat, long):
             data.append([HOME, ville])
         else:    
             data.append([HOME, ville + " (" + dpt + ")"])
-        data.append([BOUSSOLE, f"lat.:  {float(lat):.4f}°  / long.: {float(long):.4f}° "])
-        data.append([CLOCK, datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S")])
-
+        data.append([BOUSSOLE, f"lat.:  {float(lat):.4f}°  / long.: {float(long):.4f}° / alt.: {float(alt):.0f}m "])
+        #data.append([CLOCK, datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S")])
+        data.append([PC,recap])
     if compute_args().condensate:
         table = columnar.columnar(data, no_borders=True, wrap_max=0)
     else:
@@ -612,9 +686,10 @@ def obtain_city_data_from_ip():
         ville = data["city"]
         lat = str(data["latitude"])
         long = str(data["longitude"])
-        dpt = str(data["postal"])
+        dpt = str(data["state"])
         return ville, dpt, lat, long 
-    
+
+
 
 
 def obtain_city_data_from_gps():
@@ -658,7 +733,9 @@ def obtain_city_data():
             ville = location.raw.get("address").get("city")
         dpt = location.raw.get("address").get("county")
         if dpt ==None:
-            dpt=""
+            dpt=location.raw.get("address").get("state")
+        if dpt ==None:
+            dpt= location.raw.get("address").get("postcode")  
         cp = location.raw.get("address").get("postcode")
         if cp == None:
             cp = ""
@@ -678,11 +755,15 @@ def obtain_city_data():
     if len(choix)==0:
         print(my_colored("erreur : aucune ville trouvée", "red")) 
         exit(1)
-    i=0    
-    for choice in choix:
-        i=i+1
-        print("["+str(i)+"] " + choice[1] + " (" + choice[2]+ ")")
-    toto = input("Quelle ville? ")
+    while True:    
+        i=0    
+        for choice in choix:
+            i=i+1
+            print("["+str(i)+"] " + choice[1] + " (" + choice[2]+ ")")
+        toto = input("Quelle ville? ")
+        if toto.isnumeric() and 1 <= int(toto) <= len(choix):
+            break
+        print(my_colored("erreur : choix incorrect", "red"))       
     choice = choix[int(toto)-1]
     ville = choice[1]
     dpt = choice[2]
@@ -704,7 +785,7 @@ def print_debug(message):
 
 
 
-def resume(latitude, longitude):
+def resume(latitude, longitude, tz):
     retry_session = retry_requests.retry(cache_session(), retries=5, backoff_factor=0.2)
     openmeteo = openmeteo_requests.Client(session=retry_session)
     url = "https://api.open-meteo.com/v1/meteofrance"
@@ -713,7 +794,7 @@ def resume(latitude, longitude):
     if compute_args().past!=0:
         date_fin = (datetime.datetime.now() + datetime.timedelta(days=-1)).strftime("%Y-%m-%d")    
     params = {
-        "timezone": "Europe/Paris",
+        "timezone": tz,
         "start_date": date_debut,
 	    "end_date": date_fin,
         "latitude": latitude,
@@ -749,6 +830,9 @@ def resume(latitude, longitude):
     snowfall = daily.Variables(9).ValuesAsNumpy()
     precipitation_hours= daily.Variables(10).ValuesAsNumpy()
     sunshine_duration= daily.Variables(11).ValuesAsNumpy()
+    alt= response.Elevation()
+    debut=daily.Time()
+    fin=(daily.TimeEnd())
     return (
         daily_temperature_2m_min,
         daily_temperature_2m_max,
@@ -761,16 +845,19 @@ def resume(latitude, longitude):
         weather_code,
         snowfall,
         precipitation_hours,
-        sunshine_duration
+        sunshine_duration,
+        alt,
+        debut,
+        fin
     )
 
 
-def specific_day(latitude, longitude, day):
+def specific_day(latitude, longitude, day, tz):
     retry_session = retry_requests.retry(cache_session(), retries=5, backoff_factor=0.2)
     openmeteo = openmeteo_requests.Client(session=retry_session)
     url = "https://api.open-meteo.com/v1/meteofrance"
     params = {
-        "timezone": "Europe/Paris",
+        "timezone": tz,
         "latitude": latitude,
         "longitude": longitude,
         "hourly": [
@@ -785,7 +872,8 @@ def specific_day(latitude, longitude, day):
             "snowfall",
             "relative_humidity_2m",
             "sunshine_duration",
-            "cloud_cover" 
+            "cloud_cover",
+            "is_day"
         ],
         "start_date": (datetime.datetime.now() + datetime.timedelta(days=day)).strftime(
             "%Y-%m-%d"
@@ -810,6 +898,8 @@ def specific_day(latitude, longitude, day):
     relative_humidity_2m = hourly.Variables(9).ValuesAsNumpy()
     sunshine_duration = hourly.Variables(10).ValuesAsNumpy()
     cloud_cover = hourly.Variables(11).ValuesAsNumpy()
+    alt= response.Elevation()
+    isday= hourly.Variables(12).ValuesAsNumpy()
     return (
         hourly_temperature_2m,
         hourly_apparent_temperature,
@@ -822,7 +912,9 @@ def specific_day(latitude, longitude, day):
         snowfall,
         relative_humidity_2m,
         sunshine_duration,
-        cloud_cover
+        cloud_cover,
+        alt,
+        isday
                 )
 
 def cache_session():
@@ -839,7 +931,7 @@ def cache_session():
     )
 
 
-def current(latitude, longitude):
+def current(latitude, longitude, tz):
     retry_session = retry_requests.retry(cache_session(), retries=5, backoff_factor=0.2)
     openmeteo = openmeteo_requests.Client(session=retry_session)
 
@@ -847,6 +939,7 @@ def current(latitude, longitude):
     params = {
         "latitude": latitude,
         "longitude": longitude,
+        "timezone": tz,
         "current": [
             "temperature_2m",
             "relative_humidity_2m",
@@ -859,6 +952,7 @@ def current(latitude, longitude):
             "wind_speed_10m",
             "wind_direction_10m",
             "wind_gusts_10m",
+            "is_day"
         ],
     }
     print_debug("appel api meteo france "+url+"?"+'&'.join([f'{key}={",".join(value) if isinstance(value, list) else value}' for key, value in params.items()]))
@@ -877,6 +971,9 @@ def current(latitude, longitude):
     current_wind_speed_10m = current.Variables(8).Value()
     current_wind_direction_10m = current.Variables(9).Value()
     current_wind_gusts_10m = current.Variables(10).Value()
+    isday= current.Variables(11).Value()
+    altitude=response.Elevation()
+    time=int(response.Current().Time())
 
     return (
         current_temperature_2m,
@@ -888,7 +985,10 @@ def current(latitude, longitude):
         current_wind_gusts_10m,
         current_wind_direction_10m,
         current_weather_code,
-        snowfall
+        snowfall,
+        altitude,
+        time,
+        isday
     )
 
 def clean_string(mystring):
