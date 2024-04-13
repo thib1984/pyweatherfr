@@ -24,7 +24,7 @@ jobs:
           python -m pip install --upgrade pip
           python -m pip install --upgrade setuptools
       #installation          
-      - name: install pypodo
+      - name: install pyweatherfr
         run: |
           pip install .
       #test
@@ -32,9 +32,9 @@ jobs:
         run: |
           pyweatherfr nantes
           pyweatherfr nouméa -n
-          pyweatherfr 38700 -j2
-          pyweatherfr grenoble -p50 --utc
-          pyweatherfr ancenis -p3 --pc
+          pyweatherfr 38700 -j2 --nocache
+          pyweatherfr grenoble -p50 --utc -c
+          pyweatherfr ancenis -p3 --pc --nocolor
       - name: install pep517
         run: |
           pip install pep517
