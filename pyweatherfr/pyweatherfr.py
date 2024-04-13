@@ -159,7 +159,7 @@ def previsions_detaillees(ville, dpt, lat, long, tz):
         snowfall,
         relative_humidity_2m,
         sunshine_duration,
-        cloud_cover,
+        shortwave_radiation,
         alt,
         isday   
     ) = specific_day(lat, long, diff_jour(long,lat), tz)
@@ -215,7 +215,7 @@ def previsions_detaillees(ville, dpt, lat, long, tz):
         weather, emojiweather = traduction(current_weather_code[h],isday[h])
         humidity = f"{relative_humidity_2m[h]:.0f}%"
         duree_soleil = f"{sunshine_duration[h]/60:.0f}'"
-        couv_nuage = f" {cloud_cover[h]:.0f}%"        
+        rayonnement = f" {shortwave_radiation[h]:.0f}W/m"        
         if compute_args().nocolor:
             data.append(
                 [
@@ -234,8 +234,7 @@ def previsions_detaillees(ville, dpt, lat, long, tz):
                     direction,
                     pression,
                     humidity,
-                    duree_soleil,
-                    couv_nuage,
+                    rayonnement,
                 ]
             )
         else:
@@ -256,8 +255,7 @@ def previsions_detaillees(ville, dpt, lat, long, tz):
                     direction,
                     pression,
                     humidity,
-                    duree_soleil,
-                    couv_nuage,
+                    rayonnement,
                     warning,
                 ]
             )
@@ -272,8 +270,7 @@ def previsions_detaillees(ville, dpt, lat, long, tz):
             "direction vent",
             "pression",
             "humidité",
-            "durée soleil",
-            "couverture nuage"            
+            "rayonnement"            
         ]
     else:
         headers = [
@@ -285,8 +282,7 @@ def previsions_detaillees(ville, dpt, lat, long, tz):
             "direction vent",
             "pression",
             "humidité",
-            "durée soleil",
-            "couverture nuage",            
+            "rayonnement",            
             "warnings",
         ]
 
@@ -389,7 +385,8 @@ def previsions_courantes(ville, dpt, lat, long, tz):
         snowfall,
         alt,
         time,
-        isday
+        isday,
+        w_soleil
 
     ) = current(lat, long, tz)
     recap = "Données courantes mesurées à " + datetime.datetime.fromtimestamp(time,tz=pytz.timezone(tz)).strftime('%Y-%m-%d %H:%M') 
@@ -421,6 +418,7 @@ def previsions_courantes(ville, dpt, lat, long, tz):
                 + direction,
             ]
         )
+        data.append(["rayonnement", f"{w_soleil:.0f}W/m"])
         data.append(["temps", current_weather])
 
     else:
@@ -474,6 +472,7 @@ def previsions_courantes(ville, dpt, lat, long, tz):
                     "",
                 ]
             )
+        data.append(["rayonnement", f"{w_soleil:.0f}W/m",""])    
         data.append(["temps", emojiweather + " " + current_weather, ""])
     if compute_args().condensate:
         table = columnar.columnar(data, no_borders=True, wrap_max=0)
@@ -875,7 +874,7 @@ def specific_day(latitude, longitude, day, tz):
             "snowfall",
             "relative_humidity_2m",
             "sunshine_duration",
-            "cloud_cover",
+            "shortwave_radiation",
             "is_day"
         ],
         "start_date": (datetime.datetime.now(tz=pytz.timezone(tz)) + datetime.timedelta(days=day)).strftime(
@@ -900,7 +899,7 @@ def specific_day(latitude, longitude, day, tz):
     snowfall = hourly.Variables(8).ValuesAsNumpy()
     relative_humidity_2m = hourly.Variables(9).ValuesAsNumpy()
     sunshine_duration = hourly.Variables(10).ValuesAsNumpy()
-    cloud_cover = hourly.Variables(11).ValuesAsNumpy()
+    shortwave_radiation = hourly.Variables(11).ValuesAsNumpy()
     alt= response.Elevation()
     isday= hourly.Variables(12).ValuesAsNumpy()
     return (
@@ -915,7 +914,7 @@ def specific_day(latitude, longitude, day, tz):
         snowfall,
         relative_humidity_2m,
         sunshine_duration,
-        cloud_cover,
+        shortwave_radiation,
         alt,
         isday
                 )
@@ -955,7 +954,8 @@ def current(latitude, longitude, tz):
             "wind_speed_10m",
             "wind_direction_10m",
             "wind_gusts_10m",
-            "is_day"
+            "is_day",
+            "shortwave_radiation"
         ],
     }
     print_debug("appel api meteo france "+url+"?"+'&'.join([f'{key}={",".join(value) if isinstance(value, list) else value}' for key, value in params.items()]))
@@ -977,6 +977,7 @@ def current(latitude, longitude, tz):
     isday= current.Variables(11).Value()
     altitude=response.Elevation()
     time=int(response.Current().Time())
+    shortwave_radiation=current.Variables(12).Value()
 
     return (
         current_temperature_2m,
@@ -991,7 +992,8 @@ def current(latitude, longitude, tz):
         snowfall,
         altitude,
         time,
-        isday
+        isday,
+        shortwave_radiation
     )
 
 def clean_string(mystring):
