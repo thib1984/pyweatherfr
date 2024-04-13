@@ -1,6 +1,7 @@
 # A VENIR
 
-- [ ] test install cicd
+
+
 - [ ] previsions -n ajouter data comme -j 
 - [ ] integrer test sur heure soleil si ==3 si lumineux et ou petite pluie
 - [ ] comparer boundingbox openstreetmap pour doublons
@@ -8,6 +9,16 @@
 
 - [ ] mode full pour humidité/pression/soleil etc
 - [ ] mode minimal pour temps / pluie uniquement (uniquement emoji si non nocolor)
+
+- [ ] clean code
+- [ ] ajouter log version and co pour issue : https://github.com/thib1984/ytdlmusic/blob/main/ytdlmusic/print.py
+- [ ] json formater pour le log/debug : https://www.freecodecamp.org/news/how-to-pretty-print-json-in-python/
+- [ ] fichier log dans le dossier config pour remplacer le mode debug avec dates and co
+
+# 4.1.1
+
+
+- [x] -d ne fonctionne pas!
 
 # 4.1.0
 
@@ -39,10 +50,8 @@
 
 ## technic
 
-- [ ] clean code
-- [ ] ajouter log version and co pour issue : https://github.com/thib1984/ytdlmusic/blob/main/ytdlmusic/print.py
-- [ ] json formater pour le log/debug : https://www.freecodecamp.org/news/how-to-pretty-print-json-in-python/
-- [ ] fichier log dans le dossier config pour remplacer le mode debug avec dates and co
+- [x] test install cicd
+
 
 # 4.0.1
 

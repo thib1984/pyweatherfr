@@ -31,7 +31,7 @@ jobs:
       - name: Launch test
         run: |
           pyweatherfr nantes
-          pyweatherfr nouméa -n
+          pyweatherfr nouméa -n -v
           pyweatherfr 38700 -j2 --nocache
           pyweatherfr grenoble -p50 --utc -c
           pyweatherfr ancenis -p3 --pc --nocolor

@@ -97,6 +97,20 @@ def get_user_config_directory_pyweather():
     return ze_path
 
 
+def diff_jour(long,lat):
+    tz=timezonefinder.TimezoneFinder().timezone_at(lng=float(long), lat=float(lat))
+    if not compute_args().date == None:
+        if not est_format_date(compute_args().date):
+            print(my_colored("erreur : format date invalide, format attendu yyyy-mm-dd", "red"))
+            exit(1)
+        diff = (pytz.timezone(tz).localize(datetime.datetime.strptime(compute_args().date, "%Y-%m-%d")) - datetime.datetime.now(tz=pytz.timezone(tz))).days +1
+        print_debug(str(diff) + " jours")
+        if diff>=4 or diff<-100:
+            print(my_colored("erreur : date invalide (-100 à +4 jour de la date actuelle)", "red"))
+            exit(1)
+        return diff     
+    return compute_args().jour
+
 def est_format_date(chaine):
     try:
         datetime.datetime.strptime(chaine, '%Y-%m-%d')
@@ -113,14 +127,6 @@ def find():
     else:
         ville, dpt, lat, long = obtain_city_data_from_ip()
     tz=timezonefinder.TimezoneFinder().timezone_at(lng=float(long), lat=float(lat))
-    if not compute_args().date == None:
-        if not est_format_date(compute_args().date):
-            print(my_colored("erreur : format date invalide, format attendu yyyy-mm-dd", "red"))
-            exit(1)
-        diff = (pytz.timezone(tz).localize(datetime.datetime.strptime(compute_args().date, "%Y-%m-%d")) - datetime.datetime.now(tz=pytz.timezone(tz))).days
-        if diff>=4 or diff<100:
-            print(my_colored("erreur : date invalide (-100 à +4 jour de la date actuelle)", "red"))
-            exit(1)    
     if compute_args().pc:
         tz=str(tzlocal.get_localzone())
     if compute_args().utc:
@@ -130,7 +136,7 @@ def find():
         previsions_courantes(ville, dpt, lat, long,tz)
     elif not compute_args().date == None:
         previsions_detaillees(ville, dpt, lat, long,tz)        
-    elif compute_args().jour == 1000:
+    elif diff_jour(long,lat) == 1000:
         previsions_generiques(ville, dpt, lat, long,tz)
     else:
         previsions_detaillees(ville, dpt, lat, long,tz)
@@ -140,11 +146,7 @@ def find():
 def previsions_detaillees(ville, dpt, lat, long, tz):
 
 
-    if compute_args().date:
-        day = (pytz.timezone(tz).localize(datetime.datetime.strptime(compute_args().date, "%Y-%m-%d")) - datetime.datetime.now(tz=pytz.timezone(tz))).days
-    else:    
-        day = compute_args().jour
-
+    
     (
         hourly_temperature_2m,
         hourly_apparent_temperature,
@@ -160,8 +162,8 @@ def previsions_detaillees(ville, dpt, lat, long, tz):
         cloud_cover,
         alt,
         isday   
-    ) = specific_day(lat, long, day, tz)
-    recap ="Prévisions détaillées pour le " + (datetime.datetime.now(tz=pytz.timezone(tz)) + datetime.timedelta(days=compute_args().jour)).strftime(
+    ) = specific_day(lat, long, diff_jour(long,lat), tz)
+    recap ="Prévisions détaillées pour le " + (datetime.datetime.now(tz=pytz.timezone(tz)) + datetime.timedelta(days=diff_jour(long,lat))).strftime(
             "%Y-%m-%d")
     if compute_args().pc:
         recap = recap + " (pc)"
@@ -169,15 +171,16 @@ def previsions_detaillees(ville, dpt, lat, long, tz):
         recap = recap + " (utc.)"        
     else:
         recap = recap + " (loc.)"    
-    if compute_args().jour<0:
-        recap ="Données détaillées pour le " + (datetime.datetime.now(tz=pytz.timezone(tz)) + datetime.timedelta(days=compute_args().jour)).strftime(
+    if diff_jour(long,lat)<0:
+        recap ="Données détaillées pour le " + (datetime.datetime.now(tz=pytz.timezone(tz)) + datetime.timedelta(days=diff_jour(long,lat))).strftime(
                 "%Y-%m-%d")        
     print_generic_data_town(ville, dpt, lat, long, alt, recap)
     data = []
+    new_var = diff_jour(long,lat)
     for h in range(0, 24):
         warning = ""
         if (
-            (datetime.datetime.now(tz=pytz.timezone(tz)) + datetime.timedelta(days=compute_args().jour)).strftime(
+            (datetime.datetime.now(tz=pytz.timezone(tz)) + datetime.timedelta(days=new_var)).strftime(
             "%Y-%m-%d") == datetime.datetime.now(tz=pytz.timezone(tz)).strftime("%Y-%m-%d")
             and 0 < h - int(datetime.datetime.now(tz=pytz.timezone(tz)).strftime("%H")) <= 1
         ):
@@ -220,7 +223,7 @@ def previsions_detaillees(ville, dpt, lat, long, tz):
                         datetime.datetime.now(tz=pytz.timezone(tz)).replace(
                             hour=0, minute=0, second=0, microsecond=0
                         )
-                        + datetime.timedelta(days=compute_args().jour)
+                        + datetime.timedelta(days=new_var)
                         + datetime.timedelta(hours=h),
                         "%Y-%m-%d %H:%M",
                     ),
@@ -242,7 +245,7 @@ def previsions_detaillees(ville, dpt, lat, long, tz):
                         datetime.datetime.now(tz=pytz.timezone(tz)).replace(
                             hour=0, minute=0, second=0, microsecond=0
                         )
-                        + datetime.timedelta(days=compute_args().jour)
+                        + datetime.timedelta(days=new_var)
                         + datetime.timedelta(hours=h),
                         "%Y-%m-%d %H:%M",
                     ),
