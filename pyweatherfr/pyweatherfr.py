@@ -726,7 +726,7 @@ def obtain_city_data():
         print(my_colored("erreur : aucune ville trouvée", "red")) 
         exit(1)    
     for location in locations:
-        if (location.raw.get("addresstype")=="town" or location.raw.get("addresstype")=="city" or location.raw.get("addresstype")=="municipality" or location.raw.get("addresstype")=="village"):
+        if (location.raw.get("addresstype")=="postcode" or location.raw.get("addresstype")=="town" or location.raw.get("addresstype")=="city" or location.raw.get("addresstype")=="municipality" or location.raw.get("addresstype")=="village"):
             print_debug(json.dumps(location.raw, indent=4,ensure_ascii=False))
             ville = None
             if ville == None or (location.raw.get("address").get("village") != None and (clean_string(location.raw.get("address").get("village").lower())==clean_string(town.lower()) or (compute_args().world and location.raw.get("address").get("country")!="France"))):
