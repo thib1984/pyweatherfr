@@ -121,11 +121,11 @@ def est_format_date(chaine):
 def find():
 
     if compute_args().town:
-        ville, dpt, lat, long = obtain_city_data()
+        ville, dpt, lat, long,country = obtain_city_data()
     elif compute_args().gps:
-        ville, dpt, lat, long = obtain_city_data_from_gps()
+        ville, dpt, lat, long,country = obtain_city_data_from_gps()
     else:
-        ville, dpt, lat, long = obtain_city_data_from_ip()
+        ville, dpt, lat, long,country = obtain_city_data_from_ip()
     tz=timezonefinder.TimezoneFinder().timezone_at(lng=float(long), lat=float(lat))
     if compute_args().pc:
         tz=str(tzlocal.get_localzone())
@@ -140,7 +140,9 @@ def find():
         previsions_generiques(ville, dpt, lat, long,tz)
     else:
         previsions_detaillees(ville, dpt, lat, long,tz)
-
+    if country ==None or country!="France":
+        print(my_colored("warning : ville potentiellement hors de France, les prévisions et données peuvent être moins détailées", "yellow"))
+    
 
 
 def previsions_detaillees(ville, dpt, lat, long, tz):
@@ -689,7 +691,11 @@ def obtain_city_data_from_ip():
         lat = str(data["latitude"])
         long = str(data["longitude"])
         dpt = str(data["state"])
-        return ville, dpt, lat, long 
+        country = str(data["country_name"])
+        if country!="France" and compute_args().world == False:
+            print(my_colored("erreur : aucune ville trouvée. Si vous souhaitez rechercher une ville hors de France, ajoutez --world", "red"))
+            exit(1)
+        return ville, dpt, lat, long, country
 
 
 
@@ -702,7 +708,39 @@ def obtain_city_data_from_gps():
         + " longitude="
         + str(compute_args().gps[1])
     )
-    return "", "", str(compute_args().gps[0]), str(compute_args().gps[1])
+    geolocator = geopy.geocoders.Nominatim(user_agent="my_geocoder")
+    location = geolocator.reverse(compute_args().gps[0] +", " + compute_args().gps[1],addressdetails=True,language="fr")
+
+    print_debug(json.dumps(location.raw, indent=4,ensure_ascii=False))
+    ville = None
+    if ville == None or (location.raw.get("address").get("village") != None):
+        ville = location.raw.get("address").get("village")
+    if ville == None or (location.raw.get("address").get("municipality") != None):
+        ville = location.raw.get("address").get("municipality")
+    if ville == None or (location.raw.get("address").get("town") != None):
+        ville = location.raw.get("address").get("town")               
+    if ville == None or (location.raw.get("address").get("city") != None):
+        ville = location.raw.get("address").get("city")        
+    dpt = location.raw.get("address").get("county")
+    if dpt ==None:
+        dpt=location.raw.get("address").get("state")
+    if dpt ==None:
+        dpt= location.raw.get("address").get("postcode") 
+    if dpt ==None or location.raw.get("address").get("country")!="France":
+        dpt= location.raw.get("address").get("country")              
+    cp = location.raw.get("address").get("postcode")
+    country=location.raw.get("address").get("country") 
+    if country!="France" and compute_args().world == False:
+        print(my_colored("erreur : aucune ville trouvée. Si vous souhaitez rechercher une ville hors de France, ajoutez --world", "red"))
+        exit(1)    
+    if cp == None:
+        cp = ""
+    lat = location.raw.get("lat")
+    long = location.raw.get("lon")
+    print_debug(ville+"-"+dpt+"-"+lat+"-"+long+"-"+country)
+
+
+    return ville, dpt, lat, long, country
 
 
 def obtain_city_data():
@@ -716,15 +754,18 @@ def obtain_city_data():
     
     # Géocodage d'une adresse
     if compute_args().world:
-        locations = geolocator.geocode(town,exactly_one=False,addressdetails=True)
+        locations = geolocator.geocode(town,exactly_one=False,addressdetails=True,language="fr")
     else:
-        locations = geolocator.geocode(town + ", France",exactly_one=False,addressdetails=True)
+        locations = geolocator.geocode(town + ", France",exactly_one=False,addressdetails=True,language="fr")
     
     # Affichage des informations de localisation
     choix = []
     if locations == None:
-        print(my_colored("erreur : aucune ville trouvée", "red")) 
-        exit(1)    
+        if not compute_args().world:
+            print(my_colored("erreur : aucune ville trouvée. Si vous souhaitez rechercher une ville hors de France, ajoutez --world", "red"))
+        else:
+            print(my_colored("erreur : aucune ville trouvée", "red"))
+        exit(1)  
     for location in locations:
         if (location.raw.get("addresstype")=="postcode" or location.raw.get("addresstype")=="town" or location.raw.get("addresstype")=="city" or location.raw.get("addresstype")=="municipality" or location.raw.get("addresstype")=="village"):
             print_debug(json.dumps(location.raw, indent=4,ensure_ascii=False))
@@ -742,26 +783,31 @@ def obtain_city_data():
                 dpt=location.raw.get("address").get("state")
             if dpt ==None:
                 dpt= location.raw.get("address").get("postcode") 
-            if dpt ==None or compute_args().world:
+            if dpt ==None or location.raw.get("address").get("country")!="France":
                 dpt= location.raw.get("address").get("country")              
             cp = location.raw.get("address").get("postcode")
+            country = location.raw.get("address").get("country")
             if cp == None:
                 cp = ""
             lat = location.raw.get("lat")
             long = location.raw.get("lon")
-            print_debug(ville+"-"+dpt+"-"+lat+"-"+long)
+            print_debug(ville+"-"+dpt+"-"+lat+"-"+long+"-"+country)
             if (clean_string(ville.lower()) == clean_string(town.lower()) or cp.lower() == town.lower() or (compute_args().world and location.raw.get("address").get("country")!="France")): 
                 if ville+"-"+dpt not in [item[0] for item in choix]:  # Vérifier si ville+"-"+dpt n'est pas déjà présent dans choix
-                    choix.append([ville+"-"+dpt, ville, dpt, lat, long])
+                    choix.append([ville+"-"+dpt, ville, dpt, country,lat, long])
     if len(choix)==1:
         choice = choix[0]
         ville = choice[1]
         dpt = choice[2]
-        lat = choice[3]
-        long = choice[4]
-        return ville, dpt, lat, long    
+        country = choice[3]
+        lat = choice[4]
+        long = choice[5]
+        return ville, dpt, lat, long, country    
     if len(choix)==0:
-        print(my_colored("erreur : aucune ville trouvée", "red")) 
+        if not compute_args().world:
+            print(my_colored("erreur : aucune ville trouvée. Si vous souhaitez rechercher une ville hors de France, ajoutez --world", "red"))
+        else:
+            print(my_colored("erreur : aucune ville trouvée", "red"))
         exit(1)
     while True:    
         i=0    
@@ -775,9 +821,10 @@ def obtain_city_data():
     choice = choix[int(toto)-1]
     ville = choice[1]
     dpt = choice[2]
+    country = choice[3]
     lat = choice[3]
     long = choice[4]
-    return ville, dpt, lat, long
+    return ville, dpt, lat, long, country
 
 
 def my_colored(message, color):
