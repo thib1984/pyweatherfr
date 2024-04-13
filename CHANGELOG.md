@@ -1,20 +1,42 @@
 # A VENIR
 
-- [ ] améliorer infos villes si ville ou dpt non renseignés
-- [ ] securiser la saisie du choix de ville
-- [ ] mode full pour humidité/pression/soleil etc
-- [ ] mode minimal pour temps / pluie uniquement (uniquement emoji si non nocolor)
+## bugs
+
+- [x] bug basse-terre
+- [ ] securiser la saisie du choix de ville : https://github.com/thib1984/ytdlmusic/blob/main/ytdlmusic/choice.py
+- [ ] gérer fuseau horaire en fonction de la ville (ex Nouméa): https://www.geeksforgeeks.org/get-time-zone-of-a-given-location-using-python/
+
+## optim
+
+- [ ] test install cicd
+- [ ] changer cp to state pour la recherche par ip
+- [ ] améliorer unités from apimeteofrance
 - [ ] previsions -n ajouter data comme -j 
 - [ ] gestion des emojis aux largeurs fantaisistes
 - [ ] emoji nuit claire, nuit nuageuse
-- [ ] recherche par date précise pour -j
-- [ ] -j donnerait le jour actuel
 - [ ] recap de la recherche dans le bloc ville
+- [ ] integrer test sur heure soleil si ==3 si lumineux et ou petite pluie
+- [ ] comparer boundingbox openstreetmap pour doublons
+- [ ] ameliorer affichage dpt from openstreetmap basse-terre
+
+## features
+
+- [ ] mode full pour humidité/pression/soleil etc
+- [ ] mode minimal pour temps / pluie uniquement (uniquement emoji si non nocolor)
+- [ ] recherche par date précise pour -j
+- [ ] -j sans param donnerait le jour actuel
+- [ ] altitude from apimeteofrance
+
+## technic
+
 - [ ] clean code
-- [ ] test install cicd
+- [ ] ajouter log version and co pour issue : https://github.com/thib1984/ytdlmusic/blob/main/ytdlmusic/print.py
+- [ ] json formater pour le log/debug : https://www.freecodecamp.org/news/how-to-pretty-print-json-in-python/
+- [ ] fichier log dans le dossier config pour remplacer le mode debug avec dates and co
 
 # 4.0.1
 
+- [x] améliorer infos villes si ville ou dpt non renseignés
 - [x] limite le nb de decimales au GPS
 - [x] maj --cache pour cache session en nocache
 - [x] librairie manquante Numpy

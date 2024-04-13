@@ -438,7 +438,7 @@ def previsions_generiques(ville, dpt, lat, long):
         precipitation_hours,
         sunshine_duration,
     ) = resume(lat, long)
-    data2 = []
+    data = []
     fin = 3
     if compute_args().past!=0:
         fin=-1
@@ -476,7 +476,7 @@ def previsions_generiques(ville, dpt, lat, long):
         duree_pluie = f"{precipitation_hours[i]:.0f}h"
         duree_soleil = f"{sunshine_duration[i]/3600:.1f}h"
         if compute_args().nocolor:
-            data2.append(
+            data.append(
                 [
                     datetime.datetime.strftime(
                         datetime.datetime.now().replace(
@@ -505,7 +505,7 @@ def previsions_generiques(ville, dpt, lat, long):
                 "durée soleil"
             ]
         else:
-            data2.append(
+            data.append(
                 [
                     datetime.datetime.strftime(
                         datetime.datetime.now().replace(
@@ -537,12 +537,12 @@ def previsions_generiques(ville, dpt, lat, long):
                 "warning",
             ]
 
-    if data2 != []:
+    if data != []:
         if compute_args().condensate:
-            table = columnar.columnar(data2, no_borders=True, wrap_max=0)
+            table = columnar.columnar(data, no_borders=True, wrap_max=0)
         else:
             print("")
-            table = columnar.columnar(data2, headers, no_borders=False, wrap_max=0)
+            table = columnar.columnar(data, headers, no_borders=False, wrap_max=0)
         print(table)
 
 
@@ -608,7 +608,7 @@ def obtain_city_data_from_ip():
             "recherche de la localisation depuis https://geolocation-db.com/json"
         )
         data = json.loads(url.read().decode())
-        print_debug(str(data))
+        print_debug(str(json.dumps(data, indent=4,ensure_ascii=False)))
         ville = data["city"]
         lat = str(data["latitude"])
         long = str(data["longitude"])
@@ -646,8 +646,10 @@ def obtain_city_data():
         print(my_colored("erreur : aucune ville trouvée", "red")) 
         exit(1)    
     for location in locations:
-        print_debug(str(location.raw))
-        ville = clean_string(location.raw.get("address").get("village"))
+        print_debug(json.dumps(location.raw, indent=4,ensure_ascii=False))
+        ville = clean_string(location.raw.get("address").get("island"))
+        if ville == None or (location.raw.get("address").get("village") != None and clean_string(location.raw.get("address").get("village").lower())==clean_string(town.lower())):
+            ville = location.raw.get("address").get("village")
         if ville == None or (location.raw.get("address").get("municipality") != None and clean_string(location.raw.get("address").get("municipality").lower())==clean_string(town.lower())):
             ville = location.raw.get("address").get("municipality")
         if ville == None or (location.raw.get("address").get("town") != None and clean_string(location.raw.get("address").get("town").lower())==clean_string(town.lower())):
