@@ -98,6 +98,11 @@ def compute_args():
         action="store_true",
         help="désactiver couleur et emojis en sortie -à utiliser en cas de problème d'affichage-",
     )
+    my_parser.add_argument(
+        "--world",
+        action="store_true",
+        help="activer la recherche hors France",
+    )    
     group = my_parser.add_mutually_exclusive_group()
     group.add_argument(
         "--pc",

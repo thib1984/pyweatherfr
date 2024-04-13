@@ -288,7 +288,7 @@ def previsions_detaillees(ville, dpt, lat, long, tz):
 
     if data != []:
         if compute_args().condensate:
-            table = columnar.columnar(data, no_borders=True, wrap_max=0)
+            table = columnar.columnar(data, headers, no_borders=True, wrap_max=0)
         else:
             print("")
             table = columnar.columnar(data, headers, no_borders=False, wrap_max=0)
@@ -614,7 +614,7 @@ def previsions_generiques(ville, dpt, lat, long, tz):
 
     if data != []:
         if compute_args().condensate:
-            table = columnar.columnar(data, no_borders=True, wrap_max=0)
+            table = columnar.columnar(data, headers, no_borders=True, wrap_max=0)
         else:
             print("")
             table = columnar.columnar(data, headers, no_borders=False, wrap_max=0)
@@ -715,7 +715,10 @@ def obtain_city_data():
     geolocator = geopy.geocoders.Nominatim(user_agent="my_geocoder")
     
     # Géocodage d'une adresse
-    locations = geolocator.geocode(town + ", France",exactly_one=False,addressdetails=True)
+    if compute_args().world:
+        locations = geolocator.geocode(town,exactly_one=False,addressdetails=True)
+    else:
+        locations = geolocator.geocode(town + ", France",exactly_one=False,addressdetails=True)
     
     # Affichage des informations de localisation
     choix = []
@@ -723,30 +726,33 @@ def obtain_city_data():
         print(my_colored("erreur : aucune ville trouvée", "red")) 
         exit(1)    
     for location in locations:
-        print_debug(json.dumps(location.raw, indent=4,ensure_ascii=False))
-        ville = clean_string(location.raw.get("address").get("island"))
-        if ville == None or (location.raw.get("address").get("village") != None and clean_string(location.raw.get("address").get("village").lower())==clean_string(town.lower())):
-            ville = location.raw.get("address").get("village")
-        if ville == None or (location.raw.get("address").get("municipality") != None and clean_string(location.raw.get("address").get("municipality").lower())==clean_string(town.lower())):
-            ville = location.raw.get("address").get("municipality")
-        if ville == None or (location.raw.get("address").get("town") != None and clean_string(location.raw.get("address").get("town").lower())==clean_string(town.lower())):
-            ville = location.raw.get("address").get("town")               
-        if ville == None or (location.raw.get("address").get("city") != None and clean_string(location.raw.get("address").get("city").lower())==clean_string(town.lower())):
-            ville = location.raw.get("address").get("city")
-        dpt = location.raw.get("address").get("county")
-        if dpt ==None:
-            dpt=location.raw.get("address").get("state")
-        if dpt ==None:
-            dpt= location.raw.get("address").get("postcode")  
-        cp = location.raw.get("address").get("postcode")
-        if cp == None:
-            cp = ""
-        lat = location.raw.get("lat")
-        long = location.raw.get("lon")
-        print_debug(ville+"-"+dpt+"-"+lat+"-"+long)
-        if clean_string(ville.lower()) == clean_string(town.lower()) or cp.lower() == town.lower(): 
-            if ville+"-"+dpt not in [item[0] for item in choix]:  # Vérifier si ville+"-"+dpt n'est pas déjà présent dans choix
-                choix.append([ville+"-"+dpt, ville, dpt, lat, long])
+        if (location.raw.get("addresstype")=="town" or location.raw.get("addresstype")=="city" or location.raw.get("addresstype")=="municipality" or location.raw.get("addresstype")=="village"):
+            print_debug(json.dumps(location.raw, indent=4,ensure_ascii=False))
+            ville = None
+            if ville == None or (location.raw.get("address").get("village") != None and (clean_string(location.raw.get("address").get("village").lower())==clean_string(town.lower()) or (compute_args().world and location.raw.get("address").get("country")!="France"))):
+                ville = location.raw.get("address").get("village")
+            if ville == None or (location.raw.get("address").get("municipality") != None and (clean_string(location.raw.get("address").get("municipality").lower())==clean_string(town.lower()) or (compute_args().world and location.raw.get("address").get("country")!="France"))):
+                ville = location.raw.get("address").get("municipality")
+            if ville == None or (location.raw.get("address").get("town") != None and (clean_string(location.raw.get("address").get("town").lower())==clean_string(town.lower()) or (compute_args().world and location.raw.get("address").get("country")!="France"))):
+                ville = location.raw.get("address").get("town")               
+            if ville == None or (location.raw.get("address").get("city") != None and (clean_string(location.raw.get("address").get("city").lower())==clean_string(town.lower()) or (compute_args().world and location.raw.get("address").get("country")!="France"))):
+                ville = location.raw.get("address").get("city")        
+            dpt = location.raw.get("address").get("county")
+            if dpt ==None:
+                dpt=location.raw.get("address").get("state")
+            if dpt ==None:
+                dpt= location.raw.get("address").get("postcode") 
+            if dpt ==None or compute_args().world:
+                dpt= location.raw.get("address").get("country")              
+            cp = location.raw.get("address").get("postcode")
+            if cp == None:
+                cp = ""
+            lat = location.raw.get("lat")
+            long = location.raw.get("lon")
+            print_debug(ville+"-"+dpt+"-"+lat+"-"+long)
+            if (clean_string(ville.lower()) == clean_string(town.lower()) or cp.lower() == town.lower() or (compute_args().world and location.raw.get("address").get("country")!="France")): 
+                if ville+"-"+dpt not in [item[0] for item in choix]:  # Vérifier si ville+"-"+dpt n'est pas déjà présent dans choix
+                    choix.append([ville+"-"+dpt, ville, dpt, lat, long])
     if len(choix)==1:
         choice = choix[0]
         ville = choice[1]

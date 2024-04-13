@@ -1,6 +1,6 @@
 # :sunny: :umbrella: :cloud: pyweatherfr
 
-pyweatherfr affiche les prévisions méteo pour les communes françaises dans votre terminal. Il utilise l'API de MéteoFrance
+pyweatherfr affiche les prévisions méteo pour les communes françaises (voire mondiales) dans votre terminal. Il utilise l'API de MéteoFrance
 
 
 # 🚀 Comment utiliser **pyweatherfr**
@@ -40,6 +40,7 @@ exemple : ``pyweatherfr Grenoble -d 2024-03-30`` affiche les données météo d�
 
 ## Autres options
 
+  - ``--world``    active la recherche des villes dans le monde entier. Attention, les données sont moins précises.
   - ``-h/--help``    montrer l'aide
   - ``-u/--update``  update pyweatherfr
   - ``-c/--condensate``  condense la sortie
