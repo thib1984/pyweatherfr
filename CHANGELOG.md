@@ -19,6 +19,7 @@
 
 
 - [x] -d ne fonctionne pas!
+- [x] correction tz
 
 # 4.1.0
 

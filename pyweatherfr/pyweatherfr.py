@@ -792,10 +792,10 @@ def resume(latitude, longitude, tz):
     retry_session = retry_requests.retry(cache_session(), retries=5, backoff_factor=0.2)
     openmeteo = openmeteo_requests.Client(session=retry_session)
     url = "https://api.open-meteo.com/v1/meteofrance"
-    date_debut = (datetime.datetime.now() + datetime.timedelta(days=-1*compute_args().past)).strftime("%Y-%m-%d")
-    date_fin = (datetime.datetime.now() + datetime.timedelta(days=3)).strftime("%Y-%m-%d")
+    date_debut = (datetime.datetime.now(tz=pytz.timezone(tz)) + datetime.timedelta(days=-1*compute_args().past)).strftime("%Y-%m-%d")
+    date_fin = (datetime.datetime.now(tz=pytz.timezone(tz)) + datetime.timedelta(days=3)).strftime("%Y-%m-%d")
     if compute_args().past!=0:
-        date_fin = (datetime.datetime.now() + datetime.timedelta(days=-1)).strftime("%Y-%m-%d")    
+        date_fin = (datetime.datetime.now(tz=pytz.timezone(tz)) + datetime.timedelta(days=-1)).strftime("%Y-%m-%d")    
     params = {
         "timezone": tz,
         "start_date": date_debut,
@@ -878,11 +878,11 @@ def specific_day(latitude, longitude, day, tz):
             "cloud_cover",
             "is_day"
         ],
-        "start_date": (datetime.datetime.now() + datetime.timedelta(days=day)).strftime(
+        "start_date": (datetime.datetime.now(tz=pytz.timezone(tz)) + datetime.timedelta(days=day)).strftime(
             "%Y-%m-%d"
         ),
         "end_date": (
-            datetime.datetime.now() + datetime.timedelta(days=day + 1)
+            datetime.datetime.now(tz=pytz.timezone(tz)) + datetime.timedelta(days=day + 1)
         ).strftime("%Y-%m-%d"),
     }
     print_debug("appel api meteo france "+url+"?"+'&'.join([f'{key}={",".join(value) if isinstance(value, list) else value}' for key, value in params.items()]))
