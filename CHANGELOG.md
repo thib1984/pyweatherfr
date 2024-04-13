@@ -1,10 +1,13 @@
 # A VENIR
 
-- [ ] pyweatherfr -g 89 2.15 --world corriger
+
+- [ ] pyweatherfr pekin --world -v ajouter au ci/cd
 
 - [ ] integrer test sur heure soleil si ==3 si lumineux et ou petite pluie
 - [ ] comparer boundingbox openstreetmap pour doublons
 - [ ] ajouter fleche vent
+- [ ] supprimer --world avec l'option lang a l'appel openstreetmap
+- [ ] option multilang pour les villes
 
 - [ ] mode full pour humidité/pression/soleil etc
 - [ ] mode minimal pour temps / pluie uniquement (uniquement emoji si non nocolor)
@@ -13,6 +16,12 @@
 - [ ] ajouter log version and co pour issue : https://github.com/thib1984/ytdlmusic/blob/main/ytdlmusic/print.py
 - [ ] json formater pour le log/debug : https://www.freecodecamp.org/news/how-to-pretty-print-json-in-python/
 - [ ] fichier log dans le dossier config pour remplacer le mode debug avec dates and co
+
+# 5.0.2
+
+- [x] pyweatherfr pekin --world -v + ajouter au ci/cd
+- [x] pyweatherfr -g 89 2.15 --world corriger
+
 
 # 5.0.1
 
@@ -41,8 +50,6 @@
 
 # 4.1.0
 
-## bugs
-
 - [x] bug basse-terre
 - [x] securiser la saisie du choix de ville : https://github.com/thib1984/ytdlmusic/blob/main/ytdlmusic/choice.py
 - [x] gérer fuseau horaire en fonction de la ville (ex Nouméa): https://www.geeksforgeeks.org/get-time-zone-of-a-given-location-using-python/
@@ -51,16 +58,12 @@
 - [x] corrige la possibilite de -p / -j / -n en //
 - [x] test format et range si --date
 
-## optim
-
 - [x] changer cp to state pour la recherche par ip
 - [x] améliorer unités from apimeteofrance
 - [x] ameliorer affichage dpt from openstreetmap basse-terre
 - [x] recap de la recherche dans le bloc ville
 - [x] emoji nuit claire, nuit nuageuse
 - [x] gestion des emojis aux largeurs fantaisistes
-
-## features
 
 - [x] altitude from apimeteofrance
 - [x] -utc ou -local pour la tz

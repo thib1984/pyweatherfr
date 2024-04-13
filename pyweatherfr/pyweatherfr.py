@@ -710,8 +710,9 @@ def obtain_city_data_from_gps():
     )
     geolocator = geopy.geocoders.Nominatim(user_agent="my_geocoder")
     location = geolocator.reverse(compute_args().gps[0] +", " + compute_args().gps[1],addressdetails=True,language="fr")
-
-    print_debug(json.dumps(location.raw, indent=4,ensure_ascii=False))
+    if location == None:
+        print(my_colored("erreur : aucune ville trouvée.", "red"))
+        exit(1)
     ville = None
     if ville == None or (location.raw.get("address").get("village") != None):
         ville = location.raw.get("address").get("village")
@@ -767,8 +768,9 @@ def obtain_city_data():
             print(my_colored("erreur : aucune ville trouvée", "red"))
         exit(1)  
     for location in locations:
+        print_debug(json.dumps(location.raw, indent=4,ensure_ascii=False))
         if (location.raw.get("addresstype")=="postcode" or location.raw.get("addresstype")=="town" or location.raw.get("addresstype")=="city" or location.raw.get("addresstype")=="municipality" or location.raw.get("addresstype")=="village"):
-            print_debug(json.dumps(location.raw, indent=4,ensure_ascii=False))
+            
             ville = None
             if ville == None or (location.raw.get("address").get("village") != None and (clean_string(location.raw.get("address").get("village").lower())==clean_string(town.lower()) or (compute_args().world and location.raw.get("address").get("country")!="France"))):
                 ville = location.raw.get("address").get("village")
@@ -822,8 +824,8 @@ def obtain_city_data():
     ville = choice[1]
     dpt = choice[2]
     country = choice[3]
-    lat = choice[3]
-    long = choice[4]
+    lat = choice[4]
+    long = choice[5]
     return ville, dpt, lat, long, country
 
 
