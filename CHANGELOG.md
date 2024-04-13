@@ -15,11 +15,14 @@
 - [ ] json formater pour le log/debug : https://www.freecodecamp.org/news/how-to-pretty-print-json-in-python/
 - [ ] fichier log dans le dossier config pour remplacer le mode debug avec dates and co
 
+# 4.1.2
+
+- [x] correction tz
+
 # 4.1.1
 
-
 - [x] -d ne fonctionne pas!
-- [x] correction tz
+
 
 # 4.1.0
 
