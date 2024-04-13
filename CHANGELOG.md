@@ -19,7 +19,7 @@
 
 # 5.0.2
 
-- [x] pyweatherfr pekin --world -v + ajouter au ci/cd
+- [x] pyweatherfr pekin --world corriger
 - [x] pyweatherfr -g 89 2.15 --world corriger
 
 
