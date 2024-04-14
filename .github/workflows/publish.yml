@@ -30,7 +30,7 @@ jobs:
       #test
       - name: Launch test
         run: |
-          pyweatherfr nantes
+          echo 1 | pyweatherfr nantes
           pyweatherfr nouméa -n -v
           pyweatherfr 38700 -j2 --nocache
           pyweatherfr grenoble -p50 --utc -c
