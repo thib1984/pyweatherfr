@@ -35,7 +35,8 @@ jobs:
           pyweatherfr 38700 -j2 --nocache
           pyweatherfr grenoble -p50 --utc -c
           pyweatherfr ancenis -p3 --pc --nocolor
-          pyweatherfr barcelone --world -n --nocolor
+          pyweatherfr barcelone -n --nocolor
+          echo 2 | pyweatherfr barcelona
       - name: install pep517
         run: |
           pip install pep517

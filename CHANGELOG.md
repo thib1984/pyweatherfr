@@ -1,13 +1,9 @@
 # A VENIR
 
-
-- [ ] pyweatherfr pekin --world -v ajouter au ci/cd
-
+- [ ] KeyboardInterrupt à mieux gérer
 - [ ] integrer test sur heure soleil si ==3 si lumineux et ou petite pluie
 - [ ] comparer boundingbox openstreetmap pour doublons
 - [ ] ajouter fleche vent
-- [ ] supprimer --world avec l'option lang a l'appel openstreetmap
-- [ ] option multilang pour les villes
 
 - [ ] mode full pour humidité/pression/soleil etc
 - [ ] mode minimal pour temps / pluie uniquement (uniquement emoji si non nocolor)
@@ -16,6 +12,19 @@
 - [ ] ajouter log version and co pour issue : https://github.com/thib1984/ytdlmusic/blob/main/ytdlmusic/print.py
 - [ ] json formater pour le log/debug : https://www.freecodecamp.org/news/how-to-pretty-print-json-in-python/
 - [ ] fichier log dans le dossier config pour remplacer le mode debug avec dates and co
+
+- [ ] maj captures ecrans
+
+# 5.1.0
+
+
+- [x] supprimer --world
+- [x] correction erreur incorrecte pour rechercher gps et ip si or de France
+- [x] bug code postal si non francais pyweatherfr 44000
+- [x] maj pyweatherfr --help
+- [x] pyweatherfr pekin --world -v ajouter au ci/cd
+- [x] option multilang pour les villes
+
 
 # 5.0.2
 

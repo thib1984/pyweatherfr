@@ -28,7 +28,7 @@ def compute_args():
     check args and return them
     """
     my_parser = argparse.ArgumentParser(
-        description="pyweatherfr affiche les prévisions méteo pour les communes françaises dans votre terminal.",
+        description="pyweatherfr affiche les données méteo pour les communes françaises et mondiales dans votre terminal.",
         epilog="""
         Full documentation at: <https://github.com/thib1984/pyweatherfr>.
         Report bugs to <https://github.com/thib1984/pyweatherfr/issues>.
@@ -45,14 +45,14 @@ def compute_args():
         metavar="VILLE",
         type=str,
         nargs="?",
-        help="affichage des données météo par nom de ville ou code postal -si absent, la VILLE est déduite de l'ip-",
+        help="affichage des données météo génériques par nom de ville ou code postal (uniquement communes francaises) -si absent, la VILLE est déduite de l'ip-",
     )
     my_2group = my_parser.add_mutually_exclusive_group()
     my_2group.add_argument(
         "-n",
         "--now",
         action="store_true",
-        help="affichage des données météo détaillées actuelles",
+        help="affichage des données météo actuelles, plutôt que les données génériques",
     )
     my_2group.add_argument(
         "-j",
@@ -64,7 +64,7 @@ def compute_args():
         nargs='?',
         const=0,        
         choices=range(-101, 4),
-        help="affichage des données météo détaillées pour [JOUR] (0 pour le jour actuel, 1 pour le J+1, ..., -1 pour J-1, ...)",
+        help="affichage des données météo détaillées pour [JOUR] (0 pour le jour actuel, 1 pour le J+1, ..., -1 pour J-1, ...) plutôt que les données génériques",
     )
     my_2group.add_argument(
         "-d",
@@ -72,7 +72,7 @@ def compute_args():
         metavar="DATE",
         action="store",
         type=str,      
-        help="affichage des données météo détaillées pour [DAY] au format yyyy-mm-dd",
+        help="affichage des données météo détaillées pour [DAY] au format yyyy-mm-dd, plutôt que les données génériques",
     )    
     my_2group.add_argument(
         "-p",
@@ -82,7 +82,7 @@ def compute_args():
         type=int,
         default=0,
         choices=range(1, 101),
-        help="affichage des données météo génériques depuis [JOUR PASSE] (-10 pour J-10 à J-1, ...)",
+        help="affichage des données météo génériques depuis [JOUR PASSE] (10 pour J-10 à J-1, ...), compris entre 1 et 100, plutôt que les données génériques",
     )         
     my_group.add_argument(
         "-g",
@@ -91,18 +91,23 @@ def compute_args():
         action="store",
         nargs=2,
         type=str,
-        help="affichage des données météo par coordonnées GPS",
+        help="utilisation des coordonnées GPS à la place d'un nom de ville",
     )      
     my_parser.add_argument(
         "--nocolor",
         action="store_true",
         help="désactiver couleur et emojis en sortie -à utiliser en cas de problème d'affichage-",
     )
+    #my_parser.add_argument(
+    #    "--world",
+    #    action="store_true",
+    #    help="activer la recherche hors France",
+    #)
     my_parser.add_argument(
-        "--world",
+        "--lang",
         action="store_true",
-        help="activer la recherche hors France",
-    )    
+        help="recherche (puis affiche) les villes avec leurs noms locaux",
+    )     
     group = my_parser.add_mutually_exclusive_group()
     group.add_argument(
         "--pc",
