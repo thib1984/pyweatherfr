@@ -102,11 +102,12 @@ def compute_args():
         action="store_true",
         help="désactiver couleur et emojis en sortie -à utiliser en cas de problème d'affichage-",
     )
-    #my_parser.add_argument(
-    #    "--world",
-    #    action="store_true",
-    #    help="activer la recherche hors France",
-    #)
+    my_parser.add_argument(
+        "-w",
+        "--world",
+        action="store_true",
+        help="activer la recherche hors France",
+    )
     my_parser.add_argument(
         "--lang",
         action="store_true",

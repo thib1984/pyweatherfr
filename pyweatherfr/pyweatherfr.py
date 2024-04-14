@@ -602,16 +602,6 @@ def previsions_generiques(ville, dpt, lat, long, tz):
                         duree_soleil
                     ]
                 )
-                headers = [
-                    "date",
-                    "temps",
-                    "température (ressentie)",
-                    "précipitations",
-                    "vent (rafales)",
-                    "direction",
-                    "durée pluie",
-                    "durée soleil"
-                ]
             else:
                 data.append(
                     [
@@ -633,20 +623,33 @@ def previsions_generiques(ville, dpt, lat, long, tz):
                         warning,
                     ]
                 )
-                headers = [
-                    "date",
-                    "temps",
-                    "température (ressentie)",
-                    "précipitations",
-                    "vent (rafales)",
-                    "direction vent",
-                    "durée pluie",
-                    "durée soleil",
-                    "warning",
-                ]
         else:
             tronque=True
     if data != []:
+        if compute_args().nocolor:
+            headers = [
+                "date",
+                "temps",
+                "température (ressentie)",
+                "précipitations",
+                "vent (rafales)",
+                "direction",
+                "durée pluie",
+                "durée soleil"
+            ]
+        else:
+            headers = [
+                "date",
+                "temps",
+                "température (ressentie)",
+                "précipitations",
+                "vent (rafales)",
+                "direction vent",
+                "durée pluie",
+                "durée soleil",
+                "warning",
+            ]
+
         if compute_args().condensate:
             table = columnar.columnar(data, headers, no_borders=True, wrap_max=0)
         else:
@@ -792,6 +795,7 @@ def obtain_city_data():
     if locations is None:
         print(my_colored("erreur : aucune ville trouvée", "red"))
         exit(1)  
+    world=False    
     for location in locations:
         print_debug(json.dumps(location.raw, indent=4,ensure_ascii=False))
         if ((location.raw.get("addresstype")=="postcode" and location.raw.get("address").get("country")=="France") or location.raw.get("addresstype")=="town" or location.raw.get("addresstype")=="city" or location.raw.get("addresstype")=="municipality" or location.raw.get("addresstype")=="village"):
@@ -823,7 +827,16 @@ def obtain_city_data():
             print_debug(ville+"-"+dpt+"-"+lat+"-"+long+"-"+country)
             if (clean_string(ville.lower()) == clean_string(town.lower()) or cp.lower() == town.lower()):
                 if ville+"-"+dpt not in [item[0] for item in choix]:  
-                    choix.append([ville+"-"+dpt, ville, dpt, country,lat, long])
+                    if country=="France":
+                        choix.append([ville+"-"+dpt, ville, dpt, country,lat, long])
+                    else:
+                        if compute_args().world:
+                            choix.append([ville+"-"+dpt, ville, dpt, country,lat, long])
+                        else:
+                            world=True    
+    if not compute_args().world and world:
+        print("")
+        print(my_colored("warning : il existe des villes hors France disponibles pour wotre recherche. Relancez la avec --world pour y acceder", "yellow"))
     if len(choix)==1:
         choice = choix[0]
         ville = choice[1]
@@ -832,24 +845,25 @@ def obtain_city_data():
         lat = choice[4]
         long = choice[5]
         return ville, dpt, lat, long, country    
-    if len(choix)==0:
+    elif len(choix)==0:
         print(my_colored("erreur : aucune ville trouvée", "red"))
         exit(1)
-    while True:    
-        i=0    
-        for choice in choix:
-            i=i+1
-            print("["+str(i)+"] " + choice[1] + " (" + choice[2]+ ")")
-        toto = input("Quelle ville? ")
-        if toto.isnumeric() and 1 <= int(toto) <= len(choix):
-            break
-        print(my_colored("erreur : choix incorrect", "red"))       
-    choice = choix[int(toto)-1]
-    ville = choice[1]
-    dpt = choice[2]
-    country = choice[3]
-    lat = choice[4]
-    long = choice[5]
+    else:
+        while True:    
+            i=0    
+            for choice in choix:
+                i=i+1
+                print("["+str(i)+"] " + choice[1] + " (" + choice[2]+ ")")
+            toto = input("Quelle ville? ")
+            if toto.isnumeric() and 1 <= int(toto) <= len(choix):
+                break
+            print(my_colored("erreur : choix incorrect", "red"))       
+        choice = choix[int(toto)-1]
+        ville = choice[1]
+        dpt = choice[2]
+        country = choice[3]
+        lat = choice[4]
+        long = choice[5]
     return ville, dpt, lat, long, country
 
 

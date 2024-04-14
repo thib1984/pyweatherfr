@@ -1,6 +1,8 @@
 # A VENIR
 
 
+- [ ] ajouter cas d'erreurs dans les tests
+- [ ] marqué en rouge les records de chaque zone
 - [ ] integrer test sur heure soleil si ==3 si lumineux et ou petite pluie
 - [ ] comparer boundingbox openstreetmap pour doublons
 - [ ] mode full pour humidité/pression/soleil etc
@@ -10,6 +12,11 @@
 - [ ] json formater pour le log/debug : https://www.freecodecamp.org/news/how-to-pretty-print-json-in-python/
 - [ ] fichier log dans le dossier config pour remplacer le mode debug avec dates and co
 - [ ] maj captures ecrans
+
+# 5.2.0
+
+- [x] optimise les headers
+- [x] --world + warning si ville world atteignable
 
 # 5.1.3
 

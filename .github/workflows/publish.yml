@@ -30,14 +30,15 @@ jobs:
       #test
       - name: Launch test
         run: |
-          echo 1 | pyweatherfr nantes
+          pyweatherfr nantes
+          echo 1 | pyweatherfr nantes -w
           pyweatherfr nouméa -n -v
           pyweatherfr 38700 -j2 --nocache
           pyweatherfr grenoble -p50 --utc -c
           pyweatherfr ancenis -p3 --pc --nocolor
           pyweatherfr barcelone -n --nocolor
-          echo 2 | pyweatherfr barcelona
-          echo 3 | pyweatherfr "london" --lang
+          echo 2 | pyweatherfr barcelona -w
+          echo 3 | pyweatherfr "london" --lang -w
           pyweatherfr -v
       - name: install pep517
         run: |
