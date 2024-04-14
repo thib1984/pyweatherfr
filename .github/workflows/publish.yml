@@ -37,6 +37,7 @@ jobs:
           pyweatherfr ancenis -p3 --pc --nocolor
           pyweatherfr barcelone -n --nocolor
           echo 2 | pyweatherfr barcelona
+          echo 3 | pyweatherfr "london" --lang
       - name: install pep517
         run: |
           pip install pep517
