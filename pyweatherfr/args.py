@@ -6,6 +6,13 @@ import argparse
 import sys
 
 
+# Fonction de validation pour s'assurer que l'argument est un nombre positif
+def positive_integer(value):
+    ivalue = int(value)
+    if ivalue <= 0:
+        raise argparse.ArgumentTypeError("%s n'est pas un nombre entier strictement positif" % value)
+    return ivalue
+
 class CustomHelpFormatter(argparse.HelpFormatter):
     def _format_action_invocation(self, action):
         if not action.option_strings or action.nargs == 0:
@@ -60,10 +67,8 @@ def compute_args():
         metavar="JOUR",
         action="store",
         type=int,
-        default=1000,
         nargs='?',
         const=0,        
-        choices=range(-101, 4),
         help="affichage des données météo détaillées pour [JOUR] (0 pour le jour actuel, 1 pour le J+1, ..., -1 pour J-1, ...) plutôt que les données génériques",
     )
     my_2group.add_argument(
@@ -79,10 +84,9 @@ def compute_args():
         "--past",
         metavar="JOUR PASSE",
         action="store",
-        type=int,
+        type=positive_integer,
         default=0,
-        choices=range(1, 101),
-        help="affichage des données météo génériques depuis [JOUR PASSE] (10 pour J-10 à J-1, ...), compris entre 1 et 100, plutôt que les données génériques",
+        help="affichage des données météo génériques depuis [JOUR PASSE] (10 pour J-10 à J-1, ...), plutôt que les données génériques",
     )         
     my_group.add_argument(
         "-g",

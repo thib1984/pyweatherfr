@@ -4,8 +4,9 @@
 - [x] changement warning pression basse 990 à 995
 - [x] ajout lunettes
 - [x] warning recherche par ip si vpn proxy
-
-- [ ] tronquer les données en -p les chercher en détaillés plutot que de mettre une limite haute ou basse
+- [x] tronquer les données en -p les chercher en détaillés plutot que de mettre une limite haute ou basse
+- [x] seule limite +15 jours (cf api meteo france)
+- [x] limite le --past a un nb strcitement positif
 
 - [ ] integrer test sur heure soleil si ==3 si lumineux et ou petite pluie
 - [ ] comparer boundingbox openstreetmap pour doublons
