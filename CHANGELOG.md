@@ -1,12 +1,6 @@
 # A VENIR
 
-- [x] W/m -> W/m2
-- [x] changement warning pression basse 990 à 995
-- [x] ajout lunettes
-- [x] warning recherche par ip si vpn proxy
-- [x] tronquer les données en -p les chercher en détaillés plutot que de mettre une limite haute ou basse
-- [x] seule limite +15 jours (cf api meteo france)
-- [x] limite le --past a un nb strcitement positif
+
 
 - [ ] integrer test sur heure soleil si ==3 si lumineux et ou petite pluie
 - [ ] comparer boundingbox openstreetmap pour doublons
@@ -18,6 +12,15 @@
 - [ ] fichier log dans le dossier config pour remplacer le mode debug avec dates and co
 - [ ] maj captures ecrans
 
+# 5.1.2
+
+- [x] W/m -> W/m2
+- [x] changement warning pression basse 990 à 995
+- [x] ajout lunettes
+- [x] warning recherche par ip si vpn proxy
+- [x] tronquer les données en -p les chercher en détaillés plutot que de mettre une limite haute ou basse
+- [x] seule limite +15 jours (cf api meteo france)
+- [x] limite le --past a un nb strcitement positif
 
 # 5.1.1
 
