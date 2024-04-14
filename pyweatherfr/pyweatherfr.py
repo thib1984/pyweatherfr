@@ -687,6 +687,7 @@ def obtain_city_data_from_ip():
         print_debug(
             "recherche de la localisation depuis https://geolocation-db.com/json"
         )
+        print_debug(url.read().decode())
         data = json.loads(url.read().decode())
         print_debug(str(json.dumps(data, indent=4,ensure_ascii=False)))
         ville = data["city"]
