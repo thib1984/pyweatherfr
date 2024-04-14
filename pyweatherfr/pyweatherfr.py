@@ -61,6 +61,7 @@ FLECHE_NE = "\U00002199"
 ELEPHANT = "\U0001F418"
 PLUME = "\U0001FAB6"
 PC ="\U0001f4bb"
+LUNETTES= "\U0001F60E"
 WARNING_WARM=30
 WARNING_FROID=0
 WARNING_SNOW=0.1
@@ -68,7 +69,7 @@ WARNING_RAIN=0.1
 WARNING_WIND=30
 WARNING_WIND_GUST=50
 WARNING_HP=1030
-WARNING_BP=990
+WARNING_BP=995
 WARNING_HUMIDITY=90
 
 def get_user_config_directory_pyweather():
@@ -140,11 +141,12 @@ def find():
         previsions_generiques(ville, dpt, lat, long,tz)
     else:
         previsions_detaillees(ville, dpt, lat, long,tz)
+    if not compute_args().town and not compute_args().gps:   
+        print(my_colored("warning : si vous utilisez un proxy ou un VPN, la localisation peut être incorrecte", "yellow"))
     if country ==None:
         print(my_colored("warning : ville potentiellement hors de France, les prévisions et données peuvent être moins précises", "yellow"))
     elif  country!="France":
         print(my_colored("warning : ville hors de France, les prévisions et données peuvent être moins précises", "yellow"))
-   
 
 
 def previsions_detaillees(ville, dpt, lat, long, tz):
@@ -219,7 +221,9 @@ def previsions_detaillees(ville, dpt, lat, long, tz):
         weather, emojiweather = traduction(current_weather_code[h],isday[h])
         humidity = f"{relative_humidity_2m[h]:.0f}%"
         duree_soleil = f"{sunshine_duration[h]/60:.0f}'"
-        rayonnement = f" {shortwave_radiation[h]:.0f}W/m"        
+        rayonnement = f" {shortwave_radiation[h]:.0f}W/m\u00B2" 
+        if shortwave_radiation[h]>1000:
+            warning = warning + " " + LUNETTES   
         if compute_args().nocolor:
             data.append(
                 [
@@ -438,7 +442,7 @@ def previsions_courantes(ville, dpt, lat, long, tz):
                 + direction,
             ]
         )
-        data.append(["rayonnement", f"{w_soleil:.0f}W/m"])
+        data.append(["rayonnement", f"{w_soleil:.0f}W/m\u00B2"])
         data.append(["temps", current_weather])
 
     else:
@@ -492,7 +496,10 @@ def previsions_courantes(ville, dpt, lat, long, tz):
                     "",
                 ]
             )
-        data.append(["rayonnement", f"{w_soleil:.0f}W/m",""])    
+        if w_soleil>1000:
+            data.append(["rayonnement", f"{w_soleil:.0f}W/m\u00B2",LUNETTES]) 
+        else:      
+            data.append(["rayonnement", f"{w_soleil:.0f}W/m\u00B2",""]) 
         data.append(["temps", emojiweather + " " + current_weather, ""])
     if compute_args().condensate:
         table = columnar.columnar(data, no_borders=True, wrap_max=0)
