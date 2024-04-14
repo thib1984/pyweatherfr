@@ -101,7 +101,7 @@ def get_user_config_directory_pyweather():
 
 def diff_jour(long,lat):
     tz=timezonefinder.TimezoneFinder().timezone_at(lng=float(long), lat=float(lat))
-    if not compute_args().date == None:
+    if not compute_args().date is None:
         if not est_format_date(compute_args().date):
             print(my_colored("erreur : format date invalide, format attendu yyyy-mm-dd", "red"))
             exit(1)
@@ -136,7 +136,7 @@ def find():
     print_debug(tz)
     if compute_args().now:
         previsions_courantes(ville, dpt, lat, long,tz)
-    elif not compute_args().date == None:
+    elif not compute_args().date is None:
         previsions_detaillees(ville, dpt, lat, long,tz)        
     elif compute_args().jour is None:
         previsions_generiques(ville, dpt, lat, long,tz)
@@ -144,7 +144,7 @@ def find():
         previsions_detaillees(ville, dpt, lat, long,tz)
     if not compute_args().town and not compute_args().gps:   
         print(my_colored("warning : si vous utilisez un proxy ou un VPN, la localisation peut être incorrecte", "yellow"))
-    if country ==None:
+    if country is None:
         print(my_colored("warning : ville potentiellement hors de France, les prévisions et données peuvent être moins précises", "yellow"))
     elif  country!="France":
         print(my_colored("warning : ville hors de France, les prévisions et données peuvent être moins précises", "yellow"))
@@ -363,7 +363,7 @@ def calculer_direction(direction_vent_degres):
         direction = "NE "
         if not compute_args().nocolor:
             direction=direction+FLECHE_NE
-    return ""
+    return direction
 
 
 def traduction(current_weather_code,jour):
@@ -668,7 +668,6 @@ def print_generic_data_town(ville, dpt, lat, long, alt, recap):
         else:    
             data.append([ville + " (" + dpt + ")"])
         data.append([f"lat.:  {float(lat):.4f}° / long.: {float(long):.4f}° / alt.: {float(alt):.0f}m "])
-        #data.append([datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S")])
         data.append([recap])
     else:
         if (ville is None or ville == "") and (dpt is None or dpt == ""):
@@ -678,7 +677,6 @@ def print_generic_data_town(ville, dpt, lat, long, alt, recap):
         else:    
             data.append([HOME, ville + " (" + dpt + ")"])
         data.append([BOUSSOLE, f"lat.:  {float(lat):.4f}°  / long.: {float(long):.4f}° / alt.: {float(alt):.0f}m "])
-        #data.append([CLOCK, datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S")])
         data.append([PC,recap])
     if compute_args().condensate:
         table = columnar.columnar(data, no_borders=True, wrap_max=0)
@@ -723,17 +721,14 @@ def obtain_city_data_from_ip():
         data = json.loads(resultat)
         print_debug(str(json.dumps(data, indent=4,ensure_ascii=False)))
         ville = data["city"]
-        if ville ==None:
+        if ville is None:
             ville=""
         lat = str(data["latitude"])
         long = str(data["longitude"])
         dpt = str(data["state"])
-        if dpt ==None:
+        if dpt is None:
             dpt=""
         country = str(data["country_name"])
-        #if country==None or country!="France":
-        #    print(my_colored("erreur : aucune ville trouvée. Si vous souhaitez rechercher une ville hors de France, ajoutez --world", "red"))
-        #    exit(1)
         return ville, dpt, lat, long, country
 
 
@@ -752,31 +747,28 @@ def obtain_city_data_from_gps():
         location = geolocator.reverse(compute_args().gps[0] +", " + compute_args().gps[1],addressdetails=True)
     else:        
         location = geolocator.reverse(compute_args().gps[0] +", " + compute_args().gps[1],addressdetails=True,language="fr")
-    if location == None:
+    if location is None:
         print(my_colored("erreur : aucune ville trouvée.", "red"))
         exit(1)
     ville = None
-    if ville == None or (location.raw.get("address").get("village") != None):
+    if ville is None or (location.raw.get("address").get("village") is not None):
         ville = location.raw.get("address").get("village")
-    if ville == None or (location.raw.get("address").get("municipality") != None):
+    if ville is None or (location.raw.get("address").get("municipality") is not None):
         ville = location.raw.get("address").get("municipality")
-    if ville == None or (location.raw.get("address").get("town") != None):
+    if ville is None or (location.raw.get("address").get("town") is not None):
         ville = location.raw.get("address").get("town")               
-    if ville == None or (location.raw.get("address").get("city") != None):
+    if ville is None or (location.raw.get("address").get("city") is not None):
         ville = location.raw.get("address").get("city")        
     dpt = location.raw.get("address").get("county")
-    if dpt ==None:
+    if dpt is None:
         dpt=location.raw.get("address").get("state")
-    if dpt ==None:
+    if dpt is None:
         dpt= location.raw.get("address").get("postcode") 
-    if dpt ==None or location.raw.get("address").get("country")!="France":
+    if dpt is None or location.raw.get("address").get("country")!="France":
         dpt= location.raw.get("address").get("country")              
     cp = location.raw.get("address").get("postcode")
     country=location.raw.get("address").get("country") 
-    #if country!="France" and compute_args().world == False:
-    #    print(my_colored("erreur : aucune ville trouvée. Si vous souhaitez rechercher une ville hors de France, ajoutez --world", "red"))
-    #    exit(1)    
-    if cp == None:
+    if cp is None:
         cp = ""
     lat = location.raw.get("lat")
     long = location.raw.get("lon")
@@ -791,26 +783,13 @@ def obtain_city_data():
     town = compute_args().town
     ctx = ssl.create_default_context(cafile=certifi.where())
     geopy.geocoders.options.default_ssl_context = ctx
-    
-    # Création d'un objet géocodeur Nominatim
     geolocator = geopy.geocoders.Nominatim(user_agent="my_geocoder")
-    
-    # Géocodage d'une adresse
-    #if compute_args().world:
-    #    locations = geolocator.geocode(town,exactly_one=False,addressdetails=True,language="fr")
-    #else:
-    #    locations = geolocator.geocode(town + ", France",exactly_one=False,addressdetails=True,language="fr")
     if compute_args().lang:
         locations = geolocator.geocode(town,exactly_one=False,addressdetails=True)
     else:
         locations = geolocator.geocode(town,exactly_one=False,addressdetails=True,language="fr")    
-    # Affichage des informations de localisation
     choix = []
-    if locations == None:
-        #if not compute_args().world:
-        #    print(my_colored("erreur : aucune ville trouvée. Si vous souhaitez rechercher une ville hors de France, ajoutez --world", "red"))
-        #else:
-        #    print(my_colored("erreur : aucune ville trouvée", "red"))
+    if locations is None:
         print(my_colored("erreur : aucune ville trouvée", "red"))
         exit(1)  
     for location in locations:
@@ -818,20 +797,20 @@ def obtain_city_data():
         if ((location.raw.get("addresstype")=="postcode" and location.raw.get("address").get("country")=="France") or location.raw.get("addresstype")=="town" or location.raw.get("addresstype")=="city" or location.raw.get("addresstype")=="municipality" or location.raw.get("addresstype")=="village"):
             
             ville = None
-            if ville == None or (location.raw.get("address").get("village") != None and (clean_string(location.raw.get("address").get("village").lower())==clean_string(town.lower()))):# or (compute_args().world and location.raw.get("address").get("country")!="France"))):
+            if ville is None or (location.raw.get("address").get("village") is not None and (clean_string(location.raw.get("address").get("village").lower())==clean_string(town.lower()))):
                 ville = location.raw.get("address").get("village")
-            if ville == None or (location.raw.get("address").get("municipality") != None and (clean_string(location.raw.get("address").get("municipality").lower())==clean_string(town.lower()))):# or (compute_args().world and location.raw.get("address").get("country")!="France"))):
+            if ville is None or (location.raw.get("address").get("municipality") is not None and (clean_string(location.raw.get("address").get("municipality").lower())==clean_string(town.lower()))):
                 ville = location.raw.get("address").get("municipality")
-            if ville == None or (location.raw.get("address").get("town") != None and (clean_string(location.raw.get("address").get("town").lower())==clean_string(town.lower()))):# or (compute_args().world and location.raw.get("address").get("country")!="France"))):
+            if ville is None or (location.raw.get("address").get("town") is not None and (clean_string(location.raw.get("address").get("town").lower())==clean_string(town.lower()))):
                 ville = location.raw.get("address").get("town")               
-            if ville == None or (location.raw.get("address").get("city") != None and (clean_string(location.raw.get("address").get("city").lower())==clean_string(town.lower()))):# or (compute_args().world and location.raw.get("address").get("country")!="France"))):
+            if ville is None or (location.raw.get("address").get("city") is not None and (clean_string(location.raw.get("address").get("city").lower())==clean_string(town.lower()))):
                 ville = location.raw.get("address").get("city")        
             dpt = location.raw.get("address").get("county")
-            if dpt ==None:
+            if dpt is None:
                 dpt=location.raw.get("address").get("state")
-            if dpt ==None:
+            if dpt is None:
                 dpt= location.raw.get("address").get("postcode") 
-            if dpt ==None or location.raw.get("address").get("country")!="France":
+            if dpt is None or location.raw.get("address").get("country")!="France":
                 dpt= location.raw.get("address").get("country")
 
             country = location.raw.get("address").get("country")
@@ -842,8 +821,8 @@ def obtain_city_data():
             lat = location.raw.get("lat")
             long = location.raw.get("lon")
             print_debug(ville+"-"+dpt+"-"+lat+"-"+long+"-"+country)
-            if (clean_string(ville.lower()) == clean_string(town.lower()) or cp.lower() == town.lower()):# or (compute_args().world and location.raw.get("address").get("country")!="France")): 
-                if ville+"-"+dpt not in [item[0] for item in choix]:  # Vérifier si ville+"-"+dpt n'est pas déjà présent dans choix
+            if (clean_string(ville.lower()) == clean_string(town.lower()) or cp.lower() == town.lower()):
+                if ville+"-"+dpt not in [item[0] for item in choix]:  
                     choix.append([ville+"-"+dpt, ville, dpt, country,lat, long])
     if len(choix)==1:
         choice = choix[0]
@@ -854,10 +833,6 @@ def obtain_city_data():
         long = choice[5]
         return ville, dpt, lat, long, country    
     if len(choix)==0:
-        #if not compute_args().world:
-        #    print(my_colored("erreur : aucune ville trouvée. Si vous souhaitez rechercher une ville hors de France, ajoutez --world", "red"))
-        #else:
-        #    print(my_colored("erreur : aucune ville trouvée", "red"))
         print(my_colored("erreur : aucune ville trouvée", "red"))
         exit(1)
     while True:    
