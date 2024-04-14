@@ -17,7 +17,10 @@ def pyweatherfr():
     colorama.init()
 
     args = compute_args()
-    if args.update:
-        update()
-    else:
-        find()
+    try:
+        if args.update:
+            update()
+        else:
+            find()
+    except KeyboardInterrupt:
+        exit(1)

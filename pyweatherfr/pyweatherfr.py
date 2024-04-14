@@ -50,14 +50,14 @@ CLOCK = "\U000023F0"
 THERMO = "\U0001F321"
 HUMIDITE = "\U0001F4A7"
 PLUIE = "\U0001F327"
-FLECHE_N = "\U0000FE0F"
-FLECHE_NW = "\U0000FE0F"
-FLECHE_W = "\U0000FE0F"
-FLECHE_SW = "\U0000FE0F"
-FLECHE_S = "\U0000FE0F"
-FLECHE_SE = "\U0000FE0F"
-FLECHE_E = "\U0000FE0F"
-FLECHE_NE = "\U0000FE0F"
+FLECHE_N = "\U00002B07"
+FLECHE_NO = "\U00002198"
+FLECHE_O = "\U000027A1"
+FLECHE_SO = "\U00002197"
+FLECHE_S = "\U00002B06"
+FLECHE_SE = "\U00002196"
+FLECHE_E = "\U00002B05"
+FLECHE_NE = "\U00002199"
 ELEPHANT = "\U0001F418"
 PLUME = "\U0001FAB6"
 PC ="\U0001f4bb"
@@ -303,42 +303,58 @@ def calculer_direction(direction_vent_degres):
             direction_vent_degres <= 22.5
             or direction_vent_degres >= 360 - 22.5
         ):
-        direction = "N"
+        direction = "N  "
+        if not compute_args().nocolor:
+            direction=direction+FLECHE_N        
     if (
             direction_vent_degres <= 360 - 22.5
             and direction_vent_degres > 360 - 22.5 - 45
         ):
-        direction = "NO"
+        direction = "NO "
+        if not compute_args().nocolor:
+            direction=direction+FLECHE_NO        
     if (
             direction_vent_degres <= 360 - 22.5 - 45
             and direction_vent_degres > 360 - 22.5 - 90
         ):
-        direction = "O"
+        direction = "O  "
+        if not compute_args().nocolor:
+            direction=direction+FLECHE_O        
     if (
             direction_vent_degres <= 360 - 22.5 - 90
             and direction_vent_degres > 360 - 22.5 - 135
         ):
-        direction = "SO"
+        direction = "SO "
+        if not compute_args().nocolor:
+            direction=direction+FLECHE_SO        
     if (
             direction_vent_degres <= 360 - 22.5 - 135
             and direction_vent_degres > 360 - 22.5 - 180
         ):
-        direction = "S"
+        direction = "S  "
+        if not compute_args().nocolor:
+            direction=direction+FLECHE_S        
     if (
             direction_vent_degres <= 360 - 22.5 - 180
             and direction_vent_degres > 360 - 22.5 - 225
         ):
-        direction = "SE"
+        direction = "SE "
+        if not compute_args().nocolor:
+            direction=direction+FLECHE_SE        
     if (
             direction_vent_degres <= 360 - 22.5 - 225
             and direction_vent_degres > 360 - 22.5 - 270
         ):
-        direction = "E"
+        direction = "E  "
+        if not compute_args().nocolor:
+            direction=direction+FLECHE_E        
     if (
             direction_vent_degres <= 360 - 22.5 - 270
             and direction_vent_degres > 360 - 22.5 - 315
         ):
-        direction = "NE"
+        direction = "NE "
+        if not compute_args().nocolor:
+            direction=direction+FLECHE_NE
     return direction
 
 

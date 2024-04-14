@@ -1,19 +1,21 @@
 # A VENIR
 
-- [ ] KeyboardInterrupt à mieux gérer
 - [ ] integrer test sur heure soleil si ==3 si lumineux et ou petite pluie
 - [ ] comparer boundingbox openstreetmap pour doublons
-- [ ] ajouter fleche vent
-
 - [ ] mode full pour humidité/pression/soleil etc
 - [ ] mode minimal pour temps / pluie uniquement (uniquement emoji si non nocolor)
-
 - [ ] clean code
 - [ ] ajouter log version and co pour issue : https://github.com/thib1984/ytdlmusic/blob/main/ytdlmusic/print.py
 - [ ] json formater pour le log/debug : https://www.freecodecamp.org/news/how-to-pretty-print-json-in-python/
 - [ ] fichier log dans le dossier config pour remplacer le mode debug avec dates and co
-
 - [ ] maj captures ecrans
+
+# 5.1.1
+
+- [x] retire le doublon d'appel pour la recherche par ip
+- [x] gère l'absence de ville/dpt pour la recherche par ip
+- [x] KeyboardInterrupt à mieux gérer
+- [x] ajouter fleche vent
 
 # 5.1.0
 
