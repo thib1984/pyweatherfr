@@ -36,7 +36,7 @@ jobs:
           pyweatherfr 38700 -j2 --nocache
           pyweatherfr grenoble -p50 --utc -c
           pyweatherfr ancenis -p3 --pc --nocolor
-          pyweatherfr barcelone -n --nocolor
+          pyweatherfr barcelone -n --nocolor -w
           echo 2 | pyweatherfr barcelona -w
           echo 3 | pyweatherfr "london" --lang -w
           pyweatherfr -v
