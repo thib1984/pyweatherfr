@@ -697,8 +697,8 @@ def obtain_city_data_from_ip():
         lat = str(data["latitude"])
         long = str(data["longitude"])
         dpt = str(data["state"])
-        if state ==None:
-            state=""
+        if dpt ==None:
+            dpt=""
         country = str(data["country_name"])
         #if country==None or country!="France":
         #    print(my_colored("erreur : aucune ville trouvée. Si vous souhaitez rechercher une ville hors de France, ajoutez --world", "red"))
