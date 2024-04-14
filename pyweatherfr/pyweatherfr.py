@@ -24,7 +24,7 @@ import geopy
 import timezonefinder
 import pytz
 import tzlocal
-import re
+
 
 DOSSIER_CONFIG_PYWEATHER = "pyweatherfr"
 
@@ -687,13 +687,18 @@ def obtain_city_data_from_ip():
         print_debug(
             "recherche de la localisation depuis https://geolocation-db.com/json"
         )
-        print_debug(url.read().decode())
-        data = json.loads(re.sub(r'\s+', '', url.read().decode()))
+        resultat= url.read().decode()
+        print_debug(resultat)
+        data = json.loads(resultat)
         print_debug(str(json.dumps(data, indent=4,ensure_ascii=False)))
         ville = data["city"]
+        if ville ==None:
+            ville=""
         lat = str(data["latitude"])
         long = str(data["longitude"])
         dpt = str(data["state"])
+        if state ==None:
+            state=""
         country = str(data["country_name"])
         #if country==None or country!="France":
         #    print(my_colored("erreur : aucune ville trouvée. Si vous souhaitez rechercher une ville hors de France, ajoutez --world", "red"))
