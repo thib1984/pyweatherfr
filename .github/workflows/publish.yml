@@ -36,13 +36,14 @@ jobs:
           pyweatherfr nouméa -n -v
           pyweatherfr 38700 -j2 --nocache
           pyweatherfr grenoble -p50 --utc -c
-          pyweatherfr ancenis -p3 --pc --nocolor
+          pyweatherfr Ancenis-Saint-Géréon -p3 --pc --nocolor
           pyweatherfr barcelone -n --nocolor -w
           echo 2 | pyweatherfr barcelona -w
           echo 3 | pyweatherfr "london" --lang -w
           echo 3 | pyweatherfr "springfield, USA" -w
           echo 10 | pyweatherfr "beaulieu, France" | grep "\[11\]" || echo ok
           pyweatherfr -v
+          (pyweatherfr ancenis || echo ok) | grep aucune
       - name: install pep517
         run: |
           pip install pep517

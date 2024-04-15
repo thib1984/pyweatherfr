@@ -850,16 +850,17 @@ def obtain_city_data():
                 cp = ""
             lat = location.raw.get("lat")
             long = location.raw.get("lon")
-            print_debug(ville+"-"+dpt+"-"+lat+"-"+long+"-"+country)
-            if (clean_string(ville.lower()) == clean_string(town.lower()) or cp.lower() == town.lower()):
-                if ville+"-"+dpt not in [item[0] for item in choix]:  
-                    if country=="France":
-                        choix.append([ville+"-"+dpt, ville, dpt, country,lat, long])
-                    else:
-                        if compute_args().world:
+            if ville is not None:
+                print_debug(ville+"-"+dpt+"-"+lat+"-"+long+"-"+country)
+                if (clean_string(ville.lower()) == clean_string(town.lower()) or cp.lower() == town.lower()):
+                    if ville+"-"+dpt not in [item[0] for item in choix]:  
+                        if country=="France":
                             choix.append([ville+"-"+dpt, ville, dpt, country,lat, long])
                         else:
-                            world=True    
+                            if compute_args().world:
+                                choix.append([ville+"-"+dpt, ville, dpt, country,lat, long])
+                            else:
+                                world=True    
     if not compute_args().world and world:
         print("")
         print(my_colored("warning : il existe des villes hors France disponibles pour wotre recherche. Relancez la avec --world pour y acceder", "yellow"))
