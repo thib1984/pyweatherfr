@@ -32,6 +32,7 @@ jobs:
         run: |
           pyweatherfr nantes
           echo 1 | pyweatherfr nantes -w
+          pyweatherfr tokyo -w
           pyweatherfr nouméa -n -v
           pyweatherfr 38700 -j2 --nocache
           pyweatherfr grenoble -p50 --utc -c
@@ -40,6 +41,7 @@ jobs:
           echo 2 | pyweatherfr barcelona -w
           echo 3 | pyweatherfr "london" --lang -w
           echo 3 | pyweatherfr "springfield, USA" -w
+          echo 10 | pyweatherfr "beaulieu, France" | grep "\[11\]" || echo ok
           pyweatherfr -v
       - name: install pep517
         run: |

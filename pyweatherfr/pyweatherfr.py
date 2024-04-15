@@ -796,9 +796,9 @@ def obtain_city_data():
     geopy.geocoders.options.default_ssl_context = ctx
     geolocator = geopy.geocoders.Nominatim(user_agent="my_geocoder")
     if compute_args().lang:
-        locations = geolocator.geocode(town+","+others,exactly_one=False,addressdetails=True,limit=9999)
+        locations = geolocator.geocode(town+","+others,featuretype="city",exactly_one=False,addressdetails=True,limit=9999)
     else:
-        locations = geolocator.geocode(town+","+others,exactly_one=False,addressdetails=True,language="fr",limit=9999)    
+        locations = geolocator.geocode(town+","+others,featuretype="city",exactly_one=False,addressdetails=True,language="fr",limit=9999)    
     choix = []
     if locations is None:
         print(my_colored("erreur : aucune ville trouvée", "red"))
@@ -806,21 +806,21 @@ def obtain_city_data():
     world=False
     print_debug(str(len(locations)) +" villes trouvées")    
     for location in locations:
-        #print_debug(json.dumps(location.raw, indent=4,ensure_ascii=False))
-        if ((location.raw.get("addresstype")=="postcode" and location.raw.get("address").get("country")=="France") or location.raw.get("addresstype")=="hamlet" or location.raw.get("addresstype")=="town" or location.raw.get("addresstype")=="city" or location.raw.get("addresstype")=="municipality" or location.raw.get("addresstype")=="village"):
-            
-            
+        print_debug(json.dumps(location.raw, indent=4,ensure_ascii=False))
+        if ((location.raw.get("addresstype")=="postcode" and location.raw.get("address").get("country")=="France") or location.raw.get("addresstype")=="hamlet" or location.raw.get("addresstype")=="town" or location.raw.get("addresstype")=="city" or location.raw.get("addresstype")=="municipality" or location.raw.get("addresstype")=="village" or location.raw.get("addresstype")=="province"):   
             ville = None
-            if ville is None or (location.raw.get("address").get("hamlet") is not None and (clean_string(location.raw.get("address").get("hamlet").lower())==clean_string(town.lower()))):
-                ville = location.raw.get("address").get("hamlet")
-            if ville is None or (location.raw.get("address").get("village") is not None and (clean_string(location.raw.get("address").get("village").lower())==clean_string(town.lower()))):
-                ville = location.raw.get("address").get("village")
-            if ville is None or (location.raw.get("address").get("municipality") is not None and (clean_string(location.raw.get("address").get("municipality").lower())==clean_string(town.lower()))):
-                ville = location.raw.get("address").get("municipality")
-            if ville is None or (location.raw.get("address").get("town") is not None and (clean_string(location.raw.get("address").get("town").lower())==clean_string(town.lower()))):
-                ville = location.raw.get("address").get("town")               
-            if ville is None or (location.raw.get("address").get("city") is not None and (clean_string(location.raw.get("address").get("city").lower())==clean_string(town.lower()))):
+            if ville is None and (location.raw.get("address").get("province") is not None and (clean_string(location.raw.get("address").get("province").lower())==clean_string(town.lower()))):
+                ville = location.raw.get("address").get("province")                 
+            if ville is None and (location.raw.get("address").get("city") is not None and (clean_string(location.raw.get("address").get("city").lower())==clean_string(town.lower()))):
                 ville = location.raw.get("address").get("city") 
+            if ville is None and (location.raw.get("address").get("town") is not None and (clean_string(location.raw.get("address").get("town").lower())==clean_string(town.lower()))):
+                ville = location.raw.get("address").get("town")               
+            if ville is None and (location.raw.get("address").get("municipality") is not None and (clean_string(location.raw.get("address").get("municipality").lower())==clean_string(town.lower()))):
+                ville = location.raw.get("address").get("municipality")
+            if ville is None and (location.raw.get("address").get("village") is not None and (clean_string(location.raw.get("address").get("village").lower())==clean_string(town.lower()))):
+                ville = location.raw.get("address").get("village")
+            if ville is None and (location.raw.get("address").get("hamlet") is not None and (clean_string(location.raw.get("address").get("hamlet").lower())==clean_string(town.lower()))):
+                ville = location.raw.get("address").get("hamlet")
             dpt = ""
             if location.raw.get("address").get("county") is not None:        
                 dpt = location.raw.get("address").get("county")

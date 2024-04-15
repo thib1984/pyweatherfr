@@ -109,6 +109,7 @@ def compute_args():
         help="activer la recherche hors France",
     )
     my_parser.add_argument(
+        "-l",
         "--lang",
         action="store_true",
         help="recherche (puis affiche) les villes avec leurs noms locaux",
