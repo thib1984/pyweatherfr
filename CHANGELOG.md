@@ -20,6 +20,7 @@
 - [x] bugs beaulieu, il en faut 10 en France
 - [x] completer flags courts et arguments courts
 - [x] tokyo province japon
+- [x] ne remonte que les city (ancenis ne doit pas remonter)
 
 # 5.2.1
 
