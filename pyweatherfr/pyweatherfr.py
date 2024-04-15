@@ -836,8 +836,16 @@ def obtain_city_data():
                     dpt= dpt + ", "+location.raw.get("address").get("country")
 
             country = location.raw.get("address").get("country")
-            if country == "France":
+            if country == "France" and location.raw.get("addresstype")=="postcode":
                 cp = location.raw.get("address").get("postcode")
+                if ville is None and (location.raw.get("address").get("village") is not None):
+                    ville = location.raw.get("address").get("village")              
+                if ville is None and (location.raw.get("address").get("municipality") is not None):
+                    ville = location.raw.get("address").get("municipality")
+                if ville is None and (location.raw.get("address").get("town") is not None):
+                    ville = location.raw.get("address").get("town")               
+                if ville is None and (location.raw.get("address").get("city") is not None):
+                    ville = location.raw.get("address").get("city")                 
             else:
                 cp = ""
             lat = location.raw.get("lat")
