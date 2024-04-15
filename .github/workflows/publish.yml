@@ -39,6 +39,7 @@ jobs:
           pyweatherfr barcelone -n --nocolor -w
           echo 2 | pyweatherfr barcelona -w
           echo 3 | pyweatherfr "london" --lang -w
+          echo 3 | pyweatherfr "springfield, USA" -w
           pyweatherfr -v
       - name: install pep517
         run: |

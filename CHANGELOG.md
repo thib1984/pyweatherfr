@@ -14,6 +14,12 @@
 - [ ] json formater pour le log/debug : https://www.freecodecamp.org/news/how-to-pretty-print-json-in-python/
 - [ ] fichier log dans le dossier config pour completer le mode debug avec dates and co
 
+# 5.2.1
+
+- [x] gère mieux les doublons de villes (meme ville, meme pays)
+- [x] ajoute une options par pays pour affiner la recherche
+- [x] remonte les hamlets
+
 
 # 5.2.0
 

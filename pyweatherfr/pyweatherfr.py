@@ -782,25 +782,37 @@ def obtain_city_data_from_gps():
 
 
 def obtain_city_data():
-
-    town = compute_args().town
+    parties = compute_args().town.split(',')
+    if len(parties)>2:
+        print(my_colored("erreur : format incorrect : attendu 'ville, pays' ou 'ville'","red"))
+        exit(1)
+    if len(parties)==1 and compute_args().world==True:
+        print(my_colored("warning : si la ville souhaitée ne s'affiche pas vous pouvez utiliser le format 'ville, pays' pour la recherche","yellow"))       
+    town = parties[0]
+    others = ','.join(parties[1:])
+    print_debug(town)
+    print_debug(others)
     ctx = ssl.create_default_context(cafile=certifi.where())
     geopy.geocoders.options.default_ssl_context = ctx
     geolocator = geopy.geocoders.Nominatim(user_agent="my_geocoder")
     if compute_args().lang:
-        locations = geolocator.geocode(town,exactly_one=False,addressdetails=True)
+        locations = geolocator.geocode(town+","+others,exactly_one=False,addressdetails=True,limit=9999)
     else:
-        locations = geolocator.geocode(town,exactly_one=False,addressdetails=True,language="fr")    
+        locations = geolocator.geocode(town+","+others,exactly_one=False,addressdetails=True,language="fr",limit=9999)    
     choix = []
     if locations is None:
         print(my_colored("erreur : aucune ville trouvée", "red"))
         exit(1)  
-    world=False    
+    world=False
+    print_debug(str(len(locations)) +" villes trouvées")    
     for location in locations:
-        print_debug(json.dumps(location.raw, indent=4,ensure_ascii=False))
-        if ((location.raw.get("addresstype")=="postcode" and location.raw.get("address").get("country")=="France") or location.raw.get("addresstype")=="town" or location.raw.get("addresstype")=="city" or location.raw.get("addresstype")=="municipality" or location.raw.get("addresstype")=="village"):
+        #print_debug(json.dumps(location.raw, indent=4,ensure_ascii=False))
+        if ((location.raw.get("addresstype")=="postcode" and location.raw.get("address").get("country")=="France") or location.raw.get("addresstype")=="hamlet" or location.raw.get("addresstype")=="town" or location.raw.get("addresstype")=="city" or location.raw.get("addresstype")=="municipality" or location.raw.get("addresstype")=="village"):
+            
             
             ville = None
+            if ville is None or (location.raw.get("address").get("hamlet") is not None and (clean_string(location.raw.get("address").get("hamlet").lower())==clean_string(town.lower()))):
+                ville = location.raw.get("address").get("hamlet")
             if ville is None or (location.raw.get("address").get("village") is not None and (clean_string(location.raw.get("address").get("village").lower())==clean_string(town.lower()))):
                 ville = location.raw.get("address").get("village")
             if ville is None or (location.raw.get("address").get("municipality") is not None and (clean_string(location.raw.get("address").get("municipality").lower())==clean_string(town.lower()))):
@@ -808,14 +820,20 @@ def obtain_city_data():
             if ville is None or (location.raw.get("address").get("town") is not None and (clean_string(location.raw.get("address").get("town").lower())==clean_string(town.lower()))):
                 ville = location.raw.get("address").get("town")               
             if ville is None or (location.raw.get("address").get("city") is not None and (clean_string(location.raw.get("address").get("city").lower())==clean_string(town.lower()))):
-                ville = location.raw.get("address").get("city")        
-            dpt = location.raw.get("address").get("county")
-            if dpt is None:
-                dpt=location.raw.get("address").get("state")
-            if dpt is None:
-                dpt= location.raw.get("address").get("postcode") 
-            if dpt is None or location.raw.get("address").get("country")!="France":
-                dpt= location.raw.get("address").get("country")
+                ville = location.raw.get("address").get("city") 
+            dpt = ""
+            if location.raw.get("address").get("county") is not None:        
+                dpt = location.raw.get("address").get("county")
+            if location.raw.get("address").get("state") is not None:
+                if dpt =="":
+                    dpt = location.raw.get("address").get("state")  
+                else:
+                    dpt = dpt + ", "+ location.raw.get("address").get("state") 
+            if compute_args().world:
+                if dpt =="":                       
+                    dpt= location.raw.get("address").get("country")
+                else:
+                    dpt= dpt + ", "+location.raw.get("address").get("country")
 
             country = location.raw.get("address").get("country")
             if country == "France":
@@ -1096,6 +1114,6 @@ def clean_string(mystring):
     nfkd_form = unicodedata.normalize('NFKD', mystring)
     retour = ''.join([c for c in nfkd_form if not unicodedata.combining(c)])
     retour = retour.replace(' ', '-').replace("'", '-').replace('"', '-')
-    if mystring!=retour:
-        print_debug(mystring + " modifié en " + retour)
+    #if mystring!=retour:
+    #    print_debug(mystring + " modifié en " + retour)
     return retour
