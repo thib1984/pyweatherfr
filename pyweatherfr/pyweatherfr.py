@@ -855,7 +855,7 @@ def obtain_city_data():
                 cp = ""
             lat = location.raw.get("lat")
             long = location.raw.get("lon")
-            if location.raw.get("address").get("country")=="France" and location.raw.get("address").get("municipality") is not None and location.raw.get("address").get("village") is not None and location.raw.get("address").get("city") is not None:
+            if location.raw.get("address").get("country")=="France" and ((location.raw.get("address").get("municipality") is not None and location.raw.get("address").get("village") is not None and location.raw.get("address").get("city") is not None) or (location.raw.get("address").get("municipality") is not None and location.raw.get("address").get("town") is not None and location.raw.get("address").get("city") is not None)):
                 ville=None
             if ville is not None:
                 print_debug(ville+"-"+dpt+"-"+lat+"-"+long+"-"+country)
