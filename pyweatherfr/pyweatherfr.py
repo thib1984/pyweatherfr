@@ -811,7 +811,7 @@ def obtain_city_data():
     print_debug(str(len(locations)) +" villes trouvées")    
     for location in locations:
         print_debug(json.dumps(location.raw, indent=4,ensure_ascii=False))
-        if ((location.raw.get("addresstype")=="postcode" and location.raw.get("address").get("country")=="France") or (location.raw.get("addresstype")=="hamlet" and location.raw.get("address").get("country")!="France") or location.raw.get("addresstype")=="town" or location.raw.get("addresstype")=="city" or location.raw.get("addresstype")=="municipality" or location.raw.get("addresstype")=="village" or location.raw.get("addresstype")=="province"):   
+        if ((location.raw.get("addresstype")=="postcode" and location.raw.get("address").get("country")=="France") or (location.raw.get("addresstype")=="hamlet" and location.raw.get("address").get("country")!="France") or location.raw.get("addresstype")=="town" or location.raw.get("addresstype")=="city" or location.raw.get("addresstype")=="municipality" or location.raw.get("addresstype")=="village" or (location.raw.get("addresstype")=="province" and location.raw.get("address").get("country_code")=="jp")):   
             ville = None
             if ville is None and (location.raw.get("address").get("province") is not None and (clean_string(location.raw.get("address").get("province").lower())==clean_string(town.lower()))):
                 ville = location.raw.get("address").get("province")                 

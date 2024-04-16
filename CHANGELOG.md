@@ -20,6 +20,7 @@
 
 # 5.2.4
 
+- [x] restreint la province au japon
 - [x] ajouter cas d'erreurs dans les tests
 - [x] 5 sprigfiled en Jamaique mais 10 beaulieu en france. si munic/village/city/france on ne remonte pas
 
