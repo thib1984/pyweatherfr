@@ -728,10 +728,12 @@ def obtain_city_data_from_ip():
             ville=""
         lat = str(data["latitude"])
         long = str(data["longitude"])
-        dpt = str(data["state"])
+        dpt = data["state"]
         if dpt is None:
             dpt=""
         country = str(data["country_name"])
+        if country is None:
+            country=""        
         return ville, dpt, lat, long, country
 
 

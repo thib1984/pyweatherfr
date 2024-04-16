@@ -1,5 +1,6 @@
 # A VENIR
 
+- [ ] ip et remontée du state corrigé si non trouvé
 - [ ] emojis compatibles windows et linux
 - [ ] ajouter cas d'erreurs dans les tests
 - [ ] maj captures ecrans
