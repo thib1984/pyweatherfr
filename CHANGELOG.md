@@ -1,6 +1,8 @@
 # A VENIR
 
 
+
+
 - [ ] emojis compatibles windows et linux
 - [ ] ajouter cas d'erreurs dans les tests
 - [ ] maj captures ecrans
@@ -16,16 +18,20 @@
 - [ ] json formater pour le log/debug : https://www.freecodecamp.org/news/how-to-pretty-print-json-in-python/
 - [ ] fichier log dans le dossier config pour completer le mode debug avec dates and co
 
+# 5.2.4
+
+- [x] ajouter cas d'erreurs dans les tests
+- [x] 5 sprigfiled en Jamaique mais 10 beaulieu en france. si munic/village/city/france on ne remonte pas
+
 # 5.2.3
 
 - [x] ip et remontée du state corrigé si non trouvé
 
 # 5.2.2
 
-- [x] bugs beaulieu, il en faut 10 en France
 - [x] completer flags courts et arguments courts
 - [x] tokyo province japon
-- [x] ne remonte que les city (ancenis ne doit pas remonter)
+- [x] ne remonte que les city (ancenis ne doit pas remonter + beaulieu, il en faut 10 en France)
 
 # 5.2.1
 

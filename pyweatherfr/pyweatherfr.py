@@ -51,14 +51,16 @@ CLOCK = "\U000023F0"
 THERMO = "\U0001F321"
 HUMIDITE = "\U0001F4A7"
 PLUIE = "\U0001F327"
-FLECHE_N = "\U00002B07"
+
+FLECHE_N = "\U00002193"
 FLECHE_NO = "\U00002198"
-FLECHE_O = "\U000027A1"
+FLECHE_O = "\U00002192"
 FLECHE_SO = "\U00002197"
-FLECHE_S = "\U00002B06"
+FLECHE_S = "\U00002191"
 FLECHE_SE = "\U00002196"
-FLECHE_E = "\U00002B05"
+FLECHE_E = "\U00002190"
 FLECHE_NE = "\U00002199"
+
 ELEPHANT = "\U0001F418"
 PLUME = "\U0001FAB6"
 PC ="\U0001f4bb"
@@ -798,9 +800,9 @@ def obtain_city_data():
     geopy.geocoders.options.default_ssl_context = ctx
     geolocator = geopy.geocoders.Nominatim(user_agent="my_geocoder")
     if compute_args().lang:
-        locations = geolocator.geocode(town+","+others,featuretype="city",exactly_one=False,addressdetails=True,limit=9999)
+        locations = geolocator.geocode(town+","+others,exactly_one=False,addressdetails=True,limit=9999)
     else:
-        locations = geolocator.geocode(town+","+others,featuretype="city",exactly_one=False,addressdetails=True,language="fr",limit=9999)    
+        locations = geolocator.geocode(town+","+others,exactly_one=False,addressdetails=True,language="fr",limit=9999)    
     choix = []
     if locations is None:
         print(my_colored("erreur : aucune ville trouvée", "red"))
@@ -809,7 +811,7 @@ def obtain_city_data():
     print_debug(str(len(locations)) +" villes trouvées")    
     for location in locations:
         print_debug(json.dumps(location.raw, indent=4,ensure_ascii=False))
-        if ((location.raw.get("addresstype")=="postcode" and location.raw.get("address").get("country")=="France") or location.raw.get("addresstype")=="hamlet" or location.raw.get("addresstype")=="town" or location.raw.get("addresstype")=="city" or location.raw.get("addresstype")=="municipality" or location.raw.get("addresstype")=="village" or location.raw.get("addresstype")=="province"):   
+        if ((location.raw.get("addresstype")=="postcode" and location.raw.get("address").get("country")=="France") or (location.raw.get("addresstype")=="hamlet" and location.raw.get("address").get("country")!="France") or location.raw.get("addresstype")=="town" or location.raw.get("addresstype")=="city" or location.raw.get("addresstype")=="municipality" or location.raw.get("addresstype")=="village" or location.raw.get("addresstype")=="province"):   
             ville = None
             if ville is None and (location.raw.get("address").get("province") is not None and (clean_string(location.raw.get("address").get("province").lower())==clean_string(town.lower()))):
                 ville = location.raw.get("address").get("province")                 
@@ -823,6 +825,7 @@ def obtain_city_data():
                 ville = location.raw.get("address").get("village")
             if ville is None and (location.raw.get("address").get("hamlet") is not None and (clean_string(location.raw.get("address").get("hamlet").lower())==clean_string(town.lower()))):
                 ville = location.raw.get("address").get("hamlet")
+
             dpt = ""
             if location.raw.get("address").get("county") is not None:        
                 dpt = location.raw.get("address").get("county")
@@ -852,6 +855,8 @@ def obtain_city_data():
                 cp = ""
             lat = location.raw.get("lat")
             long = location.raw.get("lon")
+            if location.raw.get("address").get("country")=="France" and location.raw.get("address").get("municipality") is not None and location.raw.get("address").get("village") is not None and location.raw.get("address").get("city") is not None:
+                ville=None
             if ville is not None:
                 print_debug(ville+"-"+dpt+"-"+lat+"-"+long+"-"+country)
                 if (clean_string(ville.lower()) == clean_string(town.lower()) or cp.lower() == town.lower()):
@@ -865,7 +870,7 @@ def obtain_city_data():
                                 world=True    
     if not compute_args().world and world:
         print("")
-        print(my_colored("warning : il existe des villes hors France disponibles pour wotre recherche. Relancez la avec --world pour y acceder", "yellow"))
+        print(my_colored("warning : il existe des villes hors France disponibles pour wotre recherche. Relancez la avec -w pour y acceder", "yellow"))
     if len(choix)==1:
         choice = choix[0]
         ville = choice[1]

@@ -41,9 +41,14 @@ jobs:
           echo 2 | pyweatherfr barcelona -w
           echo 3 | pyweatherfr "london" --lang -w
           echo 3 | pyweatherfr "springfield, USA" -w
-          echo 10 | pyweatherfr "beaulieu, France" | grep "\[11\]" || echo ok
+          echo 10 | pyweatherfr "beaulieu, France"
+          echo 10 | pyweatherfr "beaulieu, France"| grep "\[11\]" || echo ok
+          echo 5 | pyweatherfr "springfield, Jamaique" -w
+          echo 5 | pyweatherfr "springfield, Jamaique" -w | grep "\[6\]" || echo ok
           pyweatherfr -v
           (pyweatherfr ancenis || echo ok) | grep aucune
+          (pyweatherfr tokyo || echo ok) | grep aucune
+          (pyweatherfr tokyo || echo ok) | grep "Relancez la avec --world"
       - name: install pep517
         run: |
           pip install pep517
