@@ -1,6 +1,6 @@
 # A VENIR
 
-- [ ] ip et remontée du state corrigé si non trouvé
+
 - [ ] emojis compatibles windows et linux
 - [ ] ajouter cas d'erreurs dans les tests
 - [ ] maj captures ecrans
@@ -15,6 +15,10 @@
 - [ ] ajouter log version and co pour issue : https://github.com/thib1984/ytdlmusic/blob/main/ytdlmusic/print.py
 - [ ] json formater pour le log/debug : https://www.freecodecamp.org/news/how-to-pretty-print-json-in-python/
 - [ ] fichier log dans le dossier config pour completer le mode debug avec dates and co
+
+# 5.2.3
+
+- [x] ip et remontée du state corrigé si non trouvé
 
 # 5.2.2
 
