@@ -110,9 +110,12 @@ def diff_jour(long,lat):
         diff = (pytz.timezone(tz).localize(datetime.datetime.strptime(compute_args().date, "%Y-%m-%d")) - datetime.datetime.now(tz=pytz.timezone(tz))).days +1
         print_debug(str(diff) + " jours")
         if diff>=15:
-            print(my_colored("erreur : date invalide (limitée à +15 jour de la date actuelle)", "red"))
+            print(my_colored("erreur : date invalide (limitée à +14 jour de la date actuelle)", "red"))
             exit(1)
-        return diff     
+        return diff
+    if compute_args().jour>=15:
+        print(my_colored("erreur : date invalide (limitée à +14 jour de la date actuelle)", "red"))
+        exit(1)                 
     return compute_args().jour
 
 def est_format_date(chaine):
