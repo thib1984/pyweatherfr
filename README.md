@@ -43,7 +43,6 @@ exemple : ``pyweatherfr Grenoble -d 2024-03-30`` affiche les données météo d�
   - ``-w/--world``  recherche la ville en pramètre dans le monde et non seulement en France
   - ``-h/--help``    montrer l'aide
   - ``-u/--update``  update pyweatherfr
-  - ``-c/--condensate``  condense la sortie
   - ``--nocolor``  désactive les couleurs et les emojis en sortie
   - ``-v/--verbose``  mode verbeux
   - ``--nocache``  supprime le cache de l'api meteo france avant l'appel

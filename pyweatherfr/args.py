@@ -126,12 +126,6 @@ def compute_args():
         help="utilise l'heure UTC",
     )          
     my_parser.add_argument(
-        "-c",
-        "--condensate",
-        action="store_true",
-        help="condenser la sortie",
-    )
-    my_parser.add_argument(
         "--nocache",
         action="store_true",
         help="supprime le cache de l'api meteo france",

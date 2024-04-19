@@ -126,7 +126,6 @@ def est_format_date(chaine):
         return False
 
 def find():
-
     if compute_args().town:
         ville, dpt, lat, long,country = obtain_city_data()
     elif compute_args().gps:
@@ -282,9 +281,9 @@ def previsions_detaillees(ville, dpt, lat, long, tz):
             "date",
             "temps",
             "température (ressentie)",
-            "précipitations",
+            "pluie",
             "vent (rafales)",
-            "direction vent",
+            "dir.",
             "pression",
             "humidité",
             "rayonnement"            
@@ -294,9 +293,9 @@ def previsions_detaillees(ville, dpt, lat, long, tz):
             "date",
             "temps",
             "température (ressentie)",
-            "précipitations",
+            "pluie",
             "vent (rafales)",
-            "direction vent",
+            "dir.",
             "pression",
             "humidité",
             "rayonnement",            
@@ -304,11 +303,8 @@ def previsions_detaillees(ville, dpt, lat, long, tz):
         ]
 
     if data != []:
-        if compute_args().condensate:
-            table = columnar.columnar(data, headers, no_borders=True, wrap_max=0)
-        else:
-            print("")
-            table = columnar.columnar(data, headers, no_borders=False, wrap_max=0)
+        print("")
+        table = columnar.columnar(data, headers, no_borders=False, wrap_max=0)
         print(table)
 
 def calculer_direction(direction_vent_degres):
@@ -389,7 +385,7 @@ def traduction(current_weather_code,jour):
     if current_weather_code >= 20 and current_weather_code <= 29:
         return ["fin de pluie", RAIN]
     if current_weather_code >= 30 and current_weather_code <= 39:
-        return ["tempete de poussière, sable ou neige", FOG]
+        return ["tempete", FOG]
     if current_weather_code >= 40 and current_weather_code <= 49:
         return ["brouillard", FOG]
     if current_weather_code >= 50 and current_weather_code <= 59:
@@ -399,7 +395,7 @@ def traduction(current_weather_code,jour):
     if current_weather_code >= 70 and current_weather_code <= 79:
         return ["neige", SNOW]
     if current_weather_code >= 80 and current_weather_code <= 99:
-        return ["averse / orage", ORAGE_PLUIE]
+        return ["averse-orage", ORAGE_PLUIE]
     return ["", ""]
 
 def previsions_courantes(ville, dpt, lat, long, tz):
@@ -510,11 +506,8 @@ def previsions_courantes(ville, dpt, lat, long, tz):
         else:      
             data.append(["rayonnement", f"{w_soleil:.0f}W/m\u00B2",""]) 
         data.append(["temps", emojiweather + " " + current_weather, ""])
-    if compute_args().condensate:
-        table = columnar.columnar(data, no_borders=True, wrap_max=0)
-    else:
-        print("")
-        table = columnar.columnar(data, no_borders=False, wrap_max=0)
+    print("")
+    table = columnar.columnar(data, no_borders=False, wrap_max=0)
     print(table)
 
 
@@ -562,7 +555,10 @@ def previsions_generiques(ville, dpt, lat, long, tz):
                 warning = warning + " " + SNOW
             elif daily_precipitation_sum[i] >= WARNING_RAIN:
                 warning = warning + " " + RAIN
-            temp = f"{daily_temperature_2m_min[i]:.1f}°C ({daily_apparent_temperature_min[i]:.1f}°C) -> {daily_temperature_2m_max[i]:.1f}°C ({daily_apparent_temperature_max[i]:.1f}°C)"
+            if os.get_terminal_size().columns > 140:    
+                temp = f"{daily_temperature_2m_min[i]:.1f}°C ({daily_apparent_temperature_min[i]:.1f}°C) -> {daily_temperature_2m_max[i]:.1f}°C ({daily_apparent_temperature_max[i]:.1f}°C)"
+            else:
+                temp = f"{daily_temperature_2m_min[i]:.0f}°C -> {daily_temperature_2m_max[i]:.0f}°C"
             if (
                 daily_temperature_2m_min[i] <= WARNING_FROID
                 or daily_apparent_temperature_min[i] <= WARNING_FROID
@@ -579,7 +575,7 @@ def previsions_generiques(ville, dpt, lat, long, tz):
                 warning = warning + " " + WARM
             weather, emojiweather = traduction(weather_code[i],1)
 
-            vent = f"{daily_wind_speed_10m_max[i]:.1f}km/h ({daily_wind_gusts_10m_max[i]:.1f}km/h)"
+            vent = f"{daily_wind_speed_10m_max[i]:.0f}km/h ({daily_wind_gusts_10m_max[i]:.0f}km/h)"
             direction=calculer_direction(daily_wind_direction_10m_dominant[i])
 
 
@@ -589,78 +585,141 @@ def previsions_generiques(ville, dpt, lat, long, tz):
             duree_pluie = f"{precipitation_hours[i]:.0f}h"
             duree_soleil = f"{sunshine_duration[i]/3600:.1f}h"
             if compute_args().nocolor:
-                data.append(
-                    [
-                        datetime.datetime.strftime(
-                            datetime.datetime.now(tz=pytz.timezone(tz)).replace(
-                                hour=0, minute=0, second=0, microsecond=0
-                            )
-                            + datetime.timedelta(hours=24 * i),
-                            "%Y-%m-%d",
-                        ),
-                        weather,
-                        temp,
-                        pluie,
-                        vent,
-                        direction,
-                        duree_pluie,
-                        duree_soleil
-                    ]
-                )
+                if os.get_terminal_size().columns > 140:
+                    data.append(
+                        [
+                            datetime.datetime.strftime(
+                                datetime.datetime.now(tz=pytz.timezone(tz)).replace(
+                                    hour=0, minute=0, second=0, microsecond=0
+                                )
+                                + datetime.timedelta(hours=24 * i),
+                                "%Y-%m-%d",
+                            ),
+                            weather,
+                            temp,
+                            pluie,
+                            vent,
+                            direction,
+                            duree_pluie,
+                            duree_soleil
+                        ]
+                    )
+                else:
+                    data.append(
+                        [
+                            datetime.datetime.strftime(
+                                datetime.datetime.now(tz=pytz.timezone(tz)).replace(
+                                    hour=0, minute=0, second=0, microsecond=0
+                                )
+                                + datetime.timedelta(hours=24 * i),
+                                "%y-%m-%d",
+                            ),
+                            weather,
+                            temp,
+                            pluie,
+                            vent,
+                            direction
+                        ]
+                    )
             else:
-                data.append(
-                    [
-                        datetime.datetime.strftime(
-                            datetime.datetime.now(tz=pytz.timezone(tz)).replace(
-                                hour=0, minute=0, second=0, microsecond=0
-                            )
-                            + datetime.timedelta(hours=24 * i)
-                            + datetime.timedelta(days=-1*compute_args().past),
-                            "%Y-%m-%d",
-                        ),
-                        emojiweather + " " + weather,
-                        temp,
-                        pluie,
-                        vent,
-                        direction,
-                        duree_pluie,
-                        duree_soleil,
-                        warning,
-                    ]
-                )
+                if os.get_terminal_size().columns > 140:
+
+                    data.append(
+                        [
+                            datetime.datetime.strftime(
+                                datetime.datetime.now(tz=pytz.timezone(tz)).replace(
+                                    hour=0, minute=0, second=0, microsecond=0
+                                )
+                                + datetime.timedelta(hours=24 * i)
+                                + datetime.timedelta(days=-1*compute_args().past),
+                                "%Y-%m-%d",
+                            ),
+                            emojiweather + " " + weather,
+                            temp,
+                            pluie,
+                            vent,
+                            direction,
+                            duree_pluie,
+                            duree_soleil,
+                            warning,
+                        ]
+                    )
+                else:
+                    data.append(
+                        [
+                            datetime.datetime.strftime(
+                                datetime.datetime.now(tz=pytz.timezone(tz)).replace(
+                                    hour=0, minute=0, second=0, microsecond=0
+                                )
+                                + datetime.timedelta(hours=24 * i)
+                                + datetime.timedelta(days=-1*compute_args().past),
+                                "%y-%m-%d",
+                            ),
+                            emojiweather + " " + weather,
+                            temp,
+                            pluie,
+                            vent,
+                            direction,
+                            warning,
+                        ]
+                    )
         else:
             tronque=True
     if data != []:
         if compute_args().nocolor:
-            headers = [
-                "date",
-                "temps",
-                "température (ressentie)",
-                "précipitations",
-                "vent (rafales)",
-                "direction",
-                "durée pluie",
-                "durée soleil"
-            ]
+            if os.get_terminal_size().columns > 140:
+            
+                headers = [
+                    "date",
+                    "temps",
+                    "température (ressentie)",
+                    "pluie",
+                    "vent (rafales)",
+                    "direction",
+                    "tps pluie",
+                    "tps soleil"
+                ]
+            else:
+                headers = [
+                    "date",
+                    "temps",
+                    "température",
+                    "pluie",
+                    "vent (rafales)",
+                    "direction"
+                ]                
         else:
-            headers = [
-                "date",
-                "temps",
-                "température (ressentie)",
-                "précipitations",
-                "vent (rafales)",
-                "direction vent",
-                "durée pluie",
-                "durée soleil",
-                "warning",
-            ]
+            if os.get_terminal_size().columns > 140:
 
-        if compute_args().condensate:
-            table = columnar.columnar(data, headers, no_borders=True, wrap_max=0)
-        else:
-            print("")
-            table = columnar.columnar(data, headers, no_borders=False, wrap_max=0)
+                headers = [
+                    "date",
+                    "temps",
+                    "température (ressentie)",
+                    "pluie",
+                    "vent (rafales)",
+                    "dir.",
+                    "tps pluie",
+                    "tps soleil",
+                    "",
+                ]
+            else:
+                                headers = [
+                    "date",
+                    "temps",
+                    "température",
+                    "pluie",
+                    "vent (rafales)",
+                    "dir.",
+                    "",
+                ]
+
+
+        print("")
+        table = columnar.columnar(data, headers, no_borders=False, wrap_max=0)
         print(table)
+        if not os.get_terminal_size().columns > 140:
+            print(my_colored("warning : pour + d'affichage, élargissez votre terminal", "yellow"))
+
     if tronque:
         print(my_colored("warning : données tronquées", "yellow"))
 
@@ -686,10 +745,9 @@ def print_generic_data_town(ville, dpt, lat, long, alt, recap):
             data.append([HOME, ville + " (" + dpt + ")"])
         data.append([BOUSSOLE, f"lat.:  {float(lat):.4f}°  / long.: {float(long):.4f}° / alt.: {float(alt):.0f}m "])
         data.append([PC,recap])
-    if compute_args().condensate:
-        table = columnar.columnar(data, no_borders=True, wrap_max=0)
-    else:
-        table = columnar.columnar(data, no_borders=False, wrap_max=0)
+
+
+    table = columnar.columnar(data, no_borders=False, wrap_max=0)
 
     print(table)
 
