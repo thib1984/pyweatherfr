@@ -1,7 +1,8 @@
-# A VENIR
+# A VENIR 5.3.0
 
-- [ ] pyweatherfr moscou -w -j50
 
+- [ ] mode responsive
+- [ ] supprimer --condensate
 
 - [ ] emojis compatibles windows et linux
 - [ ] ajouter cas d'erreurs dans les tests
@@ -11,12 +12,14 @@
 - [ ] marqué en rouge les records de chaque zone
 - [ ] integrer test sur heure soleil si ==3 si lumineux et ou petite pluie
 - [ ] comparer boundingbox openstreetmap pour doublons
-- [ ] mode full pour humidité/pression/soleil etc
-- [ ] mode minimal pour temps / pluie uniquement (uniquement emoji si non nocolor)
 - [ ] clean code
 - [ ] ajouter log version and co pour issue : https://github.com/thib1984/ytdlmusic/blob/main/ytdlmusic/print.py
 - [ ] json formater pour le log/debug : https://www.freecodecamp.org/news/how-to-pretty-print-json-in-python/
 - [ ] fichier log dans le dossier config pour completer le mode debug avec dates and co
+
+# 5.2.5
+
+- [x] limite les recherche par -j à 14j
 
 # 5.2.4
 
