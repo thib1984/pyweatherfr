@@ -374,7 +374,11 @@ def previsions_detaillees(ville, dpt, lat, long, tz):
             print(my_colored("warning : pour + d'affichage, élargissez votre terminal", "yellow"))
 
 def isFullWidth():
-    return os.get_terminal_size().columns > 140 or compute_args().fullwidth
+    try:
+        return os.get_terminal_size().columns > 140 or compute_args().fullwidth
+    except Exception:
+        print_debug("détection impossible de la largeur du terminal")
+        return True
 
 def calculer_direction(direction_vent_degres):
     if (
