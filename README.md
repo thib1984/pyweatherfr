@@ -4,7 +4,7 @@ pyweatherfr affiche les prévisions méteo pour les communes françaises (voire 
 
 
 # 🚀 Comment utiliser **pyweatherfr**
-
+![image](./demo_02.png)
 pyweatherfr affiche les prévisions météo sur 4 jours en se basant sur l'ip
 
 pyweatherfr \[VILLE\]
@@ -53,9 +53,12 @@ exemple : ``pyweatherfr Grenoble -d 2024-03-30`` affiche les données météo d�
 
 # Démo
 
-![image](./demo_01.png)
+![image](https://github.com/thib1984/pyweatherfr/assets/45128847/9b0c5353-8e1b-4dfa-86b5-e2d5472a6cf2)
 
-![image](./demo_02.png)
+![image](https://github.com/thib1984/pyweatherfr/assets/45128847/e92ceca0-e542-4c15-8eea-6a6067d55af8)
+
+![image](https://github.com/thib1984/pyweatherfr/assets/45128847/2d938bcd-3ee9-432b-a02d-080147ccc974)
+
 
 # ⚙️ Install
 
