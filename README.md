@@ -48,8 +48,8 @@ exemple : ``pyweatherfr Grenoble -d 2024-03-30`` affiche les données météo d�
   - ``--nocache``  supprime le cache de l'api meteo france avant l'appel
   - ``--utc``    utilise l'heure utc dans les previsions au lieu de l'heure locale de la ville
   - ``--pc``    utilise l'heure du pc dans les previsions au lieu de l'heure locale de la ville
-  - ``-l/--lang` recherche (puis affiche) les villes avec leurs noms locaux
-  - ``-f/--fullwidth` affiche toutes les données y compris si la largeur du terminal est trop petite  
+  - ``-l/--lang`` recherche (puis affiche) les villes avec leurs noms locaux
+  - ``-f/--fullwidth`` affiche toutes les données y compris si la largeur du terminal est trop petite  
 
 # Démo
 
