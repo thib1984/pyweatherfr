@@ -199,9 +199,14 @@ def previsions_detaillees(ville, dpt, lat, long, tz):
             and 0 < h - int(datetime.datetime.now(tz=pytz.timezone(tz)).strftime("%H")) <= 1
         ):
             warning = warning + " " + CLOCK
-        temp = (
-            f"{hourly_temperature_2m[h]:.1f}°C ({hourly_apparent_temperature[h]:.1f}°C)"
-        )
+        if isFullWidth():    
+            temp = (
+                f"{hourly_temperature_2m[h]:.1f}°C ({hourly_apparent_temperature[h]:.1f}°C)"
+            )
+        else:
+            temp = (
+                f"{hourly_temperature_2m[h]:.0f}°C"
+            )               
         if hourly_temperature_2m[h] <= WARNING_FROID or hourly_apparent_temperature[h] <= WARNING_FROID:
             warning = warning + " " + COLD
         if hourly_temperature_2m[h] >= WARNING_WARM or hourly_apparent_temperature[h] >= WARNING_WARM:
@@ -213,7 +218,7 @@ def previsions_detaillees(ville, dpt, lat, long, tz):
             warning = warning + " " + RAIN
 
         vent = (
-            f"{hourly_wind_speed_10m[h]:.1f}km/h ({hourly_wind_gusts_10m[h]:.1f}km/h)"
+            f"{hourly_wind_speed_10m[h]:.0f}km/h ({hourly_wind_gusts_10m[h]:.0f}km/h)"
         )
         direction = calculer_direction(hourly_wind_direction_10m[h])
 
@@ -233,79 +238,143 @@ def previsions_detaillees(ville, dpt, lat, long, tz):
         if shortwave_radiation[h]>1000:
             warning = warning + " " + LUNETTES   
         if compute_args().nocolor:
-            data.append(
-                [
-                    datetime.datetime.strftime(
-                        datetime.datetime.now(tz=pytz.timezone(tz)).replace(
-                            hour=0, minute=0, second=0, microsecond=0
-                        )
-                        + datetime.timedelta(days=new_var)
-                        + datetime.timedelta(hours=h),
-                        "%Y-%m-%d %H:%M",
-                    ),
-                    weather,
-                    temp,
-                    pluie,
-                    vent,
-                    direction,
-                    pression,
-                    humidity,
-                    rayonnement,
-                ]
-            )
+            if isFullWidth():
+                data.append(
+                    [
+                        datetime.datetime.strftime(
+                            datetime.datetime.now(tz=pytz.timezone(tz)).replace(
+                                hour=0, minute=0, second=0, microsecond=0
+                            )
+                            + datetime.timedelta(days=new_var)
+                            + datetime.timedelta(hours=h),
+                            "%H:%M",
+                        ),
+                        weather,
+                        temp,
+                        pluie,
+                        vent,
+                        direction,
+                        pression,
+                        humidity,
+                        rayonnement,
+                    ]
+                )
+            else:
+                data.append(
+                    [
+                        datetime.datetime.strftime(
+                            datetime.datetime.now(tz=pytz.timezone(tz)).replace(
+                                hour=0, minute=0, second=0, microsecond=0
+                            )
+                            + datetime.timedelta(days=new_var)
+                            + datetime.timedelta(hours=h),
+                            "%H:%M",
+                        ),
+                        weather,
+                        temp,
+                        pluie,
+                        vent,
+                        direction
+                    ]
+                )                    
         else:
-            data.append(
-                [
-                    datetime.datetime.strftime(
-                        datetime.datetime.now(tz=pytz.timezone(tz)).replace(
-                            hour=0, minute=0, second=0, microsecond=0
-                        )
-                        + datetime.timedelta(days=new_var)
-                        + datetime.timedelta(hours=h),
-                        "%Y-%m-%d %H:%M",
-                    ),
-                    emojiweather + " " + weather,
-                    temp,
-                    pluie,
-                    vent,
-                    direction,
-                    pression,
-                    humidity,
-                    rayonnement,
-                    warning,
-                ]
-            )
+            if isFullWidth():
+                data.append(
+                    [
+                        datetime.datetime.strftime(
+                            datetime.datetime.now(tz=pytz.timezone(tz)).replace(
+                                hour=0, minute=0, second=0, microsecond=0
+                            )
+                            + datetime.timedelta(days=new_var)
+                            + datetime.timedelta(hours=h),
+                            "%H:%M",
+                        ),
+                        emojiweather + " " + weather,
+                        temp,
+                        pluie,
+                        vent,
+                        direction,
+                        pression,
+                        humidity,
+                        rayonnement,
+                        warning,
+                    ]
+                )
+            else:
+                data.append(
+                    [
+                        datetime.datetime.strftime(
+                            datetime.datetime.now(tz=pytz.timezone(tz)).replace(
+                                hour=0, minute=0, second=0, microsecond=0
+                            )
+                            + datetime.timedelta(days=new_var)
+                            + datetime.timedelta(hours=h),
+                            "%H:%M",
+                        ),
+                        emojiweather + " " + weather,
+                        temp,
+                        pluie,
+                        vent,
+                        direction,
+                        warning,
+                    ]
+                )                    
 
     if compute_args().nocolor:
-        headers = [
-            "date",
-            "temps",
-            "température (ressentie)",
-            "pluie",
-            "vent (rafales)",
-            "dir.",
-            "pression",
-            "humidité",
-            "rayonnement"            
-        ]
+        if isFullWidth():
+            headers = [
+                "heure",
+                "temps",
+                "température (ressentie)",
+                "pluie",
+                "vent (rafales)",
+                "dir.",
+                "pression",
+                "humidité",
+                "rayonnement"            
+            ]
+        else:
+            headers = [
+                "heure",
+                "temps",
+                "température",
+                "pluie",
+                "vent (rafales)",
+                "dir."         
+            ]                
     else:
-        headers = [
-            "date",
-            "temps",
-            "température (ressentie)",
-            "pluie",
-            "vent (rafales)",
-            "dir.",
-            "pression",
-            "humidité",
-            "rayonnement",            
-            "warnings",
-        ]
-
+        if isFullWidth():
+            headers = [
+                "heure",
+                "temps",
+                "température (ressentie)",
+                "pluie",
+                "vent (rafales)",
+                "dir.",
+                "pression",
+                "humidité",
+                "rayonnement",            
+                "/!\\",
+            ]
+        else:
+            headers = [
+                "heure",
+                "temps",
+                "température",
+                "pluie",
+                "vent (rafales)",
+                "dir.",          
+                "/!\\",
+            ]            
     if data != []:
         print("")
         table = columnar.columnar(data, headers, no_borders=False, wrap_max=0)
         print(table)
+        if not isFullWidth():
+            print(my_colored("warning : pour + d'affichage, élargissez votre terminal", "yellow"))
+
+def isFullWidth():
+    return os.get_terminal_size().columns > 140 or compute_args().fullwidth
 
 def calculer_direction(direction_vent_degres):
     if (
@@ -555,7 +624,7 @@ def previsions_generiques(ville, dpt, lat, long, tz):
                 warning = warning + " " + SNOW
             elif daily_precipitation_sum[i] >= WARNING_RAIN:
                 warning = warning + " " + RAIN
-            if os.get_terminal_size().columns > 140:    
+            if isFullWidth():    
                 temp = f"{daily_temperature_2m_min[i]:.1f}°C ({daily_apparent_temperature_min[i]:.1f}°C) -> {daily_temperature_2m_max[i]:.1f}°C ({daily_apparent_temperature_max[i]:.1f}°C)"
             else:
                 temp = f"{daily_temperature_2m_min[i]:.0f}°C -> {daily_temperature_2m_max[i]:.0f}°C"
@@ -585,7 +654,7 @@ def previsions_generiques(ville, dpt, lat, long, tz):
             duree_pluie = f"{precipitation_hours[i]:.0f}h"
             duree_soleil = f"{sunshine_duration[i]/3600:.1f}h"
             if compute_args().nocolor:
-                if os.get_terminal_size().columns > 140:
+                if isFullWidth():
                     data.append(
                         [
                             datetime.datetime.strftime(
@@ -622,7 +691,7 @@ def previsions_generiques(ville, dpt, lat, long, tz):
                         ]
                     )
             else:
-                if os.get_terminal_size().columns > 140:
+                if isFullWidth():
 
                     data.append(
                         [
@@ -667,7 +736,7 @@ def previsions_generiques(ville, dpt, lat, long, tz):
             tronque=True
     if data != []:
         if compute_args().nocolor:
-            if os.get_terminal_size().columns > 140:
+            if isFullWidth():
             
                 headers = [
                     "date",
@@ -689,7 +758,7 @@ def previsions_generiques(ville, dpt, lat, long, tz):
                     "direction"
                 ]                
         else:
-            if os.get_terminal_size().columns > 140:
+            if isFullWidth():
 
                 headers = [
                     "date",
@@ -717,7 +786,7 @@ def previsions_generiques(ville, dpt, lat, long, tz):
         print("")
         table = columnar.columnar(data, headers, no_borders=False, wrap_max=0)
         print(table)
-        if not os.get_terminal_size().columns > 140:
+        if not isFullWidth():
             print(my_colored("warning : pour + d'affichage, élargissez votre terminal", "yellow"))
 
     if tronque:

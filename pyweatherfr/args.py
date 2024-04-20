@@ -109,6 +109,12 @@ def compute_args():
         help="activer la recherche hors France",
     )
     my_parser.add_argument(
+        "-f",
+        "--fullwidth",
+        action="store_true",
+        help="force l'affichage de toutes les données",
+    )    
+    my_parser.add_argument(
         "-l",
         "--lang",
         action="store_true",

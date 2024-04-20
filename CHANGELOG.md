@@ -1,8 +1,8 @@
 # A VENIR 5.3.0
 
 
-- [ ] mode responsive
-- [ ] supprimer --condensate
+- [x] supprimer --condensate
+- [x] mode responsive / -f / / retrait -c
 
 - [ ] emojis compatibles windows et linux
 - [ ] ajouter cas d'erreurs dans les tests
@@ -28,7 +28,7 @@
 - [x] 5 sprigfiled en Jamaique mais 10 beaulieu en france. si munic/village/city/france on ne remonte pas
 
 # 5.2.3
-
+width
 - [x] ip et remontée du state corrigé si non trouvé
 
 # 5.2.2

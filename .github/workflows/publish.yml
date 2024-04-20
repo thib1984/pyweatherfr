@@ -35,7 +35,7 @@ jobs:
           pyweatherfr tokyo -w
           pyweatherfr nouméa -n -v
           pyweatherfr 38700 -j2 --nocache
-          pyweatherfr grenoble -p50 --utc -c
+          pyweatherfr grenoble -p50 --utc -f
           pyweatherfr Ancenis-Saint-Géréon -p3 --pc --nocolor
           pyweatherfr barcelone -n --nocolor -w
           echo 2 | pyweatherfr barcelona -w
