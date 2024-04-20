@@ -1,13 +1,13 @@
 # :sunny: :umbrella: :cloud: pyweatherfr
 
-pyweatherfr affiche les prévisions méteo pour les communes françaises (voire mondiales) dans votre terminal. Il utilise l'API de MéteoFrance
+pyweatherfr affiche les prévisions méteo pour les communes françaises (voire mondiales) dans votre terminal. Il utilise l'API de MéteoFrance et d'OpenStreetMap.
 
 
 # 🚀 Comment utiliser **pyweatherfr**
-![image](./demo_02.png)
-pyweatherfr affiche les prévisions météo sur 4 jours en se basant sur l'ip
 
 pyweatherfr \[VILLE\]
+
+exemple : ``pyweatherfr`` affiche les prévisions météo pour la ville trouvée en se basant sur l'ip
 
 exemple : ``pyweatherfr Grenoble`` affiche les prévisions météo pour Grenoble sur 4 jours
 
@@ -57,7 +57,7 @@ exemple : ``pyweatherfr Grenoble -d 2024-03-30`` affiche les données météo d�
 
 ![image](https://github.com/thib1984/pyweatherfr/assets/45128847/e92ceca0-e542-4c15-8eea-6a6067d55af8)
 
-![image](https://github.com/thib1984/pyweatherfr/assets/45128847/2d938bcd-3ee9-432b-a02d-080147ccc974)
+![image](https://githubpour Grenoble sur 4 jours.com/thib1984/pyweatherfr/assets/45128847/2d938bcd-3ee9-432b-a02d-080147ccc974)
 
 
 # ⚙️ Install
