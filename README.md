@@ -57,7 +57,9 @@ exemple : ``pyweatherfr Grenoble -d 2024-03-30`` affiche les données météo d�
 
 ![image](https://github.com/thib1984/pyweatherfr/assets/45128847/e92ceca0-e542-4c15-8eea-6a6067d55af8)
 
-![image](https://githubpour Grenoble sur 4 jours.com/thib1984/pyweatherfr/assets/45128847/2d938bcd-3ee9-432b-a02d-080147ccc974)
+![image](https://github/thib1984/pyweatherfr/assets/45128847/2d938bcd-3ee9-432b-a02d-080147ccc974)
+
+![image](https://github.com/thib1984/pyweatherfr/assets/45128847/b75a6a03-74fa-42b4-8cf5-24b15f35fa21)
 
 
 # ⚙️ Install
