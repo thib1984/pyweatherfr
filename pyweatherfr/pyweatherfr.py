@@ -226,7 +226,7 @@ def previsions_detaillees(ville, dpt, lat, long, tz):
         if hourly_wind_speed_10m[h] >= WARNING_WIND or hourly_wind_gusts_10m[h] >= WARNING_WIND_GUST:
             warning = warning + " " + WIND
 
-        pression = f"{surface_pressure[h]:.1f}Hpa"
+        pression = f"{surface_pressure[h]:.0f}Hpa"
         if surface_pressure[h] >= WARNING_HP:
             warning = warning + " " + ELEPHANT
         if surface_pressure[h] <= WARNING_BP:
@@ -656,7 +656,7 @@ def previsions_generiques(ville, dpt, lat, long, tz):
             if daily_wind_speed_10m_max[i] >= WARNING_WIND or daily_wind_gusts_10m_max[i] >= WARNING_WIND_GUST:
                 warning = warning + " " + WIND
             duree_pluie = f"{precipitation_hours[i]:.0f}h"
-            duree_soleil = f"{sunshine_duration[i]/3600:.1f}h"
+            duree_soleil = f"{sunshine_duration[i]/3600:.0f}h"
             if compute_args().nocolor:
                 if isFullWidth():
                     data.append(
@@ -1022,7 +1022,10 @@ def obtain_city_data():
             for choice in choix:
                 i=i+1
                 print("["+str(i)+"] " + choice[1] + " (" + choice[2]+ ")")
+            print("[0] pour quitter")
             toto = input("Quelle ville? ")
+            if toto.isnumeric() and int(toto) ==0:
+                exit(0)
             if toto.isnumeric() and 1 <= int(toto) <= len(choix):
                 break
             print(my_colored("erreur : choix incorrect", "red"))       

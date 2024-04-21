@@ -1,8 +1,10 @@
-# A VENIR 
+# A VENIR 5.3.1
+
+- [x] retire la virgule à la pression et à la durée soleil
+- [x] ajout choix 0 pour quitter proprement au choix de la ville
 
 - [ ] emojis compatibles windows et linux
 - [ ] ajouter cas d'erreurs dans les tests
-- [ ] maj captures ecrans
 
 
 - [ ] marqué en rouge les records de chaque zone
@@ -18,6 +20,7 @@
 
 - [x] supprimer --condensate
 - [x] mode responsive / -f / / retrait -c
+- [x] maj captures ecrans
 
 # 5.2.5
 
