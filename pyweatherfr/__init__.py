@@ -4,7 +4,7 @@ pyweatherfr init
 
 
 from pyweatherfr.args import compute_args
-from pyweatherfr.pyweatherfr import find
+from pyweatherfr.app import find
 from pyweatherfr.update import update
 import colorama
 
