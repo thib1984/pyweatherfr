@@ -3,10 +3,9 @@ pyweatherfr init
 """
 
 
-import pyweatherfr.args
-import pyweatherfr.pyweatherfr
-import pyweatherfr.update
-
+from pyweatherfr.args import compute_args
+from pyweatherfr.pyweatherfr import find
+from pyweatherfr.update import update
 import colorama
 
 
@@ -17,10 +16,11 @@ def pyweatherfr():
     
     colorama.init()
 
+    args = compute_args()
     try:
-        if pyweatherfr.args.compute_args().update:
-            pyweatherfr.update.update()
+        if args.update:
+            update()
         else:
-            pyweatherfr.pyweatherfr.find()
+            find()
     except KeyboardInterrupt:
         exit(1)
