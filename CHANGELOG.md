@@ -1,19 +1,20 @@
-# A VENIR 5.3.1
-
-- [x] retire la virgule à la pression et à la durée soleil
-- [x] ajout choix 0 pour quitter proprement au choix de la ville
-
-- [ ] emojis compatibles windows et linux
-- [ ] ajouter cas d'erreurs dans les tests
+# A VENIR 
 
 
 - [ ] marqué en rouge les records de chaque zone
 - [ ] integrer test sur heure soleil si ==3 si lumineux et ou petite pluie
 - [ ] comparer boundingbox openstreetmap pour doublons
-- [ ] clean code
 - [ ] ajouter log version and co pour issue : https://github.com/thib1984/ytdlmusic/blob/main/ytdlmusic/print.py
 - [ ] json formater pour le log/debug : https://www.freecodecamp.org/news/how-to-pretty-print-json-in-python/
 - [ ] fichier log dans le dossier config pour completer le mode debug avec dates and co
+
+# 5.3.1
+
+- [x] retire la virgule à la pression et à la durée soleil
+- [x] ajout choix 0 pour quitter proprement au choix de la ville
+- [x] clean code
+- [ ] emojis compatibles windows et linux
+- [ ] ajouter cas d'erreurs dans les tests
 
 # 5.3.0
 

@@ -10,8 +10,11 @@ import sys
 def positive_integer(value):
     ivalue = int(value)
     if ivalue <= 0:
-        raise argparse.ArgumentTypeError("%s n'est pas un nombre entier strictement positif" % value)
+        raise argparse.ArgumentTypeError(
+            "%s n'est pas un nombre entier strictement positif" % value
+        )
     return ivalue
+
 
 class CustomHelpFormatter(argparse.HelpFormatter):
     def _format_action_invocation(self, action):
@@ -29,6 +32,7 @@ class CustomHelpFormatter(argparse.HelpFormatter):
             return super(CustomHelpFormatter, self)._format_args(
                 action, default_metavar
             )
+
 
 def compute_args():
     """
@@ -67,8 +71,8 @@ def compute_args():
         metavar="JOUR",
         action="store",
         type=int,
-        nargs='?',
-        const=0,        
+        nargs="?",
+        const=0,
         help="affichage des données météo détaillées pour [JOUR] (0 pour le jour actuel, 1 pour le J+1, ..., -1 pour J-1, ...) plutôt que les données génériques",
     )
     my_2group.add_argument(
@@ -76,9 +80,9 @@ def compute_args():
         "--date",
         metavar="DATE",
         action="store",
-        type=str,      
+        type=str,
         help="affichage des données météo détaillées pour [DAY] au format yyyy-mm-dd, plutôt que les données génériques",
-    )    
+    )
     my_2group.add_argument(
         "-p",
         "--past",
@@ -87,7 +91,7 @@ def compute_args():
         type=positive_integer,
         default=0,
         help="affichage des données météo génériques depuis [JOUR PASSE] (10 pour J-10 à J-1, ...), plutôt que les données génériques",
-    )         
+    )
     my_group.add_argument(
         "-g",
         "--gps",
@@ -96,7 +100,7 @@ def compute_args():
         nargs=2,
         type=str,
         help="utilisation des coordonnées GPS à la place d'un nom de ville",
-    )      
+    )
     my_parser.add_argument(
         "--nocolor",
         action="store_true",
@@ -113,13 +117,13 @@ def compute_args():
         "--fullwidth",
         action="store_true",
         help="force l'affichage de toutes les données",
-    )    
+    )
     my_parser.add_argument(
         "-l",
         "--lang",
         action="store_true",
         help="recherche (puis affiche) les villes avec leurs noms locaux",
-    )     
+    )
     group = my_parser.add_mutually_exclusive_group()
     group.add_argument(
         "--pc",
@@ -130,25 +134,24 @@ def compute_args():
         "--utc",
         action="store_true",
         help="utilise l'heure UTC",
-    )          
+    )
     my_parser.add_argument(
         "--nocache",
         action="store_true",
         help="supprime le cache de l'api meteo france",
-    )    
+    )
     my_parser.add_argument(
         "-v",
         "--verbose",
         action="store_true",
         help="mode verbeux",
-    )              
+    )
     my_group.add_argument(
         "-u",
         "--update",
         action="store_true",
         help="mise à jour de pyweatherfr",
     )
-
 
     args = my_parser.parse_args()
     return args
