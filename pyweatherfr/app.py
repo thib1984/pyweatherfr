@@ -744,7 +744,7 @@ def print_generic_data_town(ville, dpt, lat, long, alt, recap):
     table = columnar.columnar(data, no_borders=False, wrap_max=0)
 
     print(table)
-    if ville=="Springfield":
+    if ville=="Springfield" and "Oregon" in dpt:
         art_ascii = "\
             |\/\/\/|\n\
             |      |\n\

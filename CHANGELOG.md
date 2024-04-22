@@ -8,6 +8,10 @@
 - [ ] json formater pour le log/debug : https://www.freecodecamp.org/news/how-to-pretty-print-json-in-python/
 - [ ] fichier log dans le dossier config pour completer le mode debug avec dates and co
 
+# 5.3.3
+
+- [x] esatergg
+
 # 5.3.2
 
 - [x] esatergg
