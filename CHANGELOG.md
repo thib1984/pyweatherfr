@@ -8,6 +8,10 @@
 - [ ] json formater pour le log/debug : https://www.freecodecamp.org/news/how-to-pretty-print-json-in-python/
 - [ ] fichier log dans le dossier config pour completer le mode debug avec dates and co
 
+# 5.3.2
+
+- [x] esatergg
+
 # 5.3.1
 
 - [x] retire la virgule à la pression et à la durée soleil

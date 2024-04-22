@@ -744,6 +744,20 @@ def print_generic_data_town(ville, dpt, lat, long, alt, recap):
     table = columnar.columnar(data, no_borders=False, wrap_max=0)
 
     print(table)
+    if ville=="Springfield":
+        art_ascii = "\
+            |\/\/\/|\n\
+            |      |\n\
+            |      |\n\
+            | (o)(o)\n\
+            C      _)\n\
+            | ,___|\n\
+            |   /\n\
+            /____\n\
+            /    \  \n\
+        "
+
+        print(art_ascii)
 
 
 def obtain_city_data_from_gps():
