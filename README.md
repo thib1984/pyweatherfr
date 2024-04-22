@@ -50,6 +50,8 @@ exemple : ``pyweatherfr Grenoble -d 2024-03-30`` affiche les données météo d�
   - ``--pc``    utilise l'heure du pc dans les previsions au lieu de l'heure locale de la ville
   - ``-l/--lang`` recherche (puis affiche) les villes avec leurs noms locaux
   - ``-f/--fullwidth`` affiche toutes les données y compris si la largeur du terminal est trop petite  
+ - ``--serious`` retire les easter eggs 
+
 
 # Démo
 

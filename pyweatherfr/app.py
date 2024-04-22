@@ -66,7 +66,7 @@ WARNING_BP = 995
 WARNING_HUMIDITY = 90
 
 
-def find():
+def app():
     if pyweatherfr.args.compute_args().town:
         ville, dpt, lat, long, country = obtain_city_data()
     elif pyweatherfr.args.compute_args().gps:
@@ -719,7 +719,10 @@ def print_generic_data_town(ville, dpt, lat, long, alt, recap):
         elif dpt is None or dpt == "":
             data.append([ville])
         else:
-            data.append([ville + " (" + dpt + ")"])
+            if ville.lower() == ville[::-1].lower() and not pyweatherfr.args.compute_args().serious:
+                data.append([ville + " (" + dpt[::-1] + ")"])
+            else:
+                data.append([ville + " (" + dpt + ")"])
         data.append(
             [
                 f"lat.:  {float(lat):.4f}° / long.: {float(long):.4f}° / alt.: {float(alt):.0f}m "
@@ -732,7 +735,10 @@ def print_generic_data_town(ville, dpt, lat, long, alt, recap):
         elif dpt is None or dpt == "":
             data.append([HOME, ville])
         else:
-            data.append([HOME, ville + " (" + dpt + ")"])
+            if ville.lower() == ville[::-1].lower() and not pyweatherfr.args.compute_args().serious:
+                data.append([HOME, ville + " (" + dpt[::-1] + ")"])
+            else:
+                data.append([HOME, ville + " (" + dpt + ")"])               
         data.append(
             [
                 BOUSSOLE,
@@ -744,7 +750,7 @@ def print_generic_data_town(ville, dpt, lat, long, alt, recap):
     table = columnar.columnar(data, no_borders=False, wrap_max=0)
 
     print(table)
-    if ville=="Springfield" and "Oregon" in dpt:
+    if ville=="Springfield" and "Oregon" in dpt and not pyweatherfr.args.compute_args().serious:
         art_ascii = "\
             |\/\/\/|\n\
             |      |\n\

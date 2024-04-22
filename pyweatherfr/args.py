@@ -113,6 +113,11 @@ def compute_args():
         help="activer la recherche hors France",
     )
     my_parser.add_argument(
+        "--serious",
+        action="store_true",
+        help="retire les easters eggs (dommage)",
+    )
+    my_parser.add_argument(
         "-f",
         "--fullwidth",
         action="store_true",

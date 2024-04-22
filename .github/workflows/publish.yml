@@ -31,6 +31,8 @@ jobs:
       - name: Launch test
         run: |
           pyweatherfr nantes
+          pyweatherfr esse
+          pyweatherfr esse --serious
           echo 1 | pyweatherfr nantes -w
           pyweatherfr tokyo -w
           pyweatherfr nouméa -n -v
