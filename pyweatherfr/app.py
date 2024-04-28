@@ -361,7 +361,7 @@ def previsions_detaillees(ville, dpt, lat, long, tz):
         print("")
         table = columnar.columnar(data, headers, no_borders=pyweatherfr.args.compute_args().condensate, wrap_max=0, justify= 'l' if pyweatherfr.args.compute_args().nocolor else 'c')
         print(table)
-        if not isFullWidth():
+        if not isFullWidth() and not pyweatherfr.args.compute_args().minimize:
             print(
                 pyweatherfr.log.my_colored(
                     "warning : pour plus de données, élargissez votre terminal et relancez la commande, ou utilisez l'option --f (affiche dégradé possible).", "yellow"
@@ -662,7 +662,7 @@ def previsions_generiques(ville, dpt, lat, long, tz):
                                 + datetime.timedelta(
                                     days=-1 * pyweatherfr.args.compute_args().past
                                 ),
-                                "%y-%m-%d",
+                                "%m-%d",
                             ),
                             emojiweather + " " + weather,
                             temp,
@@ -725,7 +725,7 @@ def previsions_generiques(ville, dpt, lat, long, tz):
         print("")
         table = columnar.columnar(data, headers, no_borders=pyweatherfr.args.compute_args().condensate, wrap_max=0, justify= 'l' if pyweatherfr.args.compute_args().nocolor else 'c')
         print(table)
-        if not isFullWidth():
+        if not isFullWidth() and not pyweatherfr.args.compute_args().minimize:
             print(
                 pyweatherfr.log.my_colored(
                     "warning : pour plus de données, élargissez votre terminal et relancez la commande, ou utilisez l'option --f (affiche dégradé possible).", "yellow"
@@ -912,6 +912,8 @@ def est_format_date(chaine):
 
 
 def isFullWidth():
+    if pyweatherfr.args.compute_args().minimize:
+        return False
     try:
         return (
             os.get_terminal_size().columns > 140

@@ -122,13 +122,20 @@ def compute_args():
         "--condensate",
         action="store_true",
         help="condense la sortie",
-    )    
-    my_parser.add_argument(
+    )
+    group3 = my_parser.add_mutually_exclusive_group()    
+    group3.add_argument(
         "-f",
         "--fullwidth",
         action="store_true",
         help="force l'affichage de toutes les données",
     )
+    group3.add_argument(
+        "-m",
+        "--minimize",
+        action="store_true",
+        help="force l'affichage minimal des données",
+    )    
     my_parser.add_argument(
         "-l",
         "--lang",

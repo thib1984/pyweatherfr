@@ -31,7 +31,7 @@ jobs:
       - name: Launch test
         run: |
           pyweatherfr nantes
-          pyweatherfr esse
+          pyweatherfr esse -m
           pyweatherfr esse --serious -c
           echo 1 | pyweatherfr nantes -w
           pyweatherfr tokyo -w
@@ -47,7 +47,7 @@ jobs:
           echo 10 | pyweatherfr "beaulieu, France"| grep "\[11\]" || echo ok
           echo 5 | pyweatherfr "springfield, Jamaique" -w
           echo 5 | pyweatherfr "springfield, Jamaique" -w | grep "\[6\]" || echo ok
-          pyweatherfr -v
+          pyweatherfr -v -m
           (pyweatherfr ancenis || echo ok) | grep aucune
           (pyweatherfr tokyo || echo ok) | grep aucune
           (pyweatherfr tokyo || echo ok) | grep "Relancez la commande avec -w"
