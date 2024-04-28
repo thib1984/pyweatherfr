@@ -50,7 +50,7 @@ jobs:
           pyweatherfr -v
           (pyweatherfr ancenis || echo ok) | grep aucune
           (pyweatherfr tokyo || echo ok) | grep aucune
-          (pyweatherfr tokyo || echo ok) | grep "Relancez la avec -w"
+          (pyweatherfr tokyo || echo ok) | grep "Relancez la commande avec -w"
       - name: install pep517
         run: |
           pip install pep517
