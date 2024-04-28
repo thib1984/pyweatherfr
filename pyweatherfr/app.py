@@ -225,7 +225,7 @@ def previsions_detaillees(ville, dpt, lat, long, tz):
         if shortwave_radiation[h] >= WARNING_WATTS:
             warning = warning + "  " + LUNETTES
             nbw=nbw+1
-        for i in range(nbw):  
+        for k in range(nbw):  
             warning = warning + " "
         warning = warning + " "    
         if pyweatherfr.args.compute_args().nocolor:
@@ -584,7 +584,7 @@ def previsions_generiques(ville, dpt, lat, long, tz):
             ):
                 warning = warning + "  " + WIND
                 nbw=nbw+1
-            for i in range(nbw):  
+            for k in range(nbw):  
                 warning = warning + " " 
             warning = warning + " "    
             duree_pluie = f"{precipitation_hours[i]:.0f}h"

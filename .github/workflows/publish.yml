@@ -32,7 +32,7 @@ jobs:
         run: |
           pyweatherfr nantes
           pyweatherfr esse
-          pyweatherfr esse --serious
+          pyweatherfr esse --serious -c
           echo 1 | pyweatherfr nantes -w
           pyweatherfr tokyo -w
           pyweatherfr nouméa -n -v

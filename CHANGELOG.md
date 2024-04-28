@@ -7,7 +7,12 @@
 - [ ] ajouter log version and co pour issue : https://github.com/thib1984/ytdlmusic/blob/main/ytdlmusic/print.py
 - [ ] json formater pour le log/debug : https://www.freecodecamp.org/news/how-to-pretty-print-json-in-python/
 - [ ] fichier log dans le dossier config pour completer le mode debug avec dates and co
+- [ ] ajouter test easter egg
+- [ ] ajouter test -c et -f
 
+# 5.3.6
+
+- [x] corrige la date inocrrecte
 
 # 5.3.5
 
