@@ -10,6 +10,10 @@
 - [ ] ajouter test easter egg
 - [ ] ajouter test -c et -f
 
+# 5.4.0
+
+- [x] integre l'option -m
+
 # 5.3.6
 
 - [x] corrige la date inocrrecte
