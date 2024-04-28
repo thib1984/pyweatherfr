@@ -18,10 +18,10 @@ import numpy
 
 SUN = "\U0001F31E"
 MI_SUN = "\U0001F324"
-CLOUD = "\U0001F325"
+CLOUD = "\U0001F325" + " "
 NIGHT_CLOUD = "\U0001f319"
 MI_CLOUD_RAIN = "\U0001F326"
-RAIN = "\U0001F327"
+RAIN = "\U0001F327" + " "
 SNOW = "\U0001F328"
 NIGHT_CLEAR = "\U0001f319"
 ORAGE = "\U0001F329"
@@ -64,6 +64,7 @@ WARNING_WIND_GUST = 50
 WARNING_HP = 1030
 WARNING_BP = 995
 WARNING_HUMIDITY = 90
+WARNING_WATTS = 1000
 
 
 def app():
@@ -95,14 +96,14 @@ def app():
     ):
         print(
             pyweatherfr.log.my_colored(
-                "warning : si vous utilisez un proxy ou un VPN, la localisation peut être incorrecte",
+                "warning : si vous utilisez un proxy ou un VPN, la localisation peut être incorrecte.",
                 "yellow",
             )
         )
     if country is None:
         print(
             pyweatherfr.log.my_colored(
-                "warning : ville potentiellement hors de France, les prévisions et données peuvent être moins précises",
+                "warning : ville potentiellement hors de France, les prévisions et données peuvent être moins précises.",
                 "yellow",
             )
         )
@@ -154,10 +155,11 @@ def previsions_detaillees(ville, dpt, lat, long, tz):
         if numpy.isnan(hourly_temperature_2m[h]):
             print(
                 pyweatherfr.log.my_colored(
-                    "warning : pas de données pour ce jour", "yellow"
+                    "warning : pas de données pour ce jour.", "yellow"
                 )
             )
             exit(1)
+        nbw=0    
         warning = ""
         if (
             datetime.datetime.now(tz=pytz.timezone(tz))
@@ -167,7 +169,8 @@ def previsions_detaillees(ville, dpt, lat, long, tz):
         ) and 0 < h - int(
             datetime.datetime.now(tz=pytz.timezone(tz)).strftime("%H")
         ) <= 1:
-            warning = warning + " " + CLOCK
+            warning = warning + "  " + CLOCK
+            nbw=nbw+1
         if isFullWidth():
             temp = f"{hourly_temperature_2m[h]:.1f}°C ({hourly_apparent_temperature[h]:.1f}°C)"
         else:
@@ -176,17 +179,21 @@ def previsions_detaillees(ville, dpt, lat, long, tz):
             hourly_temperature_2m[h] <= WARNING_FROID
             or hourly_apparent_temperature[h] <= WARNING_FROID
         ):
-            warning = warning + " " + COLD
+            warning = warning + "  " + COLD
+            nbw=nbw+1
         if (
             hourly_temperature_2m[h] >= WARNING_WARM
             or hourly_apparent_temperature[h] >= WARNING_WARM
         ):
-            warning = warning + " " + WARM
+            warning = warning + "  " + WARM
+            nbw=nbw+1
         pluie = f"{hourly_precipitation[h]:.1f}mm"
         if snowfall[h] >= WARNING_SNOW:
-            warning = warning + " " + SNOW
+            warning = warning + "  " + SNOW
+            nbw=nbw+1
         elif hourly_precipitation[h] >= WARNING_RAIN:
-            warning = warning + " " + RAIN
+            warning = warning + "  " + RAIN
+            nbw=nbw+1
 
         vent = (
             f"{hourly_wind_speed_10m[h]:.0f}km/h ({hourly_wind_gusts_10m[h]:.0f}km/h)"
@@ -198,19 +205,29 @@ def previsions_detaillees(ville, dpt, lat, long, tz):
             hourly_wind_speed_10m[h] >= WARNING_WIND
             or hourly_wind_gusts_10m[h] >= WARNING_WIND_GUST
         ):
-            warning = warning + " " + WIND
+            warning = warning + "  " + WIND
+            nbw=nbw+1
 
         pression = f"{surface_pressure[h]:.0f}Hpa"
         if surface_pressure[h] >= WARNING_HP:
-            warning = warning + " " + ELEPHANT
+            warning = warning + "  " + ELEPHANT
+            nbw=nbw+1     
         if surface_pressure[h] <= WARNING_BP:
-            warning = warning + " " + PLUME
+            warning = warning + "  " + PLUME 
+            nbw=nbw+1                         
         weather, emojiweather = traduction(current_weather_code[h], isday[h])
         humidity = f"{relative_humidity_2m[h]:.0f}%"
+        if relative_humidity_2m[h] >= WARNING_HUMIDITY:
+            warning = warning + "  " + DROPLET
+            nbw=nbw+1           
         duree_soleil = f"{sunshine_duration[h]/60:.0f}'"
         rayonnement = f" {shortwave_radiation[h]:.0f}W/m\u00B2"
-        if shortwave_radiation[h] > 1000:
-            warning = warning + " " + LUNETTES
+        if shortwave_radiation[h] >= WARNING_WATTS:
+            warning = warning + "  " + LUNETTES
+            nbw=nbw+1
+        for i in range(nbw):  
+            warning = warning + " "
+        warning = warning + " "    
         if pyweatherfr.args.compute_args().nocolor:
             if isFullWidth():
                 data.append(
@@ -342,12 +359,12 @@ def previsions_detaillees(ville, dpt, lat, long, tz):
             ]
     if data != []:
         print("")
-        table = columnar.columnar(data, headers, no_borders=False, wrap_max=0)
+        table = columnar.columnar(data, headers, no_borders=pyweatherfr.args.compute_args().condensate, wrap_max=0, justify= 'l' if pyweatherfr.args.compute_args().nocolor else 'c')
         print(table)
         if not isFullWidth():
             print(
                 pyweatherfr.log.my_colored(
-                    "warning : pour + d'affichage, élargissez votre terminal", "yellow"
+                    "warning : pour plus de données, élargissez votre terminal et relancez la commande, ou utilisez l'option --f (affiche dégradé possible).", "yellow"
                 )
             )
 
@@ -460,13 +477,13 @@ def previsions_courantes(ville, dpt, lat, long, tz):
                     "",
                 ]
             )
-        if w_soleil > 1000:
+        if w_soleil >= WARNING_WATTS:
             data.append(["rayonnement", f"{w_soleil:.0f}W/m\u00B2", LUNETTES])
         else:
             data.append(["rayonnement", f"{w_soleil:.0f}W/m\u00B2", ""])
         data.append(["temps", emojiweather + " " + current_weather, ""])
     print("")
-    table = columnar.columnar(data, no_borders=False, wrap_max=0)
+    table = columnar.columnar(data, no_borders=pyweatherfr.args.compute_args().condensate, wrap_max=0, justify= 'l' if pyweatherfr.args.compute_args().nocolor else 'c')
     print(table)
 
 
@@ -526,12 +543,15 @@ def previsions_generiques(ville, dpt, lat, long, tz):
     tronque = False
     for i in range(0, len(daily_precipitation_sum)):
         if not numpy.isnan(daily_precipitation_sum[i]):
+            nbw=0
             warning = ""
             pluie = f"{daily_precipitation_sum[i]:.1f}mm"
             if snowfall[i] >= WARNING_SNOW:
-                warning = warning + " " + SNOW
+                warning = warning + "  " + SNOW
+                nbw=nbw+1
             elif daily_precipitation_sum[i] >= WARNING_RAIN:
-                warning = warning + " " + RAIN
+                warning = warning + "  " + RAIN
+                nbw=nbw+1
             if isFullWidth():
                 temp = f"{daily_temperature_2m_min[i]:.1f}°C ({daily_apparent_temperature_min[i]:.1f}°C) -> {daily_temperature_2m_max[i]:.1f}°C ({daily_apparent_temperature_max[i]:.1f}°C)"
             else:
@@ -542,14 +562,16 @@ def previsions_generiques(ville, dpt, lat, long, tz):
                 or daily_temperature_2m_max[i] <= WARNING_FROID
                 or daily_apparent_temperature_max[i] <= WARNING_FROID
             ):
-                warning = warning + " " + COLD
+                warning = warning + "  " + COLD
+                nbw=nbw+1
             if (
                 daily_temperature_2m_min[i] >= WARNING_WARM
                 or daily_apparent_temperature_min[i] >= WARNING_WARM
                 or daily_temperature_2m_max[i] >= WARNING_WARM
                 or daily_apparent_temperature_max[i] >= WARNING_WARM
             ):
-                warning = warning + " " + WARM
+                warning = warning + "  " + WARM
+                nbw=nbw+1
             weather, emojiweather = traduction(weather_code[i], 1)
 
             vent = f"{daily_wind_speed_10m_max[i]:.0f}km/h ({daily_wind_gusts_10m_max[i]:.0f}km/h)"
@@ -560,7 +582,11 @@ def previsions_generiques(ville, dpt, lat, long, tz):
                 daily_wind_speed_10m_max[i] >= WARNING_WIND
                 or daily_wind_gusts_10m_max[i] >= WARNING_WIND_GUST
             ):
-                warning = warning + " " + WIND
+                warning = warning + "  " + WIND
+                nbw=nbw+1
+            for i in range(nbw):  
+                warning = warning + " " 
+            warning = warning + " "    
             duree_pluie = f"{precipitation_hours[i]:.0f}h"
             duree_soleil = f"{sunshine_duration[i]/3600:.0f}h"
             if pyweatherfr.args.compute_args().nocolor:
@@ -683,7 +709,7 @@ def previsions_generiques(ville, dpt, lat, long, tz):
                     "dir.",
                     "tps pluie",
                     "tps soleil",
-                    "",
+                    "/!\\",
                 ]
             else:
                 headers = [
@@ -693,21 +719,21 @@ def previsions_generiques(ville, dpt, lat, long, tz):
                     "pluie",
                     "vent (rafales)",
                     "dir.",
-                    "",
+                    "/!\\",
                 ]
 
         print("")
-        table = columnar.columnar(data, headers, no_borders=False, wrap_max=0)
+        table = columnar.columnar(data, headers, no_borders=pyweatherfr.args.compute_args().condensate, wrap_max=0, justify= 'l' if pyweatherfr.args.compute_args().nocolor else 'c')
         print(table)
         if not isFullWidth():
             print(
                 pyweatherfr.log.my_colored(
-                    "warning : pour + d'affichage, élargissez votre terminal", "yellow"
+                    "warning : pour plus de données, élargissez votre terminal et relancez la commande, ou utilisez l'option --f (affiche dégradé possible).", "yellow"
                 )
             )
 
     if tronque:
-        print(pyweatherfr.log.my_colored("warning : données tronquées", "yellow"))
+        print(pyweatherfr.log.my_colored("warning : données partiellement indisponibles.", "yellow"))
 
 
 def print_generic_data_town(ville, dpt, lat, long, alt, recap):
@@ -747,7 +773,7 @@ def print_generic_data_town(ville, dpt, lat, long, alt, recap):
         )
         data.append([PC, recap])
 
-    table = columnar.columnar(data, no_borders=False, wrap_max=0)
+    table = columnar.columnar(data, no_borders=pyweatherfr.args.compute_args().condensate, wrap_max=0, justify= 'l' if pyweatherfr.args.compute_args().nocolor else 'c')
 
     print(table)
     if ville=="Springfield" and "Oregon" in dpt and not pyweatherfr.args.compute_args().serious:
@@ -782,14 +808,14 @@ def obtain_city_data():
     if len(parties) > 2:
         print(
             pyweatherfr.log.my_colored(
-                "erreur : format incorrect : attendu 'ville, pays' ou 'ville'", "red"
+                "erreur : format incorrect : attendu 'ville, pays' ou 'ville'.", "red"
             )
         )
         exit(1)
     if len(parties) == 1 and pyweatherfr.args.compute_args().world == True:
         print(
             pyweatherfr.log.my_colored(
-                "warning : si la ville souhaitée ne s'affiche pas vous pouvez utiliser le format 'ville, pays' pour la recherche",
+                "warning : si la ville souhaitée ne s'affiche pas vous pouvez utiliser le format 'ville, pays' pour la recherche.",
                 "yellow",
             )
         )
@@ -802,7 +828,7 @@ def obtain_city_data():
         print("")
         print(
             pyweatherfr.log.my_colored(
-                "warning : il existe des villes hors France disponibles pour wotre recherche. Relancez la avec -w pour y acceder",
+                "warning : il existe des villes hors de France disponibles pour votre recherche. Relancez la commande avec -w pour y accéder.",
                 "yellow",
             )
         )
@@ -815,7 +841,7 @@ def obtain_city_data():
         long = choice[5]
         return ville, dpt, lat, long, country
     elif len(choix) == 0:
-        print(pyweatherfr.log.my_colored("erreur : aucune ville trouvée", "red"))
+        print(pyweatherfr.log.my_colored("erreur : aucune ville trouvée.", "red"))
         exit(1)
     else:
         while True:
@@ -829,7 +855,7 @@ def obtain_city_data():
                 exit(0)
             if answer.isnumeric() and 1 <= int(answer) <= len(choix):
                 break
-            print(pyweatherfr.log.my_colored("erreur : choix incorrect", "red"))
+            print(pyweatherfr.log.my_colored("erreur : choix incorrect.", "red"))
         choice = choix[int(answer) - 1]
         ville = choice[1]
         dpt = choice[2]
@@ -845,7 +871,7 @@ def diff_jour(long, lat):
         if not est_format_date(pyweatherfr.args.compute_args().date):
             print(
                 pyweatherfr.log.my_colored(
-                    "erreur : format date invalide, format attendu yyyy-mm-dd", "red"
+                    "erreur : format date invalide, format attendu yyyy-mm-dd.", "red"
                 )
             )
             exit(1)
@@ -861,7 +887,7 @@ def diff_jour(long, lat):
         if diff >= 15:
             print(
                 pyweatherfr.log.my_colored(
-                    "erreur : date invalide (limitée à +14 jour de la date actuelle)",
+                    "erreur : date invalide (limitée à +14 jour de la date actuelle).",
                     "red",
                 )
             )
@@ -870,7 +896,7 @@ def diff_jour(long, lat):
     if pyweatherfr.args.compute_args().jour >= 15:
         print(
             pyweatherfr.log.my_colored(
-                "erreur : date invalide (limitée à +14 jour de la date actuelle)", "red"
+                "erreur : date invalide (limitée à +14 jour de la date actuelle).", "red"
             )
         )
         exit(1)

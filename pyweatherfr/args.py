@@ -118,6 +118,12 @@ def compute_args():
         help="retire les easters eggs (dommage)",
     )
     my_parser.add_argument(
+        "-c",
+        "--condensate",
+        action="store_true",
+        help="condense la sortie",
+    )    
+    my_parser.add_argument(
         "-f",
         "--fullwidth",
         action="store_true",

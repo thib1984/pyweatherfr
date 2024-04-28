@@ -8,6 +8,16 @@
 - [ ] json formater pour le log/debug : https://www.freecodecamp.org/news/how-to-pretty-print-json-in-python/
 - [ ] fichier log dans le dossier config pour completer le mode debug avec dates and co
 
+
+# 5.3.5
+
+- [x] reintegre l'option -c
+- [x] fix ortographe
+- [x] améliore le rendu des emojis dans les tableaux
+- [x] ajoute l emoji d'humidité
+- [x] centre les données dans les tableaux sauf si nocolor
+
+
 # 5.3.4
 
 - [x] esatergg two
