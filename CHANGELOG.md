@@ -10,9 +10,14 @@
 - [ ] ajouter test easter egg
 - [ ] ajouter test -c et -f
 
+# 6.0.1
+
+- [x] display updates
+
 # 6.0.0
 
 - [x] clean docs
+- [x] delete self-update
 
 # 5.4.0
 

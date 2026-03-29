@@ -4,7 +4,18 @@ pygitscrum argparse gestion
 
 import argparse
 import sys
+import importlib.metadata
 
+def get_env_report():
+    lines = []
+
+    lines.append("\nInstalled packages:")
+    for dist in sorted(importlib.metadata.distributions(), key=lambda d: d.metadata["Name"].lower()):
+        name = dist.metadata["Name"]
+        version = dist.version
+        lines.append(f"  - {name}=={version}")
+
+    return "\n".join(lines)
 
 # Fonction de validation pour s'assurer que l'argument est un nombre positif
 def positive_integer(value):
@@ -16,7 +27,7 @@ def positive_integer(value):
     return ivalue
 
 
-class CustomHelpFormatter(argparse.HelpFormatter):
+class CustomHelpFormatter(argparse.RawDescriptionHelpFormatter, argparse.HelpFormatter):
     def _format_action_invocation(self, action):
         if not action.option_strings or action.nargs == 0:
             return super()._format_action_invocation(action)
@@ -40,14 +51,28 @@ def compute_args():
     """
     my_parser = argparse.ArgumentParser(
         description="pyweatherfr affiche les données méteo pour les communes françaises et mondiales dans votre terminal.",
-        epilog="""
-        Full documentation at: <https://github.com/thib1984/pyweatherfr>.
-        Report bugs to <https://github.com/thib1984/pyweatherfr/issues>.
-        MIT Licence.
-        Copyright (c) 2021 thib1984.
-        This is free software: you are free to change and redistribute it.
-        There is NO WARRANTY, to the extent permitted by law.
-        Written by thib1984.""",
+        epilog=f"""
+To upgrade, run:
+    pipx upgrade pyweatherfr --include-deps
+To install, run:
+    pipx install pyweatherfr
+To force reinstall, run:
+    pipx install pyweatherfr --force
+To uninstall, run:
+    pipx uninstall pyweatherfr
+To force uninstall (if needed), run:
+    pipx uninstall pyweatherfr --force
+
+{get_env_report()}
+
+Full documentation at: <https://github.com/thib1984/pyweatherfr>.
+Report bugs to <https://github.com/thib1984/pyweatherfr/issues>.
+MIT Licence.
+Copyright (c) 2021 thib1984.
+This is free software: you are free to change and redistribute it.
+There is NO WARRANTY, to the extent permitted by law.
+Written by thib1984.
+""",
         formatter_class=CustomHelpFormatter,
     )
     my_group = my_parser.add_mutually_exclusive_group()
@@ -163,12 +188,6 @@ def compute_args():
         "--verbose",
         action="store_true",
         help="mode verbeux",
-    )
-    my_group.add_argument(
-        "-u",
-        "--update",
-        action="store_true",
-        help="mise à jour de pyweatherfr",
     )
 
     args = my_parser.parse_args()
