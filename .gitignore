@@ -3,4 +3,5 @@ dist
 pyweatherfr.egg-info
 .vscode
 venv
+pyweatherfr_env
 

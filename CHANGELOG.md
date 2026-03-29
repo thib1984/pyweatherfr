@@ -10,6 +10,10 @@
 - [ ] ajouter test easter egg
 - [ ] ajouter test -c et -f
 
+# 6.0.0
+
+- [x] clean docs
+
 # 5.4.0
 
 - [x] integre l'option -m
