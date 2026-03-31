@@ -24,17 +24,16 @@ pip uninstall pyweatherfr --break-system-packages
 # Installation
 
 ```
-pipx upgrade pyweatherfr
-pipx reinstall pyweatherfr #to force update dependencies
+pipx install pyweatherfr
 ```
 
 # Upgrade
 
 ```
-pipx upgrade pyweatherfr --include-deps
+pipx upgrade pyweatherfr
+pipx reinstall pyweatherfr #to force update dependencies
 ```
 
-This command upgrades the application to the latest version and also updates all its dependencies.
 
 # Uninstall
 
