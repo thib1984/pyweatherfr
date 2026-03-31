@@ -24,7 +24,8 @@ pip uninstall pyweatherfr --break-system-packages
 # Installation
 
 ```
-pipx install pyweatherfr
+pipx upgrade pyweatherfr
+pipx reinstall pyweatherfr #to force update dependencies
 ```
 
 # Upgrade

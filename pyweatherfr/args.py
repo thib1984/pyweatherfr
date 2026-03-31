@@ -53,7 +53,8 @@ def compute_args():
         description="pyweatherfr affiche les données méteo pour les communes françaises et mondiales dans votre terminal.",
         epilog=f"""
 To upgrade, run:
-    pipx upgrade pyweatherfr --include-deps
+    pipx upgrade pyweatherfr
+    pipx reinstall pyweatherfr #to force update dependencies
 To install, run:
     pipx install pyweatherfr
 To force reinstall, run:
